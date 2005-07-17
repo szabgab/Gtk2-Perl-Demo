@@ -1,0 +1,3 @@
+In this demo application we provide both a simple tutorial to the Perl 
+binding of Gtk and a bunch of examples.
+

@@ -1,0 +1,153 @@
+#!/usr/bin/perl 
+use warnings;
+use strict;
+use Gtk2 '-init';
+
+use constant TRUE  => 1;
+use constant FALSE => 0;
+
+my $window = Gtk2::Window->new;
+$window->set_title('Widget Layout');
+$window->signal_connect( destroy => sub { Gtk2->main_quit; } );
+$window->set_border_width(3);
+
+my $vbox = Gtk2::VBox->new( FALSE, 6 );
+$window->add($vbox);
+#--------------------------------------
+
+my $vbox0 = Gtk2::VBox->new( FALSE, 6 );
+$vbox0->set_border_width(12);
+$vbox->add($vbox0);
+
+my $frame0 = Gtk2::Frame->new('Button0');
+$vbox0->pack_start( $frame0, TRUE, TRUE, 0 );
+$frame0->set_border_width(3);
+
+my $hbox0 = Gtk2::HBox->new( FALSE, 6 );
+$frame0->add($hbox0);
+$hbox0->set_border_width(3);
+
+my $inc_button0 = Gtk2::Button->new('_Click Me');
+$hbox0->pack_start( $inc_button0, FALSE, FALSE, 0 );
+my $count0 = 0;
+
+my $reset_button0 = Gtk2::Button->new('Reset0');
+$hbox0->pack_start( $reset_button0, FALSE, FALSE, 0 );
+
+my $label0 = Gtk2::Label->new("But0 Clicked $count0 times");
+$vbox0->add($label0);
+
+my $separator0 = Gtk2::HSeparator->new;
+$vbox->pack_start($separator0, FALSE, TRUE, 1);
+$separator0->show;
+
+$inc_button0->signal_connect(
+    clicked => sub {
+     $count0++;    
+     $label0->set_text("But0 Clicked $count0 times");
+        
+    }
+);
+$reset_button0->signal_connect(
+    clicked => sub { 
+              $count0 = 0;
+              $label0->set_text("But0 Clicked $count0 times"); 
+              }
+);
+
+#------------------------------------------------------------
+
+my $vbox1 = Gtk2::VBox->new( FALSE, 6 );
+$vbox1->set_border_width(12);
+$vbox->add($vbox1);
+
+my $frame1 = Gtk2::Frame->new('Button1');
+$vbox1->pack_start( $frame1, TRUE, TRUE, 0 );
+$frame1->set_border_width(12);
+
+my $hbox1 = Gtk2::HBox->new( FALSE, 6 );
+$frame1->add($hbox1);
+$hbox1->set_border_width(3);
+
+my $inc_button1 = Gtk2::Button->new('_Click Me');
+$hbox1->pack_start( $inc_button1, FALSE, FALSE, 0 );
+my $count1 = 0;
+
+my $reset_button1 = Gtk2::Button->new('Reset1');
+$hbox1->pack_start( $reset_button1, FALSE, FALSE, 0 );
+
+my $label1 = Gtk2::Label->new("But1 Clicked $count1 times");
+#$vbox->pack_start( $label1, TRUE, TRUE, 0 );
+$vbox1->add($label1);
+
+my $separator1 = Gtk2::HSeparator->new;
+$vbox->pack_start($separator1, FALSE, TRUE, 1);
+$separator1->show;
+
+$inc_button1->signal_connect(
+    clicked => sub {
+        $count1++;
+        $label1->set_text("But1 Clicked $count1 times");
+            }
+);
+
+$reset_button1->signal_connect(
+    clicked => sub { $count1 = 0; 
+        $label1->set_text("But1 Clicked $count1 times");
+        }
+);
+#-----------------------------------------------------------
+my $vbox2 = Gtk2::VBox->new( FALSE, 6 );
+$vbox2->set_border_width(12);
+$vbox->add($vbox2);
+
+my $frame2 = Gtk2::Frame->new('Button2');
+$vbox2->pack_start( $frame2, TRUE, TRUE, 0 );
+$frame2->set_border_width(3);
+
+my $hbox2 = Gtk2::HBox->new( FALSE, 6 );
+$frame2->add($hbox2);
+$hbox2->set_border_width(3);
+
+my $inc_button2 = Gtk2::Button->new('_Click Me');
+$hbox2->pack_start( $inc_button2, FALSE, FALSE, 0 );
+my $count2 = 0;
+
+my $reset_button2 = Gtk2::Button->new('Reset2');
+$hbox2->pack_start( $reset_button2, FALSE, FALSE, 0 );
+
+my $label2 = Gtk2::Label->new("But2 Clicked $count2 times");
+#$vbox->pack_start( $label2, TRUE, TRUE, 0 );
+$vbox2->add($label2);
+
+my $separator2 = Gtk2::HSeparator->new;
+$vbox->pack_start($separator2, FALSE, TRUE, 1);
+$separator2->show;
+
+$inc_button2->signal_connect(
+    clicked => sub {
+        $count2++;
+        $label2->set_text("But2 Clicked $count2 times");
+    }
+);
+
+$reset_button2->signal_connect(
+    clicked => sub { $count2 = 0; 
+      $label2->set_text("But2 Clicked $count2 times");
+    }
+);
+
+#-----------------------------------------------------------
+
+my $quit_button = Gtk2::Button->new('_Quit');
+$vbox->pack_start( $quit_button, FALSE, FALSE, 0 );
+
+$quit_button->signal_connect(
+    clicked => sub {
+        Gtk2->main_quit;
+    }
+);
+#----------------------------------------------------------
+
+$window->show_all;
+Gtk2->main;

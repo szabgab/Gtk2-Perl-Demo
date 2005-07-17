@@ -1,0 +1,83 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Glib qw/TRUE FALSE/;
+use Gtk2 '-init';
+
+#GTK_STATE_NORMAL       State during normal operation.
+#GKT_STATE_ACTIVE      State of a currently active widget, such as a depressed button.
+#GTK_STATE_PRELIGHT    State indicating that the mouse pointer is over the widget 
+#GTK_STATE_SELECTED    State of a selected item, such the selected row in a list.
+#GTK_STATE_INSENSITIVE State indicating that the widget is unresponsive to user actions.
+
+my $red = Gtk2::Gdk::Color->new (0xFFFF,0,0);
+my $greyl = Gtk2::Gdk::Color->new (0x9999,0x9999,0x9999);
+my $greenl = Gtk2::Gdk::Color->new (0,0xFFFF,0xCCCC);
+my $blueh = Gtk2::Gdk::Color->new (0,0xFFFF,0xFFFF);
+my $bluel = Gtk2::Gdk::Color->new (0,0xCCCC,0xFFFF);
+my $white = Gtk2::Gdk::Color->new (0xFFFF,0xFFFF,0xFFFF);
+
+my $window = Gtk2::Window->new('toplevel');
+$window->set_title('Z');
+$window ->signal_connect( 'destroy' => \&delete_event );
+
+$window->set_border_width(10);
+$window->set_size_request(300,200);
+$window->modify_bg ('normal', $greenl);
+
+my $vbox = Gtk2::VBox->new( FALSE, 6 );
+$window->add($vbox);
+$vbox->set_border_width(2);
+
+my $hbox= Gtk2::HBox->new( FALSE, 6 );
+$vbox->pack_end($hbox,FALSE,FALSE,0);
+$hbox->set_border_width(2);
+
+#used for coloring background
+my $coleventb0 = Gtk2::EventBox->new();
+
+$vbox->pack_end( $coleventb0, FALSE, FALSE, 0 );
+$coleventb0->set_border_width(3);
+$coleventb0->modify_bg ('normal', $greyl);
+$coleventb0->set_border_width(2);
+
+my $frame0 = Gtk2::Frame->new('Controls');
+$coleventb0->add( $frame0);
+$frame0->set_border_width(3);
+$frame0->modify_bg ('normal', $red);
+
+my $hbox0 = Gtk2::HBox->new( FALSE, 6 );
+$frame0->add($hbox0);
+$hbox0->set_border_width(3);
+
+my $button = Gtk2::Button->new_from_stock('gtk-quit');
+$hbox0->pack_end( $button, FALSE, FALSE, 0 );
+$button->signal_connect( clicked => \&delete_event );
+
+my $button1 = Gtk2::Button->new('Color-test');
+$hbox0->pack_end( $button1, FALSE, FALSE, 0 );
+$button1->signal_connect( clicked => sub{ 
+                      print chr(07),"\n"; # \n or use $|++
+                     });
+$button1->modify_bg ('normal', $bluel);
+$button1->modify_bg ('prelight', $blueh);
+$button1->modify_bg ('active', $white);
+
+my $label = Gtk2::Label->new("This is a  Colored Label");
+$label->modify_fg('normal', $white);
+
+#used for coloring background of labal
+my $coleventb1 = Gtk2::EventBox->new();
+$coleventb1->set_border_width(3);
+$coleventb1->modify_bg ('normal', $red);
+$coleventb1->set_border_width(2);
+$coleventb1->add($label);
+$hbox0->pack_start( $coleventb1, FALSE, FALSE, 0 );
+
+$window->show_all();
+Gtk2->main;
+#####################################
+sub delete_event {
+Gtk2->main_quit;
+return FALSE;
+}

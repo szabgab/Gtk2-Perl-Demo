@@ -1,0 +1,13 @@
+So here should come some overview of GTK
+Learning programming in GTK
+
+Windows
+Widget
+
+See also http://gtk2-perl.sourceforge.net/doc/gtk2-perl-tut/
+
+While this is not a good text editor, you are welcome to change the 
+code and experiement with it. Especially in some of the examples
+we added several optional calles commented out (by #) that you might
+want to enable to see their effect.
+

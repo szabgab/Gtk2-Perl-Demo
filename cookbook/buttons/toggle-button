@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Glib qw/TRUE FALSE/;
+use Gtk2 '-init';
+
+my $window = Gtk2::Window->new('toplevel');
+$window->set_title('Z');
+$window ->signal_connect( 'destroy' => \&delete_event );
+$window->set_border_width(10);
+$window->set_size_request(300,200);
+
+my $vbox = Gtk2::VBox->new( FALSE, 6 );
+$window->add($vbox);
+$vbox->set_border_width(2);
+
+my $frame0 = Gtk2::Frame->new();
+$vbox->pack_end( $frame0, FALSE, FALSE, 0 );
+$frame0->set_border_width(3);
+
+my $hbox0 = Gtk2::HBox->new( FALSE, 6 );
+$frame0->add($hbox0);
+$hbox0->set_border_width(3);
+
+my $button = Gtk2::Button->new_from_stock('gtk-quit');
+$hbox0->pack_end( $button, FALSE, FALSE, 0 );
+$button->signal_connect( clicked => \&delete_event );
+
+my $hbox1 = Gtk2::HBox->new( FALSE, 6 );
+$vbox->pack_start($hbox1,FALSE, FALSE, 5);
+my $togglebutton1 = Gtk2::ToggleButton->new('1');
+$hbox1->pack_start($togglebutton1 , FALSE, FALSE, 5 );
+$togglebutton1->signal_connect( clicked => \&toggle_button_callback,'1' );
+
+my $hbox2 = Gtk2::HBox->new( FALSE, 6 );
+$vbox->pack_start($hbox2,FALSE, FALSE, 5);
+my $togglebutton2 = Gtk2::ToggleButton->new_with_label('2');
+$hbox2->pack_start( $togglebutton2, FALSE, FALSE, 5 );
+$togglebutton2->signal_connect( clicked => \&toggle_button_callback,'2' );
+
+my $hbox3 = Gtk2::HBox->new( FALSE, 6 );
+$vbox->pack_start($hbox3,FALSE, FALSE, 5);
+my $togglebutton3 = Gtk2::ToggleButton->new_with_mnemonic('3');
+$hbox3->pack_start( $togglebutton3, FALSE, FALSE, 5 );
+$togglebutton3->signal_connect( clicked => \&toggle_button_callback,'3' );
+
+$window->show_all();
+Gtk2->main;
+#####################################
+sub delete_event {
+Gtk2->main_quit;
+return FALSE;
+}  
+######################################
+
+sub toggle_button_callback {
+  my ($button,$number) = @_;
+     if ($button->get_active) {
+       # if control reaches here, the toggle button is down
+       print "$number on\n";
+     } else {
+    # if control reaches here, the toggle button is up
+       print "$number off\n";
+     }   
+  }

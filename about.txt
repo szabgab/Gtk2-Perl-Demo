@@ -1,0 +1,8 @@
+This Demo was written by Gabor Szabo using the idea of the gtk-demo
+distributed with the original C code.
+It includes a tutorial part and the example files distributed with
+the Perl binding of GTK+.
+The cookbook was collected by Joe Zenatra.
+
+Copyright The respective authors of the examples and Gabor Szabo
+License: GPL.

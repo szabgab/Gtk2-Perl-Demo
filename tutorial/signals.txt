@@ -1,0 +1,33 @@
+Explanation of signals 
+
+When something happens to the application 
+	the mouse is moved
+	a button was clicked by the mouse
+	some key was pressed (or released) on the keyboard
+	the application was closed via the [x] on the window
+our application receives a "signal" appropriate to the event.
+If we have the appropriate "signal handlers" in place when such
+signal is received then our application (the Gtk2->main loop)
+calls that "signal handler".
+
+Within the signal handler we can do any processing.
+Once the signal handler is finished the main loop gets back the command
+and waits for the next signal to arrive. (That is, unless we exit the
+program from within that signal handler.
+
+Now we can go back to the first example and rememver we had this magic
+line in it:
+
+    $window->signal_connect (destroy => sub { Gtk2->main_quit; });
+
+This is actually a signal handler that will be called when the window is destroyed,
+that is when you click on the [x] on the window.
+Within the signal handler you can see an anonymous subroutin with the single command 
+in it to quite the Gtk2 application.	
+Without this line when you click on [x] the window will disappear but the application
+will not quit. If you executed it from the command line you can kill it by
+Ctr-C but it will seem it "hangs".
+
+Throughout the tutorial we will see many types of signals and many ways to handle those
+signals.
+

@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Glib qw/TRUE FALSE/;
+use Gtk2 '-init';
+
+my $window = Gtk2::Window->new('toplevel');
+$window->set_title('Z');
+$window ->signal_connect( 'destroy' => \&delete_event );
+$window->set_border_width(10);
+$window->set_size_request(300,200);
+
+my $vbox = Gtk2::VBox->new( FALSE, 6 );
+$window->add($vbox);
+$vbox->set_border_width(2);
+
+my $hbox= Gtk2::HBox->new( FALSE, 6 );
+$vbox->pack_end($hbox,FALSE,FALSE,0);
+$hbox->set_border_width(2);
+
+
+my $button = Gtk2::Button->new_from_stock('gtk-quit');
+$hbox->pack_end( $button, FALSE, FALSE, 0 );
+$button->signal_connect( clicked => \&delete_event );
+
+
+my $color = Gtk2::Gdk::Color->new (0,0xFFFF,0);
+
+$window->modify_bg ('normal', $color);
+
+$window->show_all();
+Gtk2->main;
+#####################################
+sub delete_event {
+Gtk2->main_quit;
+return FALSE;
+}  

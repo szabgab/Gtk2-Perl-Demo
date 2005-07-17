@@ -1,0 +1,98 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Glib qw/TRUE FALSE/;
+use Gtk2 '-init';
+
+my $window = Gtk2::Window->new('toplevel');
+$window->set_title('Z');
+$window ->signal_connect( 'destroy' => \&delete_event );
+$window->set_border_width(2);
+$window->set_size_request(300,200);
+
+my $vbox = Gtk2::VBox->new( FALSE, 0 );
+$window->add($vbox);
+$vbox->set_border_width(2);
+
+my $hbox = Gtk2::HBox->new( FALSE, 0 );
+$vbox->pack_start( $hbox, FALSE, FALSE, 0 );
+$hbox->set_border_width(2);
+
+my $frame = Gtk2::Frame->new('checks');
+$hbox->pack_start( $frame, FALSE, FALSE, 0 );
+$frame->set_border_width(6);
+
+my $vboxt = Gtk2::VBox->new( FALSE, 10 );
+$frame->add($vboxt);
+$vboxt->set_border_width(10);
+
+############################################
+my $frame0 = Gtk2::Frame->new('control');
+$vbox->pack_end( $frame0, FALSE, FALSE, 0 );
+$frame0->set_border_width(3);
+
+my $hbox0 = Gtk2::HBox->new( FALSE, 6 );
+$frame0->add($hbox0);
+$hbox0->set_border_width(3);
+
+my $button = Gtk2::Button->new_from_stock('gtk-quit');
+$hbox0->pack_end( $button, FALSE, FALSE, 0 );
+$button->signal_connect( clicked => \&delete_event );
+
+my $button1 = Gtk2::Button->new('Set All');
+$hbox0->pack_start( $button1, FALSE, FALSE, 0 );
+$button1->signal_connect( clicked => \&setall_event );
+
+my $button2 = Gtk2::Button->new('Unset All');
+$hbox0->pack_start( $button2, FALSE, FALSE, 0 );
+$button2->signal_connect( clicked => \&unsetall_event );
+
+#########################################################
+
+my $checkbutton1 = Gtk2::CheckButton->new('1');
+$vboxt->pack_start( $checkbutton1, FALSE, FALSE, 0 );
+$checkbutton1->signal_connect( clicked => \&check_button_callback,'1' );
+
+my $checkbutton2 = Gtk2::CheckButton->new_with_label('2');
+$vboxt->pack_start( $checkbutton2, FALSE, FALSE, 0 );
+$checkbutton2->signal_connect( clicked => \&check_button_callback,'2' );
+
+my $checkbutton3 = Gtk2::CheckButton->new_with_mnemonic('3');
+$vboxt->pack_start( $checkbutton3, FALSE, FALSE, 0 );
+$checkbutton3->signal_connect( clicked => \&check_button_callback,'3' );
+
+$window->show_all();
+Gtk2->main;
+#####################################
+sub delete_event {
+Gtk2->main_quit;
+return FALSE;
+}  
+######################################
+
+sub check_button_callback {
+  my ($button,$number) = @_;
+     if ($button->get_active) {
+       # if control reaches here, the check button is down
+       print "$number on\n";
+     } else {
+    # if control reaches here, the check button is up
+       print "$number off\n";
+     }   
+  } 
+#######################################
+sub setall_event{
+ foreach my $check ($checkbutton1,$checkbutton2,$checkbutton3){
+         $check->set_active(1);
+         }
+}
+############################################
+sub unsetall_event{
+ foreach my $check ($checkbutton1,$checkbutton2,$checkbutton3){
+         $check->set_active(0);
+         }
+}
+############################################
+
+
+  

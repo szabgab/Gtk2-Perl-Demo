@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Glib qw/TRUE FALSE/;
+use Gtk2 '-init';
+
+my $window = Gtk2::Window->new('toplevel');
+$window->signal_connect(destroy => sub { Gtk2->main_quit; return FALSE; });
+$window->set_title("radio buttons");
+$window->set_border_width(0);
+
+my $box1 = Gtk2::VBox->new(FALSE, 0);
+$window->add($box1);
+
+my $box2 = Gtk2::VBox->new(FALSE, 10);
+$box2->set_border_width(10);
+$box1->pack_start($box2, TRUE, TRUE, 0);
+
+#the first radio button has to set the group,
+#which is undef for the first button
+my $button1 = Gtk2::RadioButton->new(undef, "button 1");
+$box2->pack_start($button1, TRUE, TRUE, 0);
+my @group = $button1->get_group;
+$button1->signal_connect( clicked => \&radio_button_callback,'1' );
+
+my $button2 = Gtk2::RadioButton->new_with_label(@group, "button 2");
+$box2->pack_start($button2, TRUE, TRUE, 0);
+$button2->signal_connect( clicked => \&radio_button_callback,'2' );
+
+my $button3 = Gtk2::RadioButton->new_with_label_from_widget($button1, "button 3");
+$box2->pack_start($button3, TRUE, TRUE, 0);
+$button3->signal_connect( clicked => \&radio_button_callback,'3' );
+
+$button2->set_active(TRUE);
+###########################################################
+my $separator = Gtk2::HSeparator->new;
+$box1->pack_start($separator, FALSE, TRUE, 0);
+
+$box2 = Gtk2::VBox->new(FALSE, 10);
+$box2->set_border_width(10);
+$box1->pack_start($box2, FALSE, TRUE, 0);
+
+
+my $button_ex = Gtk2::Button->new("close");
+$button_ex->signal_connect(clicked => sub { Gtk2->main_quit; });
+$box2->pack_start($button_ex, TRUE, TRUE, 0);
+$button_ex->can_default(TRUE);
+$button_ex->grab_default;
+
+my $button_set = Gtk2::Button->new("Get State");
+$button_set->signal_connect(clicked =>  \&get_radio_state );
+$box2->pack_start($button_set, TRUE, TRUE, 0);
+
+$window->show_all();
+
+Gtk2->main;
+################################################
+sub radio_button_callback {
+  my ($button) = @_;
+      my $label = $button->get_label;
+      print "$label is set\n";	 
+  } 
+################################################
+sub get_radio_state{
+  foreach my $rb($button1,$button2,$button3){
+    if( $rb->get_active() ){
+        print $rb->get_label,' is set',"\n"; 
+      }
+  }
+}
+#################################################
