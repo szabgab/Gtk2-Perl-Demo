@@ -8,3 +8,8 @@ The cookbook was collected by Joe Milosch (a.k.a. zentara).
 
 Copyright The respective authors of the examples and Gabor Szabo
 License: GPL.
+
+
+See also the GTK2 Perl binding web site http://gtk2-perl.sourceforge.net/
+and the tutorial on it http://gtk2-perl.sourceforge.net/doc/gtk2-perl-tut/
+
