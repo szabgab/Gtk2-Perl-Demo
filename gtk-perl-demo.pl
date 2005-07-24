@@ -46,6 +46,14 @@ my $save_button = Gtk2::Button->new("Save");
 $save_button->signal_connect(clicked=> \&save_code);
 $buttons->pack_start($save_button, FALSE, FALSE, 5);
 
+my $search_entry = Gtk2::Entry->new;
+$search_entry->set_activates_default (1);
+$buttons->pack_start($search_entry, FALSE, FALSE, 5);
+
+my $search_button = Gtk2::Button->new("Search");
+$search_button->signal_connect(clicked=> \&search);
+$buttons->pack_start($search_button, FALSE, FALSE, 5);
+
 my $exit_button = Gtk2::Button->new("Exit");
 $exit_button->signal_connect(clicked=> sub { Gtk2->main_quit; });
 $buttons->pack_end($exit_button, FALSE, FALSE, 5);
@@ -254,6 +262,33 @@ sub check_files {
 		open my $fh, $entry->{name} or die "Could not open $entry->{name} $!";
 		check_files($entry->{more}) if $entry->{more};
 	}
+}
+
+sub search {
+	#print Dumper \@_;
+	my $text = $search_entry->get_text;
+	print "$text\n";
+	print join "\n", _search($text, \@entries); 
+
+}
+sub _search {
+	my ($text, $entries) = @_;
+
+	my @resp;
+
+	foreach my $entry (@$entries) {
+		#$entry->{title}, 
+		#$entry->{type}, 
+		if (open my $fh, "<", $entry->{name}) {
+			if (grep /$text/, <$fh>) {
+				push @resp, $entry->{name};
+			}
+		}
+		if ($entry->{more}) {
+			push @resp, _search($text, $entry->{more});
+		}
+	}
+	return @resp;
 }
 
 
