@@ -51,7 +51,8 @@ $file_chooser->signal_connect (selection_changed => sub {
 });
 
 # add an app-specific entry to the shortcut list.
-$file_chooser->add_shortcut_folder ('/tmp');
+my $tmp = $ENV{TMP} || $ENV{TEMP};
+$file_chooser->add_shortcut_folder ($tmp);
 eval { $file_chooser->add_shortcut_folder_uri ('http://localhost/'); };
 warn "couldn't add shortcut: $@\n" if $@;
 
