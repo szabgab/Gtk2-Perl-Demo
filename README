@@ -1,0 +1,38 @@
+
+
+- add more entries to the tutorial
+- organize Examples and Cookbook
+- search and highlight in the current window
+- free text search in all the files
+
+
+
+TODO:
+(from muppet)
+
+The color snooper doesn't work --- it complains on the console that it needs an argument.
+
+gtk-demo allows you to run scripts by activating their rows in the treeview (double-clicking or pressing enter).  It also
+allows you to run more than one demo at a time.  Both of those features would be handy.  (Since you can edit the script,
+it would be rather easy for a user to hose the demo.)
+
+Mnemonics and stock icons would spruce up the main window a bit.
+
+If you set the shadow type on the two scrolled windows to "in", the window will look a little better.
+
+The scrolled windows should both be set to automatic on both directions; set a default size for the toplevel window to
+account for that; and use an HPaned instead of an HBox to contain the tree and text -- that gives the user more control
+over the size and position.
+
+It wasn't immediately obvious that i could edit the text to modify and run the samples.  Some explanatory text and a
+"revert" button would be helpful.  The feature is a really awesome idea, though.
+
+Instead of the "List Widgets" button that turns into a "List Examples" button, you could place both trees into a
+notebook.
+
+If you add support for Gtk2::SourceView for syntax highlighting, please be sure to make it optional.  (Not very hard to
+do.)
+
+
+
+
