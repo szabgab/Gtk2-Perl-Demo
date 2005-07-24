@@ -1,14 +1,49 @@
 
+INSTALL
+===========
+
+No need to install the application. Just unzip it and run gtk-perl-demo.pl
+
+
+
+
+TODO
+============
+- free text search in all the files
+- cleanup README file
+
+
 
 - add more entries to the tutorial
 - organize Examples and Cookbook
 - search and highlight in the current window
-- free text search in all the files
 
 
+Disable both execute button and save button for non-executable entries
+When saving a file with the name of an already existing file ask if to rewrite ?
 
-TODO:
-(from muppet)
+
+Better grouping of the examples in the multi level tree
+
+Syntax highlighting  (using Gtk2::SourceView ?)
+
+Better distribution method (preprocessing an everything in one file ?)
+
+Longer tutorial
+
+Mark clearly on the item list which one is text and which one is code
+
+We might want to run the external application on a fork so the user can run several 
+versions at the same time and see the differences.
+
+Have a list of all the signals and jump to files based on signal names ?
+Have an index of all the words in the comments and pod sections of the files ?
+
+See also and somehow integrate with 
+http://live.gnome.org/GTK2_2dPerl_2fRecipes
+
+
+TODO: (from muppet)
 
 The color snooper doesn't work --- it complains on the console that it needs an argument.
 
@@ -34,5 +69,24 @@ If you add support for Gtk2::SourceView for syntax highlighting, please be sure 
 do.)
 
 
+
+
+DONE
+=====================================
+
+All the examples from the distrubtion are included
+
+Multi level tree (so the various sections can be in expandable subtree)
+
+Add execute button
+
+Provide an index tables where we list all the Widgets we used in the examples
+and where were they used. We might be able to list all the signal handlers
+and where were they used.
+
+Code for execution should be taken from the window and we should encourage people to
+experiment with the various options. 
+
+Add save button to save the content of the code window (now that we do not have them in separate files)
 
 
