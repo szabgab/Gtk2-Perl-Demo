@@ -13,3 +13,9 @@ License: GPL.
 See also the GTK2 Perl binding web site http://gtk2-perl.sourceforge.net/
 and the tutorial on it http://gtk2-perl.sourceforge.net/doc/gtk2-perl-tut/
 
+
+
+Accelerators
+-------------
+Ctr-S - Search all the files
+Ctr-F - Search within the current buffer
