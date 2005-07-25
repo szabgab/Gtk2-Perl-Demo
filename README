@@ -1,7 +1,6 @@
 
 INSTALL
 ===========
-
 No need to install the application. Just unzip it and run gtk-perl-demo.pl
 
 
@@ -9,66 +8,57 @@ No need to install the application. Just unzip it and run gtk-perl-demo.pl
 
 TODO
 ============
-- free text search in all the files
 - cleanup README file
 
+- setup vendor branch so I can easily track changes in the real versions
+  of some of the examples as they appear in the GTK2 CVS.
 
-
+- make examples pass use strict and use warnings;
 - add more entries to the tutorial
+- missing widgets:
+  TreeSelection
 - organize Examples and Cookbook
 - search and highlight in the current window
 
 
-Disable both execute button and save button for non-executable entries
-When saving a file with the name of an already existing file ask if to rewrite ?
+- Disable both execute button and save button for non-executable entries
+- When saving a file with the name of an already existing file ask if user wants to rewrite ?
+- Syntax highlighting  (using Gtk2::SourceView ?) make it optional
 
+- Search should be invoked on ENTER wne in saerch box
+- Search results should also show the title of the file 
+- Mark clearly on the item list which one is text and which one is code
 
-Better grouping of the examples in the multi level tree
+- We might want to run the external application on a fork so the user can run several 
+  versions at the same time and see the differences.
 
-Syntax highlighting  (using Gtk2::SourceView ?)
+- Have a list of all the signals and jump to files based on signal names ?
+- Have an index of all the words in the comments and pod sections of the files ?
+  Probably not needed now that we have full text search
 
-Better distribution method (preprocessing an everything in one file ?)
+- See also and somehow integrate with 
+  http://live.gnome.org/GTK2_2dPerl_2fRecipes
 
-Longer tutorial
+- The color snooper doesn't work --- it complains on the console that it needs an argument.
+  change the script to have a default file or we will have to rework the whole examples invocation thing.
 
-Mark clearly on the item list which one is text and which one is code
+- gtk-demo allows you to run scripts by activating their rows in the treeview (double-clicking or pressing enter).  It also
+  allows you to run more than one demo at a time.  Both of those features would be handy.  (Since you can edit the script,
+  it would be rather easy for a user to hose the demo.)
 
-We might want to run the external application on a fork so the user can run several 
-versions at the same time and see the differences.
+- Mnemonics and stock icons would spruce up the main window a bit.
 
-Have a list of all the signals and jump to files based on signal names ?
-Have an index of all the words in the comments and pod sections of the files ?
+- If you set the shadow type on the two scrolled windows to "in", the window will look a little better.
 
-See also and somehow integrate with 
-http://live.gnome.org/GTK2_2dPerl_2fRecipes
+- The scrolled windows should both be set to automatic on both directions; set a default size for the toplevel window to
+  account for that; and use an HPaned instead of an HBox to contain the tree and text -- that gives the user more control
+  over the size and position.
 
+- It wasn't immediately obvious that i could edit the text to modify and run the samples.  Some explanatory text and a
+ "revert" button would be helpful.
 
-TODO: (from muppet)
-
-The color snooper doesn't work --- it complains on the console that it needs an argument.
-
-gtk-demo allows you to run scripts by activating their rows in the treeview (double-clicking or pressing enter).  It also
-allows you to run more than one demo at a time.  Both of those features would be handy.  (Since you can edit the script,
-it would be rather easy for a user to hose the demo.)
-
-Mnemonics and stock icons would spruce up the main window a bit.
-
-If you set the shadow type on the two scrolled windows to "in", the window will look a little better.
-
-The scrolled windows should both be set to automatic on both directions; set a default size for the toplevel window to
-account for that; and use an HPaned instead of an HBox to contain the tree and text -- that gives the user more control
-over the size and position.
-
-It wasn't immediately obvious that i could edit the text to modify and run the samples.  Some explanatory text and a
-"revert" button would be helpful.  The feature is a really awesome idea, though.
-
-Instead of the "List Widgets" button that turns into a "List Examples" button, you could place both trees into a
-notebook.
-
-If you add support for Gtk2::SourceView for syntax highlighting, please be sure to make it optional.  (Not very hard to
-do.)
-
-
+- Instead of the "List Widgets" button that turns into a "List Examples" button, you could place both trees into a
+  notebook.
 
 
 DONE
@@ -89,4 +79,5 @@ experiment with the various options.
 
 Add save button to save the content of the code window (now that we do not have them in separate files)
 
+- free text search in all the files
 
