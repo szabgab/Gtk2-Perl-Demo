@@ -267,28 +267,84 @@ sub check_files {
 sub search {
 	#print Dumper \@_;
 	my $text = $search_entry->get_text;
-	print "$text\n";
-	print join "\n", _search($text, \@entries); 
-
+	#print "$text\n";
+	my %hits = _search($text, \@entries); 
+	#print join "\n", keys %hits;
+	show_search_results(%hits);
 }
 sub _search {
 	my ($text, $entries) = @_;
 
-	my @resp;
+	my %resp;
 
 	foreach my $entry (@$entries) {
 		#$entry->{title}, 
 		#$entry->{type}, 
 		if (open my $fh, "<", $entry->{name}) {
-			if (grep /$text/, <$fh>) {
-				push @resp, $entry->{name};
+			if (my @lines = grep /$text/, <$fh>) {
+				chomp @lines;
+				$resp{$entry->{name}} = \@lines;
 			}
 		}
 		if ($entry->{more}) {
-			push @resp, _search($text, $entry->{more});
+			%resp = (%resp, _search($text, $entry->{more}));
 		}
 	}
-	return @resp;
+	return %resp;
+}
+
+
+#use constant STRING_COLUMN => 0;
+sub show_search_results {
+	my (%hits) = @_;
+
+	my $window = Gtk2::Window->new;
+	$window->set_size_request (850, 300);
+	$window->set_border_width (6);
+	$window->signal_connect (delete_event => sub { $window->hide});
+	my $vbox = Gtk2::VBox->new;
+	$window->add ($vbox);
+	my $sw = Gtk2::ScrolledWindow->new;
+	$sw->set_shadow_type ('etched-in');
+	$sw->set_policy ('automatic', 'automatic');
+	$vbox->pack_start ($sw, TRUE, TRUE, 0);
+
+	my $model = Gtk2::ListStore->new ('Glib::String', 'Glib::String');
+
+	foreach my $file (keys %hits) {
+		foreach my $row (@{$hits{$file}}) {
+			my $iter = $model->append;
+			$model->set ($iter, 0 => $file, 1 => $row);
+		}
+	}
+
+	my $tree_view = Gtk2::TreeView->new_with_model ($model);
+
+	#$tree_view->set_reorderable (TRUE);
+	#$model->signal_connect (rows_reordered => sub {print "rows reordered\n"});
+	#$tree_view->get_selection->set_mode ('multiple');
+	$tree_view->get_selection->signal_connect (changed => sub {
+		# $_[0] is a GtkTreeSelection
+		my @sel    = $_[0]->get_selected_rows;
+		my $iter   = $_[0]->get_selected();
+		my ($file, $row) = $model->get($iter, 0, 1);
+		show_file($buffer, $file);
+	});
+
+	$sw->add ($tree_view);
+
+
+	my @titles = ("Filename", "Result Line");
+	foreach my $i (0..@titles-1) {
+		my $renderer = Gtk2::CellRendererText->new;
+		my $column = Gtk2::TreeViewColumn->new_with_attributes ($titles[$i], 
+							$renderer, 
+							text => $i);
+		$tree_view->append_column ($column);
+	}
+
+
+	$window->show_all;
 }
 
 
