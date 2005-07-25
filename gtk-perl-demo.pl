@@ -26,7 +26,7 @@ collect_widgets(\@entries);
 my $window = Gtk2::Window->new;
 $window->set_title("GTK+ Perl binding Tutorial and code demos");
 $window->signal_connect (destroy => sub { Gtk2->main_quit; });
-$window->set_default_size(800, 500);
+$window->set_default_size(900, 500);
 
 my $vbox = Gtk2::VBox->new();
 $window->add($vbox);
@@ -111,6 +111,15 @@ $right_scroll->set_policy ('never', 'automatic');
 $right_scroll->add($textview);
 
 $hbox->add($right_scroll);
+
+
+# pane for search results
+my $sw = Gtk2::ScrolledWindow->new;
+$sw->set_shadow_type ('etched-in');
+$sw->set_policy ('automatic', 'automatic');
+$vbox->pack_start ($sw, FALSE, FALSE, 0);
+show_search_results();
+
 
 
 my @accels = (
@@ -338,18 +347,6 @@ sub _search {
 #use constant STRING_COLUMN => 0;
 sub show_search_results {
 	my (%hits) = @_;
-
-	my $window = Gtk2::Window->new;
-	$window->set_size_request (850, 300);
-	$window->set_border_width (6);
-	$window->signal_connect (delete_event => sub { $window->hide});
-	my $vbox = Gtk2::VBox->new;
-	$window->add ($vbox);
-	my $sw = Gtk2::ScrolledWindow->new;
-	$sw->set_shadow_type ('etched-in');
-	$sw->set_policy ('automatic', 'automatic');
-	$vbox->pack_start ($sw, TRUE, TRUE, 0);
-
 	my $model = Gtk2::ListStore->new ('Glib::String', 'Glib::String');
 
 	foreach my $file (keys %hits) {
@@ -359,20 +356,28 @@ sub show_search_results {
 		}
 	}
 
-	my $tree_view = Gtk2::TreeView->new_with_model ($model);
+	my ($tree_view) = $sw->get_children();
+	if ($tree_view) {
+		$tree_view->set_model($model);
+		return;
+	}
+
+	$tree_view = Gtk2::TreeView->new_with_model ($model);
 
 	#$tree_view->set_reorderable (TRUE);
 	#$model->signal_connect (rows_reordered => sub {print "rows reordered\n"});
 	#$tree_view->get_selection->set_mode ('multiple');
 	$tree_view->get_selection->signal_connect (changed => sub {
 		# $_[0] is a GtkTreeSelection
+		my ($tree_view) = $sw->get_children;
+		my $model = $tree_view->get_model();
 		my @sel    = $_[0]->get_selected_rows;
 		my $iter   = $_[0]->get_selected();
 		my ($file, $row) = $model->get($iter, 0, 1);
 		show_file($buffer, $file);
 		search_buffer($row);
 	});
-
+	
 	$sw->add ($tree_view);
 
 
@@ -384,9 +389,6 @@ sub show_search_results {
 							text => $i);
 		$tree_view->append_column ($column);
 	}
-
-
-	$window->show_all;
 }
 
 sub search_buffer {
