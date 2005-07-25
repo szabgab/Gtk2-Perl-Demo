@@ -5,13 +5,11 @@ No need to install the application. Just unzip it and run gtk-perl-demo.pl
 
 
 
-
 TODO
 ============
 
 - Search and highlight in the current window
 - Syntax highlighting  (using Gtk2::SourceView ?) make it optional
-- Ctr-S should jump in the search text box
 - Search results should also show the title of the file 
 - Mnemonics and stock icons would spruce up the main window a bit.
 - If you set the shadow type on the two scrolled windows to "in", the window will look a little better.
@@ -19,8 +17,6 @@ TODO
 - The scrolled windows should both be set to automatic on both directions; set a default size for the toplevel window to
   account for that; and use an HPaned instead of an HBox to contain the tree and text -- that gives the user more control
   over the size and position.
-
-
 
 - setup vendor branch so I can easily track changes in the real versions
   of some of the examples as they appear in the GTK2 CVS.
@@ -81,5 +77,6 @@ Add save button to save the content of the code window (now that we do not have 
 - free text search in all the files
 
 - cleanup README file
-- Search should be invoked on ENTER wne in saerch box
+- Search should be invoked on ENTER when in search box
+- Ctr-S should jump in the search text box
 

@@ -97,6 +97,18 @@ $right_scroll->add($textview);
 
 $hbox->add($right_scroll);
 
+
+my @accels = (
+	{ key => 'S', mod => 'control-mask', func => sub {$search_entry->grab_focus()} },
+);
+my $accel_group = Gtk2::AccelGroup->new;
+use Gtk2::Gdk::Keysyms;
+foreach my $a (@accels) {
+	$accel_group->connect ($Gtk2::Gdk::Keysyms{$a->{key}}, $a->{mod},
+	                       'visible', $a->{func});
+}
+$window->add_accel_group ($accel_group);
+
 $window->show_all();
 Gtk2->main;
 
