@@ -7,7 +7,7 @@ use Gtk2 '-init';
 use Data::Dumper;
 use File::Temp qw(tempfile);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 my ($ENTRY_NAME, $ENTRY_TYPE, $ENTRY_FILE) = (0, 1, 2);
 
 my @entries = do "entries.pl"; 
