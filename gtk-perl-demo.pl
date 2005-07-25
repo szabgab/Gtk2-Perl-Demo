@@ -304,13 +304,13 @@ sub check_files {
 }
 
 sub search {
-	my $text = $search_entry->get_text;
+	my $search_text = $search_entry->get_text;
 	if ($button_all->get_active()) {
-		my %hits = _search($text, \@entries); 
+		my %hits = _search($search_text, \@entries); 
 		show_search_results(%hits);
 	} else { # $button_buffer (this is the default if nothing is selected)
 		#print "Search in text\n";
-		search_buffer($text);
+		search_buffer($search_text);
 	}
 }
 sub _search {
@@ -370,6 +370,7 @@ sub show_search_results {
 		my $iter   = $_[0]->get_selected();
 		my ($file, $row) = $model->get($iter, 0, 1);
 		show_file($buffer, $file);
+		search_buffer($row);
 	});
 
 	$sw->add ($tree_view);
@@ -398,6 +399,9 @@ sub search_buffer {
 	my $start_iter = $buffer->get_iter_at_offset($start);
 	my $end_iter   = $buffer->get_iter_at_offset($start+length($text));
 	$buffer->select_range($start_iter, $end_iter);
+	#$textview->scroll_to_iter($start_iter, 0.4, TRUE, 0.0, 0.0);
+	my $mark = $buffer->create_mark("xxx", $start_iter, TRUE);
+	$textview->scroll_to_mark($mark, 0.4, TRUE, 0.5, 0.5);
 }
 
 
