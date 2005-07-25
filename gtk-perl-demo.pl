@@ -59,15 +59,15 @@ $buttons->pack_start($search_entry, FALSE, FALSE, 5);
 my $radio_buttons = Gtk2::VBox->new();
 $buttons->pack_start($radio_buttons, FALSE, FALSE, 0);
 
-my $button = Gtk2::RadioButton->new(undef, "All files");
-$radio_buttons->pack_start($button, TRUE, TRUE, 0);
-$button->show;
-my @group = $button->get_group;
+my $button_all = Gtk2::RadioButton->new(undef, "All files");
+$radio_buttons->pack_start($button_all, TRUE, TRUE, 0);
+$button_all->show;
+my @group = $button_all->get_group;
 
-$button = Gtk2::RadioButton->new_with_label(@group, "Current buffer");
-$button->set_active(TRUE);
-$radio_buttons->pack_start($button, TRUE, TRUE, 0);
-$button->show;
+my $button_buffer = Gtk2::RadioButton->new_with_label(@group, "Current buffer");
+$button_buffer->set_active(TRUE);
+$radio_buttons->pack_start($button_buffer, TRUE, TRUE, 0);
+$button_buffer->show;
 ###############
 
 my $search_button = Gtk2::Button->new("Search");
@@ -114,7 +114,10 @@ $hbox->add($right_scroll);
 
 
 my @accels = (
-	{ key => 'S', mod => 'control-mask', func => sub {$search_entry->grab_focus()} },
+	{ key => 'S', mod => 'control-mask', 
+			func => sub {$search_entry->grab_focus(); $button_all->set_active(TRUE);} },
+	{ key => 'F', mod => 'control-mask', 
+			func => sub {$search_entry->grab_focus(); $button_buffer->set_active(TRUE); }},
 );
 my $accel_group = Gtk2::AccelGroup->new;
 use Gtk2::Gdk::Keysyms;
