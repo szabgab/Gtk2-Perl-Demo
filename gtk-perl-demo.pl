@@ -49,8 +49,13 @@ $buttons->pack_start($save_button, FALSE, FALSE, 5);
 my $search_entry = Gtk2::Entry->new;
 $search_entry->set_activates_default (TRUE);
 $buttons->pack_start($search_entry, FALSE, FALSE, 5);
+#$search_entry->signal_connect ('insert-text' => sub {
+#		my ($widget, $string, $len, $position) = @_;
+#		#$window->set_default($search_button);
+#		return();
+#});
 
-# Radio buttons
+#### Radio buttons
 my $radio_buttons = Gtk2::VBox->new();
 $buttons->pack_start($radio_buttons, FALSE, FALSE, 0);
 
@@ -69,11 +74,6 @@ my $search_button = Gtk2::Button->new("Search");
 $search_button->signal_connect(clicked=> \&search);
 $buttons->pack_start($search_button, FALSE, FALSE, 5);
 $search_button->can_default(TRUE);
-$search_entry->signal_connect ('insert-text' => sub {
-		my ($widget, $string, $len, $position) = @_;
-		#$window->set_default($search_button);
-		return();
-});
 $window->set_default($search_button);
 
 
