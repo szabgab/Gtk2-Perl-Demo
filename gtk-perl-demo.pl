@@ -304,12 +304,14 @@ sub check_files {
 }
 
 sub search {
-	#print Dumper \@_;
 	my $text = $search_entry->get_text;
-	#print "$text\n";
-	my %hits = _search($text, \@entries); 
-	#print join "\n", keys %hits;
-	show_search_results(%hits);
+	if ($button_all->get_active()) {
+		my %hits = _search($text, \@entries); 
+		show_search_results(%hits);
+	} else { # $button_buffer (this is the default if nothing is selected)
+		#print "Search in text\n";
+		search_buffer($text);
+	}
 }
 sub _search {
 	my ($text, $entries) = @_;
@@ -384,6 +386,18 @@ sub show_search_results {
 
 
 	$window->show_all;
+}
+
+sub search_buffer {
+	my ($text) = @_;
+
+	#TextBuffer
+	my $cont = $buffer->get_text($buffer->get_start_iter, $buffer->get_end_iter, 0);
+	my $start = index ($cont, $text);
+	return if $start == -1;
+	my $start_iter = $buffer->get_iter_at_offset($start);
+	my $end_iter   = $buffer->get_iter_at_offset($start+length($text));
+	$buffer->select_range($start_iter, $end_iter);
 }
 
 
