@@ -83,7 +83,8 @@ $exit_button->signal_connect(clicked=> sub { Gtk2->main_quit; });
 $buttons->pack_end($exit_button, FALSE, FALSE, 5);
 
 
-my $hbox = Gtk2::HBox->new();
+###### Left pane, file or Widget listing
+my $hbox = Gtk2::HPaned->new();
 $vbox->pack_start($hbox, TRUE, TRUE, 5);
 
 my $tree_store = Gtk2::TreeStore->new('Glib::String', 'Glib::String', 'Glib::String');
@@ -97,7 +98,8 @@ my $left_scroll = Gtk2::ScrolledWindow->new;
 $left_scroll->set_policy ('never', 'automatic');
 $left_scroll->add($tree_view);
 
-$hbox->pack_start($left_scroll, FALSE, FALSE, 5);
+#$hbox->pack_start($left_scroll, FALSE, FALSE, 5);
+$hbox->add1($left_scroll);
 
 list_examples();
 my $buffer = Gtk2::TextBuffer->new();
@@ -107,10 +109,11 @@ my $textview = Gtk2::TextView->new_with_buffer($buffer);
 $textview->set_wrap_mode("word");
 
 my $right_scroll = Gtk2::ScrolledWindow->new;
-$right_scroll->set_policy ('never', 'automatic');
+$right_scroll->set_policy ('automatic', 'automatic');
 $right_scroll->add($textview);
 
-$hbox->add($right_scroll);
+$hbox->add2($right_scroll);
+$hbox->set_position(200);
 
 
 # pane for search results

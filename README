@@ -12,7 +12,6 @@ TODO
 - Search results should also show the title of the file 
 - Mnemonics and stock icons would spruce up the main window a bit.
 - If you set the shadow type on the two scrolled windows to "in", the window will look a little better.
-- Maybe search result window should be part of the main window and not a separate one.
 
 - Bookmarks
 - History of visited pages
@@ -84,4 +83,5 @@ Add save button to save the content of the code window (now that we do not have 
 - cleanup README file
 - Search should be invoked on ENTER when in search box
 - Ctr-S should jump in the search text box
+- Maybe search result window should be part of the main window and not a separate one.
 
