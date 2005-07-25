@@ -26,7 +26,7 @@ collect_widgets(\@entries);
 my $window = Gtk2::Window->new;
 $window->set_title("GTK+ Perl binding Tutorial and code demos");
 $window->signal_connect (destroy => sub { Gtk2->main_quit; });
-$window->set_default_size(900, 500);
+$window->set_default_size(900, 650);
 
 my $vbox = Gtk2::VBox->new();
 $window->add($vbox);
@@ -56,16 +56,16 @@ $buttons->pack_start($search_entry, FALSE, FALSE, 5);
 #});
 
 #### Radio buttons
-my $radio_buttons = Gtk2::VBox->new();
+my $radio_buttons = Gtk2::HBox->new();
 $buttons->pack_start($radio_buttons, FALSE, FALSE, 0);
 
 my $button_all = Gtk2::RadioButton->new(undef, "All files");
 $radio_buttons->pack_start($button_all, TRUE, TRUE, 0);
+$button_all->set_active(TRUE);
 $button_all->show;
 my @group = $button_all->get_group;
 
 my $button_buffer = Gtk2::RadioButton->new_with_label(@group, "Current buffer");
-$button_buffer->set_active(TRUE);
 $radio_buttons->pack_start($button_buffer, TRUE, TRUE, 0);
 $button_buffer->show;
 ###############
@@ -82,10 +82,14 @@ my $exit_button = Gtk2::Button->new("Exit");
 $exit_button->signal_connect(clicked=> sub { Gtk2->main_quit; });
 $buttons->pack_end($exit_button, FALSE, FALSE, 5);
 
+my $lower_pane = Gtk2::VPaned->new();
+$vbox->pack_start($lower_pane, TRUE, TRUE, 5);
+
 
 ###### Left pane, file or Widget listing
 my $hbox = Gtk2::HPaned->new();
-$vbox->pack_start($hbox, TRUE, TRUE, 5);
+#$vbox->pack_start($hbox, TRUE, TRUE, 5);
+$lower_pane->add1($hbox);
 
 my $tree_store = Gtk2::TreeStore->new('Glib::String', 'Glib::String', 'Glib::String');
 my $tree_view  = Gtk2::TreeView->new($tree_store);
@@ -120,7 +124,9 @@ $hbox->set_position(200);
 my $sw = Gtk2::ScrolledWindow->new;
 $sw->set_shadow_type ('etched-in');
 $sw->set_policy ('automatic', 'automatic');
-$vbox->pack_start ($sw, FALSE, FALSE, 0);
+#$vbox->pack_start ($sw, FALSE, FALSE, 0);
+$lower_pane->add2($sw);
+$lower_pane->set_position(450);
 show_search_results();
 
 
