@@ -11,7 +11,7 @@ TODO
 
 - Search and highlight in the current window
 - Syntax highlighting  (using Gtk2::SourceView ?) make it optional
-- Search should be invoked on ENTER wne in saerch box
+- Ctr-S should jump in the search text box
 - Search results should also show the title of the file 
 - Mnemonics and stock icons would spruce up the main window a bit.
 - If you set the shadow type on the two scrolled windows to "in", the window will look a little better.
@@ -81,3 +81,5 @@ Add save button to save the content of the code window (now that we do not have 
 - free text search in all the files
 
 - cleanup README file
+- Search should be invoked on ENTER wne in saerch box
+

@@ -47,12 +47,21 @@ $save_button->signal_connect(clicked=> \&save_code);
 $buttons->pack_start($save_button, FALSE, FALSE, 5);
 
 my $search_entry = Gtk2::Entry->new;
-$search_entry->set_activates_default (1);
+$search_entry->set_activates_default (TRUE);
 $buttons->pack_start($search_entry, FALSE, FALSE, 5);
 
 my $search_button = Gtk2::Button->new("Search");
 $search_button->signal_connect(clicked=> \&search);
 $buttons->pack_start($search_button, FALSE, FALSE, 5);
+$search_button->can_default(TRUE);
+$search_entry->signal_connect ('insert-text' => sub {
+		my ($widget, $string, $len, $position) = @_;
+		#$window->set_default($search_button);
+		return();
+});
+$window->set_default($search_button);
+
+
 
 my $exit_button = Gtk2::Button->new("Exit");
 $exit_button->signal_connect(clicked=> sub { Gtk2->main_quit; });
