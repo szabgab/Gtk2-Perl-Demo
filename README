@@ -4,7 +4,6 @@ INSTALL
 No need to install the application. Just unzip it and run gtk-perl-demo.pl
 
 
-
 TODO
 ============
 
@@ -13,6 +12,10 @@ TODO
 - Search results should also show the title of the file 
 - Mnemonics and stock icons would spruce up the main window a bit.
 - If you set the shadow type on the two scrolled windows to "in", the window will look a little better.
+- Maybe search result window should be part of the main window and not a separate one.
+
+- Bookmarks
+- History of visited pages
 
 - The scrolled windows should both be set to automatic on both directions; set a default size for the toplevel window to
   account for that; and use an HPaned instead of an HBox to contain the tree and text -- that gives the user more control
@@ -54,6 +57,8 @@ TODO
 
 - Instead of the "List Widgets" button that turns into a "List Examples" button, you could place both trees into a
   notebook.
+
+- Can we somehow include the Tutorial and maybe the full documentation?
 
 
 DONE

@@ -50,6 +50,21 @@ my $search_entry = Gtk2::Entry->new;
 $search_entry->set_activates_default (TRUE);
 $buttons->pack_start($search_entry, FALSE, FALSE, 5);
 
+# Radio buttons
+my $radio_buttons = Gtk2::VBox->new();
+$buttons->pack_start($radio_buttons, FALSE, FALSE, 0);
+
+my $button = Gtk2::RadioButton->new(undef, "All files");
+$radio_buttons->pack_start($button, TRUE, TRUE, 0);
+$button->show;
+my @group = $button->get_group;
+
+$button = Gtk2::RadioButton->new_with_label(@group, "Current buffer");
+$button->set_active(TRUE);
+$radio_buttons->pack_start($button, TRUE, TRUE, 0);
+$button->show;
+###############
+
 my $search_button = Gtk2::Button->new("Search");
 $search_button->signal_connect(clicked=> \&search);
 $buttons->pack_start($search_button, FALSE, FALSE, 5);
