@@ -19,13 +19,12 @@ need libgnomeprintui-devel
 cpan install Bundle::Gnome2
 
 
-
-
 TODO
 ============
 
 - Search results should also show the title of the file 
 - Mnemonics and stock icons would spruce up the main window a bit.
+- Repeat search with the buffer
 
 - Syntax highlighting  (using Gtk2::SourceView ?) make it optional
 

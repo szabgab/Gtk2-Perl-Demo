@@ -173,14 +173,14 @@ sub save_code {
 }
 
 sub execute_code {
-	if ($current_list eq "examples") {
-		my ($name, $type, $file) = _translate_tree_selection();
-		return if $type ne "file";
-	} else {
-		my ($path, $col) = $tree_view->get_cursor(); 
-		my @c = split /:/, $path->to_string;
-		return if @c != 2;
-	}
+	#if ($current_list eq "examples") {
+		#my ($name, $type, $file) = _translate_tree_selection();
+		#return if $type ne "file";
+	#} else {
+	#	my ($path, $col) = $tree_view->get_cursor(); 
+	#	my @c = split /:/, $path->to_string;
+	#	return if @c != 2;
+	#}
 
 	my ($fh, $temp_filename) = tempfile();
 	print $fh $buffer->get_text($buffer->get_start_iter, $buffer->get_end_iter, 0);
