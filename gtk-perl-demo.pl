@@ -96,6 +96,7 @@ $lower_pane->add1($hbox);
 my $tree_store = Gtk2::TreeStore->new('Glib::String', 'Glib::String', 'Glib::String');
 my $tree_view  = Gtk2::TreeView->new($tree_store);
 $tree_view->signal_connect (button_release_event => \&button_release);
+$tree_view->signal_connect ("row-activated"      => \&execute_code);
 my $col = Gtk2::TreeViewColumn->new_with_attributes("Right click for demo", Gtk2::CellRendererText->new(), text => "0");
 $tree_view->append_column($col);
 $tree_view->set_headers_visible(0);
@@ -188,7 +189,6 @@ sub execute_code {
 	unlink $temp_filename;
 	return;
 }
-
 
 sub add_entries {
 	my ($tree, $parent, $entries) = @_;

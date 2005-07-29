@@ -24,11 +24,10 @@ cpan install Bundle::Gnome2
 TODO
 ============
 
-- gtk-demo allows you to run scripts by activating their rows in the treeview (double-clicking or pressing enter). 
-- Syntax highlighting  (using Gtk2::SourceView ?) make it optional
 - Search results should also show the title of the file 
 - Mnemonics and stock icons would spruce up the main window a bit.
 
+- Syntax highlighting  (using Gtk2::SourceView ?) make it optional
 
 - Bookmarks
 - History of visited pages
@@ -108,5 +107,6 @@ Add save button to save the content of the code window (now that we do not have 
 - Search and highlight in the current window
 - If you set the shadow type on the two scrolled windows to "in", the window will look a little better.
   Let's see this
+- gtk-demo allows you to run scripts by activating their rows in the treeview (double-clicking or pressing enter). 
 
 
