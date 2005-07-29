@@ -4,14 +4,31 @@ INSTALL
 No need to install the application. Just unzip it and run gtk-perl-demo.pl
 
 
+prerequisites:
+Glib
+Gtk2
+
+
+
+for ViewSource to work:
+Gnome2  which is currently NOT available on MS Windows.
+to install Gnome run 
+
+need libgnomeprintui-devel
+
+cpan install Bundle::Gnome2
+
+
+
+
 TODO
 ============
 
-- Search and highlight in the current window
+- gtk-demo allows you to run scripts by activating their rows in the treeview (double-clicking or pressing enter). 
 - Syntax highlighting  (using Gtk2::SourceView ?) make it optional
 - Search results should also show the title of the file 
 - Mnemonics and stock icons would spruce up the main window a bit.
-- If you set the shadow type on the two scrolled windows to "in", the window will look a little better.
+
 
 - Bookmarks
 - History of visited pages
@@ -45,14 +62,18 @@ TODO
 - The color snooper doesn't work --- it complains on the console that it needs an argument.
   change the script to have a default file or we will have to rework the whole examples invocation thing.
 
-- gtk-demo allows you to run scripts by activating their rows in the treeview (double-clicking or pressing enter).  It also
-  allows you to run more than one demo at a time.  Both of those features would be handy.  (Since you can edit the script,
+
+- gtk-demo allows you to run more than one demo at a time.  Both of those features would be handy.  
+  (Since you can edit the script,
   it would be rather easy for a user to hose the demo.)
 - We might want to run the external application on a fork so the user can run several 
   versions at the same time and see the differences.
 
-- It wasn't immediately obvious that i could edit the text to modify and run the samples.  Some explanatory text and a
- "revert" button would be helpful.
+- It wasn't immediately obvious that i could edit the text to modify and run the samples.  
+  Some explanatory text and a "revert" button would be helpful.
+
+- When moving form a buffer that was changed to show another file it silently discards all the
+  changes made. It is not designated to be an editor or an IDE but still it might be annoying.
 
 - Instead of the "List Widgets" button that turns into a "List Examples" button, you could place both trees into a
   notebook.
@@ -84,4 +105,8 @@ Add save button to save the content of the code window (now that we do not have 
 - Search should be invoked on ENTER when in search box
 - Ctr-S should jump in the search text box
 - Maybe search result window should be part of the main window and not a separate one.
+- Search and highlight in the current window
+- If you set the shadow type on the two scrolled windows to "in", the window will look a little better.
+  Let's see this
+
 

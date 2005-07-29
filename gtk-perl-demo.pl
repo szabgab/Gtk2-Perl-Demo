@@ -22,33 +22,36 @@ my %widgets;
 my $current_list;
 collect_widgets(\@entries);
  
-
+##### Main window
 my $window = Gtk2::Window->new;
 $window->set_title("GTK+ Perl binding Tutorial and code demos");
 $window->signal_connect (destroy => sub { Gtk2->main_quit; });
 $window->set_default_size(900, 650);
 
-my $vbox = Gtk2::VBox->new();
-$window->add($vbox);
+###### Main box
+my $main_vbox = Gtk2::VBox->new();
+$window->add($main_vbox);
 
-my $buttons = Gtk2::HBox->new();
-$vbox->pack_start($buttons, FALSE, FALSE, 5);
+
+##### Menu row
+my $menu_row = Gtk2::HBox->new();
+$main_vbox->pack_start($menu_row, FALSE, FALSE, 5);
 
 my $toggle_button = Gtk2::Button->new("List Widgets");
 $toggle_button->signal_connect(clicked=> \&toggle_list);
-$buttons->pack_start($toggle_button, FALSE, FALSE, 5);
+$menu_row->pack_start($toggle_button, FALSE, FALSE, 5);
 
 my $execute_button = Gtk2::Button->new("Execute");
 $execute_button->signal_connect(clicked=> \&execute_code);
-$buttons->pack_start($execute_button, FALSE, FALSE, 5);
+$menu_row->pack_start($execute_button, FALSE, FALSE, 5);
 
 my $save_button = Gtk2::Button->new("Save");
 $save_button->signal_connect(clicked=> \&save_code);
-$buttons->pack_start($save_button, FALSE, FALSE, 5);
+$menu_row->pack_start($save_button, FALSE, FALSE, 5);
 
 my $search_entry = Gtk2::Entry->new;
 $search_entry->set_activates_default (TRUE);
-$buttons->pack_start($search_entry, FALSE, FALSE, 5);
+$menu_row->pack_start($search_entry, FALSE, FALSE, 5);
 #$search_entry->signal_connect ('insert-text' => sub {
 #		my ($widget, $string, $len, $position) = @_;
 #		#$window->set_default($search_button);
@@ -57,7 +60,7 @@ $buttons->pack_start($search_entry, FALSE, FALSE, 5);
 
 #### Radio buttons
 my $radio_buttons = Gtk2::HBox->new();
-$buttons->pack_start($radio_buttons, FALSE, FALSE, 0);
+$menu_row->pack_start($radio_buttons, FALSE, FALSE, 0);
 
 my $button_all = Gtk2::RadioButton->new(undef, "All files");
 $radio_buttons->pack_start($button_all, TRUE, TRUE, 0);
@@ -72,7 +75,7 @@ $button_buffer->show;
 
 my $search_button = Gtk2::Button->new("Search");
 $search_button->signal_connect(clicked=> \&search);
-$buttons->pack_start($search_button, FALSE, FALSE, 5);
+$menu_row->pack_start($search_button, FALSE, FALSE, 5);
 $search_button->can_default(TRUE);
 $window->set_default($search_button);
 
@@ -80,15 +83,14 @@ $window->set_default($search_button);
 
 my $exit_button = Gtk2::Button->new("Exit");
 $exit_button->signal_connect(clicked=> sub { Gtk2->main_quit; });
-$buttons->pack_end($exit_button, FALSE, FALSE, 5);
+$menu_row->pack_end($exit_button, FALSE, FALSE, 5);
 
 my $lower_pane = Gtk2::VPaned->new();
-$vbox->pack_start($lower_pane, TRUE, TRUE, 5);
+$main_vbox->pack_start($lower_pane, TRUE, TRUE, 5);
 
 
 ###### Left pane, file or Widget listing
 my $hbox = Gtk2::HPaned->new();
-#$vbox->pack_start($hbox, TRUE, TRUE, 5);
 $lower_pane->add1($hbox);
 
 my $tree_store = Gtk2::TreeStore->new('Glib::String', 'Glib::String', 'Glib::String');
@@ -99,6 +101,7 @@ $tree_view->append_column($col);
 $tree_view->set_headers_visible(0);
 
 my $left_scroll = Gtk2::ScrolledWindow->new;
+$left_scroll->set_shadow_type ('in');
 $left_scroll->set_policy ('never', 'automatic');
 $left_scroll->add($tree_view);
 
@@ -113,6 +116,7 @@ my $textview = Gtk2::TextView->new_with_buffer($buffer);
 $textview->set_wrap_mode("word");
 
 my $right_scroll = Gtk2::ScrolledWindow->new;
+$right_scroll->set_shadow_type ('in');
 $right_scroll->set_policy ('automatic', 'automatic');
 $right_scroll->add($textview);
 
@@ -122,9 +126,8 @@ $hbox->set_position(200);
 
 # pane for search results
 my $sw = Gtk2::ScrolledWindow->new;
-$sw->set_shadow_type ('etched-in');
+$sw->set_shadow_type ('in');
 $sw->set_policy ('automatic', 'automatic');
-#$vbox->pack_start ($sw, FALSE, FALSE, 0);
 $lower_pane->add2($sw);
 $lower_pane->set_position(450);
 show_search_results();
