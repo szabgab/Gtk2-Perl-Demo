@@ -17,6 +17,7 @@ if (@ARGV and $ARGV[0] eq "check") {
 	exit;
 }
 
+my $title = "GTK+ Perl binding Tutorial and code demos";
 my %files;
 my %widgets;
 my $current_list;
@@ -24,7 +25,7 @@ collect_widgets(\@entries);
  
 ##### Main window
 my $window = Gtk2::Window->new;
-$window->set_title("GTK+ Perl binding Tutorial and code demos");
+$window->set_title($title);
 $window->signal_connect (destroy => sub { Gtk2->main_quit; });
 $window->set_default_size(900, 650);
 
@@ -278,6 +279,7 @@ sub select_example {
 sub show_file {
 	my ($buffer, $filename) = @_;
 	my $code;
+	$window->set_title("$title     '$filename'");
 	if (open my $fh, $filename) {
 		$code = join "", <$fh>;
 		close $fh;
