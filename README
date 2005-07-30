@@ -24,7 +24,7 @@ TODO
 
 - Search results should also show the title of the file 
 - Mnemonics and stock icons would spruce up the main window a bit.
-- Repeat search with the buffer
+- Repeat search within the buffer pressing Ctr-N
 
 - Syntax highlighting  (using Gtk2::SourceView ?) make it optional
 

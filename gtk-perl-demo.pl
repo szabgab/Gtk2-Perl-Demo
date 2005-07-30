@@ -41,11 +41,11 @@ my $toggle_button = Gtk2::Button->new("List Widgets");
 $toggle_button->signal_connect(clicked=> \&toggle_list);
 $menu_row->pack_start($toggle_button, FALSE, FALSE, 5);
 
-my $execute_button = Gtk2::Button->new("Execute");
+my $execute_button = Gtk2::Button->new_from_stock('gtk-execute');
 $execute_button->signal_connect(clicked=> \&execute_code);
 $menu_row->pack_start($execute_button, FALSE, FALSE, 5);
 
-my $save_button = Gtk2::Button->new("Save");
+my $save_button = Gtk2::Button->new_from_stock('gtk-save');
 $save_button->signal_connect(clicked=> \&save_code);
 $menu_row->pack_start($save_button, FALSE, FALSE, 5);
 
@@ -73,7 +73,7 @@ $radio_buttons->pack_start($button_buffer, TRUE, TRUE, 0);
 $button_buffer->show;
 ###############
 
-my $search_button = Gtk2::Button->new("Search");
+my $search_button = Gtk2::Button->new_from_stock('gtk-find');
 $search_button->signal_connect(clicked=> \&search);
 $menu_row->pack_start($search_button, FALSE, FALSE, 5);
 $search_button->can_default(TRUE);
@@ -81,7 +81,7 @@ $window->set_default($search_button);
 
 
 
-my $exit_button = Gtk2::Button->new("Exit");
+my $exit_button = Gtk2::Button->new_from_stock('gtk-quit');
 $exit_button->signal_connect(clicked=> sub { Gtk2->main_quit; });
 $menu_row->pack_end($exit_button, FALSE, FALSE, 5);
 
@@ -134,7 +134,7 @@ $lower_pane->set_position(450);
 show_search_results();
 
 
-
+################ Add accelerators to the code
 my @accels = (
 	{ key => 'S', mod => 'control-mask', 
 			func => sub {$search_entry->grab_focus(); $button_all->set_active(TRUE);} },
@@ -148,6 +148,7 @@ foreach my $a (@accels) {
 	                       'visible', $a->{func});
 }
 $window->add_accel_group ($accel_group);
+#################
 
 $window->show_all();
 Gtk2->main;
