@@ -20,9 +20,33 @@ my $window = Gtk2::Window->new;
 $window->signal_connect (destroy => sub { Gtk2->main_quit; });
 
 my $button = Gtk2::Button->new("Exit");
+
+# this is the same as 
+# my $button = Gtk2::Button->new_with_label("Exit");
+
+# A better approach is to use mnemonic.
+# In this case we can add an _ infront of one of the characters.
+# GTK automatically will mark the character with an undeline and create an
+# accelerator Alt-   with the given letter.
+# In our case Alt-x will invoke the button and exit the application.
+#my $button = Gtk2::Button->new_with_mnemonic("E_xit");
+
+
+# Probably the best approach is to use stock item.
+# There are many stock items 
+# (see gtk-Stock-Items.html in the documentation)
+#my $button = Gtk2::Button->new_from_stock("gtk-quit");
+
+
+# Style
+#$button->set_relief('half');   # normal, half, none    normal is the default
+
+
 $button->signal_connect(clicked=> sub { Gtk2->main_quit; });
 $window->add($button);
 
 $window->show_all();
 Gtk2->main;
+
+
 

@@ -59,6 +59,11 @@
 			type  => "file",
 			name  => "tutorial/rightclick.pl",
 		},
+		{
+			title => "Resizable windows",
+			type  => "file",
+			name  => "tutorial/vpaned.pl",
+		},
 
 		],
 	},

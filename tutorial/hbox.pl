@@ -2,7 +2,8 @@
 use strict;
 use warnings;
 
-# The same as the previous example but now in a horizontal organization using HBox
+# Similary to the previous example we can use an HBox (Horizontal Box) 
+# That will render the widgets we put in it, well horizontally
 
 use Gtk2 '-init';
 
@@ -16,11 +17,11 @@ $hbox->set("border_width"=> 10); #optionally we set the border width
 $window->add($hbox);
 
 my $label = Gtk2::Label->new("Hello world!");
-$hbox->pack_start($label, 0, 0, 5);
+$hbox->add($label);
 
 my $button = Gtk2::Button->new("Exit");
 $button->signal_connect(clicked=> \&handle_exit_button);
-$hbox->pack_start($button, 0, 0, 5);
+$hbox->add($button);
 
 $window->show_all();
 Gtk2->main;
