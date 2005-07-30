@@ -141,6 +141,8 @@ my @accels = (
 			func => sub {$search_entry->grab_focus(); $button_all->set_active(TRUE);} },
 	{ key => 'F', mod => 'control-mask', 
 			func => sub {$search_entry->grab_focus(); $button_buffer->set_active(TRUE); }},
+	{ key => 'N', mod => 'control-mask', 
+			func => \&search_again},
 );
 my $accel_group = Gtk2::AccelGroup->new;
 use Gtk2::Gdk::Keysyms;
@@ -343,6 +345,13 @@ sub search {
 		search_buffer($search_text);
 	}
 }
+
+sub search_again {
+	my $search_text = $search_entry->get_text;
+	return if not $search_text;
+	search_buffer($search_text, "next");
+}
+
 sub _search {
 	my ($text, $entries) = @_;
 
@@ -413,12 +422,24 @@ sub show_search_results {
 }
 
 sub search_buffer {
-	my ($text) = @_;
+	my ($text, $direction) = @_;
 
 	#TextBuffer
 	my $cont = $buffer->get_text($buffer->get_start_iter, $buffer->get_end_iter, 0);
-	my $start = index ($cont, $text);
+	my $start_index = 0;
+	if ($direction) {
+	#	$start_index = 20;
+		my $mark = $buffer->get_selection_bound;
+		#print "$mark\n";
+		my $iter = $buffer->get_iter_at_mark($mark);
+		#print $iter->get_offset, "\n";
+		$start_index = $iter->get_offset;
+	}
+	
+	
+	my $start = index ($cont, $text, $start_index);
 	return if $start == -1;
+	#print "start: $start\n";
 	my $start_iter = $buffer->get_iter_at_offset($start);
 	my $end_iter   = $buffer->get_iter_at_offset($start+length($text));
 	$buffer->select_range($start_iter, $end_iter);

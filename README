@@ -24,7 +24,6 @@ TODO
 
 - Search results should also show the title of the file 
 - Mnemonics and stock icons would spruce up the main window a bit.
-- Repeat search within the buffer pressing Ctr-N
 
 - How can I catch the ESC key pressed ?
 - How can I display simple HTML files or how could we include the both the documentation and the Tutorial in the Demo tool?
@@ -63,12 +62,6 @@ TODO
 - The color snooper doesn't work --- it complains on the console that it needs an argument.
   change the script to have a default file or we will have to rework the whole examples invocation thing.
 
-
-- gtk-demo allows you to run more than one demo at a time.  Both of those features would be handy.  
-  (Since you can edit the script,
-  it would be rather easy for a user to hose the demo.)
-- We might want to run the external application on a fork so the user can run several 
-  versions at the same time and see the differences.
 
 - It wasn't immediately obvious that i could edit the text to modify and run the samples.  
   Some explanatory text and a "revert" button would be helpful.
@@ -279,4 +272,10 @@ Add save button to save the content of the code window (now that we do not have 
   Let's see this
 - gtk-demo allows you to run scripts by activating their rows in the treeview (double-clicking or pressing enter). 
 
+- gtk-demo allows you to run more than one demo at a time.  Both of those features would be handy.  
+  (Since you can edit the script,
+  it would be rather easy for a user to hose the demo.)
+- We might want to run the external application on a fork so the user can run several 
+  versions at the same time and see the differences.
+- Repeat search within the buffer pressing Ctr-N
 
