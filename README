@@ -81,71 +81,79 @@ TODO
 
 - Can we somehow include the Tutorial and maybe the full documentation?
 
+List of files in the Gtk2 documentation.
++ marks classes that are used in some of the examples
+indented entries have examples but have no entries in the documentation
+
 GtkAboutDialog
+     Gtk2::AccelGroup      +
 GtkAccelLabel
 GtkAccessible
 GtkActionGroup
 GtkAction
 GtkAdjustment
-GtkAlignment
-GtkArrow
+GtkAlignment              +
+GtkArrow                  +
 GtkAspectFrame
 GtkBin
-GtkBox
+GtkBox                    +
 GtkButtonBox
-GtkButton
-GtkCalendar
-GtkCellEditable
+GtkButton                 +
+GtkCalendar               +
+GtkCellEditable           +
 GtkCellLayout
 GtkCellRendererCombo
-GtkCellRenderer
-GtkCellRendererPixbuf
+GtkCellRenderer           +
+GtkCellRendererPixbuf     +
 GtkCellRendererProgress
-GtkCellRendererText
+GtkCellRendererText       +
 GtkCellRendererToggle
 GtkCellView
-GtkCheckButton
+GtkCheckButton            +
 GtkCheckMenuItem
 GtkCList
-GtkColorButton
+GtkColorButton            +
 GtkColorSelectionDialog
 GtkColorSelection
-GtkComboBoxEntry
-GtkComboBox
+GtkComboBoxEntry          +
+GtkComboBox               +
 GtkCombo
 GtkContainer
 GtkCTree
 GtkCurve
-GtkDialog
-GtkDrawingArea
+GtkDialog                 +
+GtkDrawingArea            +
 GtkEditable
 GtkEntryCompletion
-GtkEntry
-GtkEventBox
-GtkExpander
+GtkEntry                  +
+GtkEventBox               +
+GtkExpander               +
 GtkFileChooserButton
-GtkFileChooserDialog
-GtkFileChooser
+GtkFileChooserDialog      +
+GtkFileChooser            +
 GtkFileChooserWidget
-GtkFileSelection
+GtkFileSelection          +
 GtkFixed
 GtkFontButton
-GtkFontSelectionDialog
-GtkFontSelection
-GtkFrame
+GtkFontSelectionDialog    +
+GtkFontSelection          +
+GtkFrame                  +
 GtkGammaCurve
 GtkHandleBox
-GtkHBox
-GtkHButtonBox
+GtkHBox                   +
+GtkHButtonBox             +
 GtkHPaned
-GtkHRuler
+GtkHRuler                 +
 GtkHScale
 GtkHScrollbar
-GtkHSeparator
+GtkHSeparator             +
+   Gtk2::IconSet          +
+   Gtk2::IconFactory      +
 GtkIconTheme
 GtkIconView
-GtkImage
+GtkImage                  +
 GtkImageMenuItem
+   Gtk2::ItemFactory      +
 GtkIMContext
 GtkIMContextSimple
 GtkIMMulticontext
@@ -157,10 +165,12 @@ GtkLabel
 GtkLayout
 GtkList
 GtkListItem
-GtkListStore
-GtkMenuBar
-GtkMenu
-GtkMenuItem
+GtkListStore             +
+   Gtk2::Label           +
+   Gtk2::Layout          +
+GtkMenuBar               +
+GtkMenu                  +
+GtkMenuItem              +
 GtkMenuShell
 GtkMenuToolButton
 GtkMessageDialog
@@ -168,69 +178,76 @@ GtkMisc
 GtkNotebook
 GtkObject
 GtkOldEditable
-GtkOptionMenu
+GtkOptionMenu            +
+   Gtk2::Pango           +
 GtkPaned
 GtkPixmap
-GtkPlug
+GtkPlug                  +
 GtkPreview
-GtkProgressBar
+GtkProgressBar           +
 GtkProgress
 GtkRadioAction
-GtkRadioButton
+GtkRadioButton           +
 GtkRadioMenuItem
 GtkRadioToolButton
 GtkRange
 GtkRuler
 GtkScale
 GtkScrollbar
-GtkScrolledWindow
+GtkScrolledWindow        +
 GtkSeparator
 GtkSeparatorMenuItem
 GtkSeparatorToolItem
 GtkSettings
 GtkSizeGroup
-GtkSocket
-GtkSpinButton
+   Gtk2::SimpleMenu      +
+   Gtk2::SimpleList      +
+GtkSocket                +
+GtkSpinButton            +
 GtkStatusbar
 GtkStyle
-GtkTable
+   Gtk2::Stock           +
+GtkTable                 +
 GtkTearoffMenuItem
-GtkTextBuffer
+GtkTextBuffer            +
 GtkText
 GtkTextMark
 GtkTextTag
 GtkTextTagTable
-GtkTextView
+GtkTextView              +
+   Gtk2::Timeout         +
 GtkTipsQuery
 GtkToggleAction
-GtkToggleButton
+GtkToggleButton          +
 GtkToggleToolButton
 GtkToolbar
 GtkToolButton
 GtkToolItem
-GtkTooltips
+GtkTooltips              +
 GtkTree
 GtkTreeItem
 GtkTreeModelFilter
-GtkTreeModel
+GtkTreeModel             +
 GtkTreeModelSort
+   Gtk2::TreePath        +
+   Gtk2::TreeIter        +
 GtkTreeSelection
 GtkTreeSortable
 GtkTreeStore
-GtkTreeViewColumn
-GtkTreeView
+GtkTreeViewColumn        +
+GtkTreeView              +
 GtkUIManager
-GtkVBox
-GtkVButtonBox
+GtkVBox                  +
+GtkVButtonBox            +
 GtkViewport
-GtkVPaned
-GtkVRuler
+GtkVPaned                +
+GtkVRuler                +
 GtkVScale
 GtkVScrollbar
-GtkVSeparator
+GtkVSeparator            +
 GtkWidget
 GtkWindowGroup
-GtkWindow
+GtkWindow                +
 
 
 DONE
