@@ -38,7 +38,7 @@ $window->add($main_vbox);
 my $menu_row = Gtk2::HBox->new();
 $main_vbox->pack_start($menu_row, FALSE, FALSE, 5);
 
-my $toggle_button = Gtk2::Button->new("List Widgets");
+my $toggle_button = Gtk2::Button->new_with_mnemonic("_List Widgets");
 $toggle_button->signal_connect(clicked=> \&toggle_list);
 $menu_row->pack_start($toggle_button, FALSE, FALSE, 5);
 
@@ -236,12 +236,12 @@ sub list_widgets {
 sub toggle_list {
 	my ($widget) = @_;
 	my $label = $widget->get_label;
-	if ($label eq "List Widgets") {
+	if ($label eq "_List Widgets") {
 		list_widgets();
-		$widget->set_label("List Examples");
+		$widget->set_label("_List Examples");
 	} else {
 		list_examples();
-		$widget->set_label("List Widgets");
+		$widget->set_label("_List Widgets");
 	}
 }
 
@@ -411,7 +411,7 @@ sub show_search_results {
 	$sw->add ($tree_view);
 
 
-	my @titles = ("Filename", "Result Line");
+	my @titles = ("Filename", "_Result Line");
 	foreach my $i (0..@titles-1) {
 		my $renderer = Gtk2::CellRendererText->new;
 		my $column = Gtk2::TreeViewColumn->new_with_attributes ($titles[$i], 

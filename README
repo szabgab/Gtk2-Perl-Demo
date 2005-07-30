@@ -23,10 +23,10 @@ TODO
 ============
 
 - Search results should also show the title of the file 
-- Mnemonics and stock icons would spruce up the main window a bit.
 
 - How can I catch the ESC key pressed ?
 - How can I display simple HTML files or how could we include the both the documentation and the Tutorial in the Demo tool?
+- How to add an incon for theAlt-TAB thingy and the image when minimized ?
 
 - Syntax highlighting  (using Gtk2::SourceView ?) make it optional
 
@@ -278,4 +278,5 @@ Add save button to save the content of the code window (now that we do not have 
 - We might want to run the external application on a fork so the user can run several 
   versions at the same time and see the differences.
 - Repeat search within the buffer pressing Ctr-N
+- Mnemonics and stock icons would spruce up the main window a bit.
 
