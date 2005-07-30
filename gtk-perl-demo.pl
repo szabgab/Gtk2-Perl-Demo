@@ -187,7 +187,13 @@ sub execute_code {
 	my ($fh, $temp_filename) = tempfile();
 	print $fh $buffer->get_text($buffer->get_start_iter, $buffer->get_end_iter, 0);
 	close $fh;
-	system($^X, $temp_filename);
+	if (fork) {
+		# parent
+	} else {
+		# child
+		system($^X, $temp_filename);
+		exit;
+	}
 	unlink $temp_filename;
 	return;
 }
