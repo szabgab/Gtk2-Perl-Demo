@@ -1,3 +1,13 @@
-In this demo application we provide both a simple tutorial to the Perl 
-binding of Gtk and a bunch of examples.
+
+
+
+                    In this demo application we provide both a simple tutorial to the Perl 
+                    binding of Gtk and a bunch of examples.
+
+
+
+
+Ctr-S - Search all the files
+Ctr-F - Search within the current buffer
+Ctr-N - Repeate search within the current buffer
 

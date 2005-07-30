@@ -25,8 +25,12 @@ TODO
 - Search results should also show the title of the file 
 
 - How can I catch the ESC key pressed ?
-- How can I display simple HTML files or how could we include the both the documentation and the Tutorial in the Demo tool?
-- How to add an incon for theAlt-TAB thingy and the image when minimized ?
+- How can I display simple HTML files or pod ?
+  Gtk2::PodViewer
+  Gtk2::Html2, Gtk2::MozEmbed
+- How could we include the both the documentation and the Tutorial in the Demo tool?
+- How to add an icoon for the Alt-TAB thingy and the image when minimized ?
+  Gtk2::Window->set_icon()?
 
 - Syntax highlighting  (using Gtk2::SourceView ?) make it optional
 

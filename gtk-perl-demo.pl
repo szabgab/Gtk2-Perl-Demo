@@ -9,6 +9,7 @@ use File::Temp qw(tempfile);
 
 our $VERSION = '0.02';
 my ($ENTRY_NAME, $ENTRY_TYPE, $ENTRY_FILE) = (0, 1, 2);
+my ($SEARCH_FILENAME, $SEARCH_TEXT, $SEARCH_TITLE) = (0, 1, 2);
 
 my @entries = do "entries.pl"; 
 if (@ARGV and $ARGV[0] eq "check") {
@@ -17,7 +18,7 @@ if (@ARGV and $ARGV[0] eq "check") {
 	exit;
 }
 
-my $title = "GTK+ Perl binding Tutorial and code demos";
+my $app_title = "GTK+ Perl binding Tutorial and code demos";
 my %files;
 my %widgets;
 my $current_list;
@@ -25,7 +26,7 @@ collect_widgets(\@entries);
  
 ##### Main window
 my $window = Gtk2::Window->new;
-$window->set_title($title);
+$window->set_title($app_title);
 $window->signal_connect (destroy => sub { Gtk2->main_quit; });
 $window->set_default_size(900, 650);
 
@@ -112,7 +113,7 @@ $hbox->add1($left_scroll);
 
 list_examples();
 my $buffer = Gtk2::TextBuffer->new();
-show_file($buffer, "welcome.txt");
+show_file($buffer, "welcome.txt", "Welcome");
 
 my $textview = Gtk2::TextView->new_with_buffer($buffer);
 $textview->set_wrap_mode("word");
@@ -270,7 +271,9 @@ sub select_widget {
 	} elsif (@c == 2) {
 		my $widget = (sort keys %widgets)[$c[0]];
 	 	my $filename = (sort keys %{$widgets{$widget}})[$c[1]];
-		show_file($buffer, $filename);
+		show_file($buffer, $filename, $widgets{$widget}{$filename});
+		print "$filename\n";
+		print Dumper $widgets{$widget};
 	} else {
 		show_text($buffer, "Internal error, bad tree item: " . $path->to_string);
 	}
@@ -280,14 +283,15 @@ sub select_example {
 	my ($name, $type, $file) = _translate_tree_selection();
 	return if not $name; # maybe some error message ?
 
-	show_file($buffer, $file);
+	show_file($buffer, $file, $name);
 	return;
 }
 
 sub show_file {
-	my ($buffer, $filename) = @_;
+	my ($buffer, $filename, $title) = @_;
 	my $code;
-	$window->set_title("$title     '$filename'");
+	$title ||= "NA";
+	$window->set_title("$app_title     $title: '$filename'");
 	if (open my $fh, $filename) {
 		$code = join "", <$fh>;
 		close $fh;
@@ -309,7 +313,7 @@ sub collect_widgets {
 
 	foreach my $entry (@$entries) {
 		if ($entry->{type} eq "file") {
-			analyze_file($entry->{name});
+			analyze_file($entry->{name}, $entry->{title});
 		}
 		collect_widgets($entry->{more}) if $entry->{more};
 	}
@@ -317,11 +321,11 @@ sub collect_widgets {
 }
 
 sub analyze_file {
-	my ($file) = @_;
+	my ($file, $title) = @_;
 	open my $fh, $file or return;
 	while (my $line = <$fh>) {
 		if ($line =~ /(Gtk2::\w+(:?::\w+)*)/) {
-			$widgets{$1}{$file}++;
+			$widgets{$1}{$file} = $title;
 		}
 	}
 }	
@@ -340,6 +344,7 @@ sub search {
 	if ($button_all->get_active()) {
 		my %hits = _search($search_text, \@entries); 
 		show_search_results(%hits);
+
 	} else { # $button_buffer (this is the default if nothing is selected)
 		#print "Search in text\n";
 		search_buffer($search_text);
@@ -358,12 +363,12 @@ sub _search {
 	my %resp;
 
 	foreach my $entry (@$entries) {
-		#$entry->{title}, 
 		#$entry->{type}, 
 		if (open my $fh, "<", $entry->{name}) {
 			if (my @lines = grep /$text/, <$fh>) {
 				chomp @lines;
-				$resp{$entry->{name}} = \@lines;
+				$resp{$entry->{name}}{lines} = \@lines;
+				$resp{$entry->{name}}{title} = $entry->{title};
 			}
 		}
 		if ($entry->{more}) {
@@ -373,16 +378,18 @@ sub _search {
 	return %resp;
 }
 
-
-#use constant STRING_COLUMN => 0;
 sub show_search_results {
 	my (%hits) = @_;
-	my $model = Gtk2::ListStore->new ('Glib::String', 'Glib::String');
+	my $model = Gtk2::ListStore->new ('Glib::String', 'Glib::String', 'Glib::String');
 
 	foreach my $file (keys %hits) {
-		foreach my $row (@{$hits{$file}}) {
+		foreach my $row (@{$hits{$file}{lines}}) {
 			my $iter = $model->append;
-			$model->set ($iter, 0 => $file, 1 => $row);
+			$model->set ($iter, 
+				$SEARCH_FILENAME => $file, 
+				$SEARCH_TEXT     => $row, 
+				$SEARCH_TITLE    => $hits{$file}{title}
+			);
 		}
 	}
 
@@ -400,12 +407,12 @@ sub show_search_results {
 	$tree_view->get_selection->signal_connect (changed => sub {
 		# $_[0] is a GtkTreeSelection
 		my ($tree_view) = $sw->get_children;
-		my $model = $tree_view->get_model();
+		my $model  = $tree_view->get_model();
 		my @sel    = $_[0]->get_selected_rows;
 		my $iter   = $_[0]->get_selected();
-		my ($file, $row) = $model->get($iter, 0, 1);
-		show_file($buffer, $file);
-		search_buffer($row);
+		my ($file, $text, $title) = $model->get($iter, $SEARCH_FILENAME, $SEARCH_TEXT, $SEARCH_TITLE); 
+		show_file($buffer, $file, $title);
+		search_buffer($text);
 	});
 	
 	$sw->add ($tree_view);
