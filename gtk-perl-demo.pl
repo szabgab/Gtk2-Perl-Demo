@@ -17,6 +17,9 @@ if (@ARGV and $ARGV[0] eq "check") {
 	print "All the files are readable\n";
 	exit;
 }
+my $HISTORY_LIMIT = 20;
+my @history;
+my $history;
 
 my $app_title = "GTK+ Perl binding Tutorial and code demos";
 my %files;
@@ -87,6 +90,38 @@ my $exit_button = Gtk2::Button->new_from_stock('gtk-quit');
 $exit_button->signal_connect(clicked=> sub { Gtk2->main_quit; });
 $menu_row->pack_end($exit_button, FALSE, FALSE, 5);
 
+
+####################### History row
+my $history_row = Gtk2::HBox->new();
+$main_vbox->pack_start($history_row, FALSE, FALSE, 5);
+
+my $history_label = Gtk2::Label->new("History");
+$history_row->pack_start($history_label, FALSE, FALSE, 5);
+
+my $history_opt = Gtk2::OptionMenu->new;
+
+sub list_history {
+	my $history_menu = Gtk2::Menu->new;
+	foreach my $h (reverse @history) {
+		#print "Add: $h->{title}\n";
+		my $item = Gtk2::MenuItem->new ($h->{title}); # filename
+		$item->signal_connect (activate => sub {
+				$history = $_[1];
+			}, $h);
+		$item->show;
+		$history_menu->append ($item);
+	}
+	$history_opt->set_menu ($history_menu);
+}
+#$history_opt->set_history (1);
+$history_row->pack_start($history_opt, FALSE, FALSE, 5);
+
+my $history_button = Gtk2::Button->new_from_stock('gtk-jump-to');
+$history_button->signal_connect(clicked=> \&show_history);
+$history_row->pack_start($history_button, FALSE, FALSE, 5);
+
+
+################# Add lower panes
 my $lower_pane = Gtk2::VPaned->new();
 $main_vbox->pack_start($lower_pane, TRUE, TRUE, 5);
 
@@ -272,8 +307,6 @@ sub select_widget {
 		my $widget = (sort keys %widgets)[$c[0]];
 	 	my $filename = (sort keys %{$widgets{$widget}})[$c[1]];
 		show_file($buffer, $filename, $widgets{$widget}{$filename});
-		print "$filename\n";
-		print Dumper $widgets{$widget};
 	} else {
 		show_text($buffer, "Internal error, bad tree item: " . $path->to_string);
 	}
@@ -289,6 +322,15 @@ sub select_example {
 
 sub show_file {
 	my ($buffer, $filename, $title) = @_;
+	if ($filename =~ /.pl$/) {
+		push @history, {
+			filename => $filename,
+			title    => $title,
+		};
+		shift @history if @history > $HISTORY_LIMIT;
+		#print map {$_->{filename} . "\n"} @history;
+	}
+	list_history(); 
 	my $code;
 	$title ||= "NA";
 	$window->set_title("$app_title     $title: '$filename'");
@@ -455,4 +497,10 @@ sub search_buffer {
 	$textview->scroll_to_mark($mark, 0.4, TRUE, 0.5, 0.5);
 }
 
-
+sub show_history {
+	#my $menu = $history_opt->get_menu or return;
+	#my $item = $menu->get_active or return;
+	#print Dumper $history;
+	return if not $history;
+	show_file($buffer, $history->{filename}, $history->{title});
+}

@@ -101,4 +101,5 @@ tutorial/rightclick.pl
 tutorial/signals.txt
 tutorial/simple.pl
 tutorial/vbox.pl
+tutorial/vpaned.pl
 welcome.txt
