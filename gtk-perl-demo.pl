@@ -6,6 +6,7 @@ use Glib qw/TRUE FALSE/;
 use Gtk2 '-init';
 use Data::Dumper;
 use File::Temp qw(tempfile);
+use Time::HiRes qw(usleep);
 
 our $VERSION = '0.02';
 my ($ENTRY_NAME, $ENTRY_TYPE, $ENTRY_FILE) = (0, 1, 2);
@@ -224,13 +225,16 @@ sub execute_code {
 
 	my ($fh, $temp_filename) = tempfile();
 	print $fh $buffer->get_text($buffer->get_start_iter, $buffer->get_end_iter, 0);
+	$fh->flush;
 	close $fh;
-	if (fork) {
-		# parent
+	usleep(1000); # to make sure the file was fully flushed by the OS 
+	              # it seems when we started to use fork, and later the background execution
+	              # ocassionally the file was not yet created by them the code reached system()
+	              # very strange
+	if ($^O =~ /win/i) {
+		system("start $^X $temp_filename");
 	} else {
-		# child
-		system($^X, $temp_filename);
-		exit;
+		system("$^X $temp_filename &");
 	}
 	unlink $temp_filename;
 	return;
