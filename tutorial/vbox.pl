@@ -14,7 +14,7 @@ use warnings;
 use Gtk2 '-init';
 
 my $window = Gtk2::Window->new;
-$window->signal_connect (destroy => sub { Gtk2->main_quit; });
+$window->signal_connect (destroy => \&handle_exit);
 
 
 # We create the VBox
@@ -30,13 +30,13 @@ my $label = Gtk2::Label->new("Hello world!");
 $vbox->add($label);
 
 my $button = Gtk2::Button->new("Exit");
-$button->signal_connect(clicked=> \&handle_exit_button);
+$button->signal_connect(clicked=> \&handle_exit);
 $vbox->add($button);
 
 $window->show_all();
 Gtk2->main;
 
-sub handle_exit_button {
+sub handle_exit {
 	print "Exiting...\n";
 	Gtk2->main_quit;
 }

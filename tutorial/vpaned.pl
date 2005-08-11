@@ -5,7 +5,7 @@ use warnings;
 use Gtk2 '-init';
 
 my $window = Gtk2::Window->new;
-$window->signal_connect (destroy => sub { Gtk2->main_quit; });
+$window->signal_connect (destroy => \&handle_exit);
 
 # The window is resizable
 my $main = Gtk2::VBox->new();
@@ -36,3 +36,6 @@ $main->add($lower_textview);
 $window->show_all();
 Gtk2->main;
 
+sub handle_exit { 
+	Gtk2->main_quit; 
+}

@@ -18,7 +18,7 @@ use Glib qw/TRUE FALSE/;
 
 my $window = Gtk2::Window->new;
 $window->set_title ("User entry");
-$window->signal_connect (destroy => sub { Gtk2->main_quit; });
+$window->signal_connect (destroy => \&handle_exit);
 
 my $vbox = Gtk2::VBox->new();
 #$vbox->set_border_width(50);
@@ -39,7 +39,7 @@ $vbox->add($show_button);
 
 
 my $exit_button = Gtk2::Button->new("Exit");
-$exit_button->signal_connect(clicked=> sub { Gtk2->main_quit; });
+$exit_button->signal_connect(clicked=> \&handle_exit);
 $vbox->add($exit_button);
 
 # This is somehow inconvenient. We are used to be able to type in text
@@ -74,5 +74,5 @@ sub show_button_clicked {
 	#$window->set_default($exit_button) if $text eq "exit";
 }
 
-
+sub handle_exit { Gtk2->main_quit; }
 

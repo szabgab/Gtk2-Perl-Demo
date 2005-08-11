@@ -10,14 +10,14 @@ use Gtk2 '-init';
 
 my $window = Gtk2::Window->new;
 $window->set_title ("Right click");
-$window->signal_connect (destroy => sub { Gtk2->main_quit; });
+$window->signal_connect (destroy => \&handle_exit);
 
 my $vbox = Gtk2::VBox->new();
 $vbox->set("border_width"=> 10);
 $window->add($vbox);
 
 my $button = Gtk2::Button->new("Right-click to show popup or left-click to Exit");
-$button->signal_connect(clicked => sub { print "bye\n"; Gtk2->main_quit; });
+$button->signal_connect(clicked => \&handle_exit);
 $button->signal_connect(button_press_event => \&handle_clicks);
 
 $vbox->pack_start($button, 0, 0, 5);
@@ -71,4 +71,7 @@ sub foo {
 		Gtk2->main_quit;
 	}
 }
-
+sub handle_exit { 
+	print "bye\n"; 
+	Gtk2->main_quit; 
+}
