@@ -8,7 +8,7 @@ use Data::Dumper;
 use File::Temp qw(tempfile);
 use Time::HiRes qw(usleep);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 my ($ENTRY_NAME, $ENTRY_TYPE, $ENTRY_FILE) = (0, 1, 2);
 my ($SEARCH_FILENAME, $SEARCH_TEXT, $SEARCH_TITLE) = (0, 1, 2);
 

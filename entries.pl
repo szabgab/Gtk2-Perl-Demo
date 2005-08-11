@@ -40,12 +40,12 @@
 			name  => "tutorial/vbox.pl",
 		},
 		{
-			title => "Horizontal layout",
+			title => "Horizontal Layout",
 			type  => "file",
 			name  => "tutorial/hbox.pl",
 		},
 		{
-			title => "Data Entry and Label change",
+			title => "Data Entry and Label Change",
 			type  => "file",
 			name  => "tutorial/box_and_button.pl",
 		},
@@ -60,7 +60,7 @@
 			name  => "tutorial/rightclick.pl",
 		},
 		{
-			title => "Resizable windows",
+			title => "Resizable Windows",
 			type  => "file",
 			name  => "tutorial/vpaned.pl",
 		},
