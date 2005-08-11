@@ -1,5 +1,5 @@
-This Demo was written by Gabor Szabo (szabgab) using the idea of 
-the gtk-demo distributed with the original C code.
+This Demo was written by Gabor Szabo (szabgab@gmail.com) using the idea 
+of the gtk-demo distributed with the original C code.
 
 It includes a tutorial part and the example files distributed 
 with the Perl binding of GTK+.
