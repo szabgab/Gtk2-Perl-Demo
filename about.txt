@@ -15,4 +15,7 @@ and the tutorial on it http://gtk2-perl.sourceforge.net/doc/gtk2-perl-tut/
 
 
 
+The latest version of this demo can always be found on
+http://www.szabgab.com/
+
 
