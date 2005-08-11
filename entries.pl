@@ -30,7 +30,7 @@
 			name  => "tutorial/button.pl",
 		},
 		{
-			title => "Exit button, printing to consol",
+			title => "Exit button, printing to console",
 			type  => "file",
 			name  => "tutorial/button_print.pl",
 		},

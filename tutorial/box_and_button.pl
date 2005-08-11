@@ -12,7 +12,7 @@ use warnings;
 use Gtk2 '-init';
 
 # Now we also import some magic TRUE and FALSE values
-# This is mainly a style issue inherited from the underlying C++ code
+# This is mainly a style issue inherited from the underlying C code
 # but we can stay with it for better readability
 use Glib qw/TRUE FALSE/;
 
