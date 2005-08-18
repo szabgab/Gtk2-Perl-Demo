@@ -64,6 +64,11 @@
 			type  => "file",
 			name  => "tutorial/vpaned.pl",
 		},
+		{
+			title => "Notebook",
+			type  => "file",
+			name  => "tutorial/notebook.pl",
+		},
 
 		],
 	},
