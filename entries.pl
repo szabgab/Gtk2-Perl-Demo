@@ -69,6 +69,11 @@
 			type  => "file",
 			name  => "tutorial/notebook.pl",
 		},
+		{
+			title => "Keyboard",
+			type  => "file",
+			name  => "tutorial/keyboard.pl",
+		},
 
 		],
 	},
