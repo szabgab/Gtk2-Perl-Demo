@@ -120,6 +120,7 @@ sub setup_treeview {
 	#}
 	
 	#$sth->finish;
+	$self->{column_info}->{id}    = {TYPE_NAME => "INTEGER"};
 	$self->{column_info}->{name}  = {TYPE_NAME => "CHAR"};
 	$self->{column_info}->{phone} = {TYPE_NAME => "CHAR"};
 	
