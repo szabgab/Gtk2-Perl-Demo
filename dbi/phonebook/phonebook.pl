@@ -47,3 +47,7 @@ my $datasheet_def = {
 
 my $data_sheet = Gtk2::Ex::Datasheet::DBI->new($datasheet_def) || die ("Error setting up Gtk2::Ex::Datasheet::DBI\n");
 
+$window->show_all;
+Gtk2->main;
+
+
