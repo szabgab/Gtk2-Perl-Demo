@@ -47,33 +47,3 @@ my $datasheet_def = {
 
 my $data_sheet = Gtk2::Ex::Datasheet::DBI->new($datasheet_def) || die ("Error setting up Gtk2::Ex::Datasheet::DBI\n");
 
-
-=pod
-#$tree_view->signal_connect (button_release_event => \&button_release);
-#$tree_view->signal_connect ("row-activated"      => \&execute_code);
-my @cols = ("Name", "Phone");
-my ($ENTRY_NAME, $ENTRY_PHONE) = (0, 1);
-foreach my $i (0..1) {
-	my $col = Gtk2::TreeViewColumn->new_with_attributes($cols[$i], Gtk2::CellRendererText->new(), text => $i);
-	$tree_view->append_column($col);
-}
-$tree_view->set_headers_visible(1);
-$main_vbox->add($tree_view);
-$window->show_all();
-
-
-my @entries = (
-	["Gabor", 123],
-	["Peter", 456],
-);
-foreach my $entry (@entries) {
-	my $child = $tree_store->append(undef);
-	$tree_store->set($child, 
-		$ENTRY_NAME  => $entry->[0], 
-		$ENTRY_PHONE => $entry->[1]);
-}
-=cut
-
-$window->show_all;
-Gtk2->main;
-
