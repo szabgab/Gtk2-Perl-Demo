@@ -13,7 +13,7 @@ use warnings;
 use Gtk2 '-init';
 
 my $window = Gtk2::Window->new;
-$window->signal_connect (destroy => \&handle_exit);
+$window->signal_connect (destroy => sub { Gtk2->main_quit;});
 
 my $button = Gtk2::Button->new("Hello world!");
 $button->signal_connect(clicked=> \&handle_exit);
