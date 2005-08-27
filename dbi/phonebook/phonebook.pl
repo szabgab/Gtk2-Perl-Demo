@@ -8,6 +8,9 @@ use Gtk2 '-init';
 use Gtk2::Ex::Datasheet::DBI;
 use DBI;
 
+my $dbfile = "phonebook.db";
+die "Database file $dbfile does not exist\n" if not -e $dbfile;
+
 
 
 my $window = Gtk2::Window->new;
@@ -22,10 +25,7 @@ $window->add($main_vbox);
 my $tree_view  = Gtk2::TreeView->new();
 $main_vbox->add($tree_view);
 
-
-
-
-my $dbh = DBI->connect("dbi:SQLite:dbname=phonebook.db","","");
+my $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile","","");
 my $datasheet_def = { 
 	dbh          => $dbh, 
 	table        => "names", 
