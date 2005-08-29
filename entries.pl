@@ -257,6 +257,11 @@
 			type  => "file",
 			name  => "examples/timeouttest.pl",
 		},
+		{
+			title => "Image map",
+			type  => "file",
+			name  => "examples/imagemap.pl",
+		},
 		],
 	},
 	{
