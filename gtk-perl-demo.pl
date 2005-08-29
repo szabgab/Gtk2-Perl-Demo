@@ -8,7 +8,7 @@ use Data::Dumper;
 use File::Temp qw(tempfile);
 use Time::HiRes qw(usleep);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 my ($ENTRY_NAME, $ENTRY_TYPE, $ENTRY_FILE) = (0, 1, 2);
 my ($SEARCH_FILENAME, $SEARCH_TEXT, $SEARCH_TITLE) = (0, 1, 2);
 
@@ -131,21 +131,31 @@ $main_vbox->pack_start($lower_pane, TRUE, TRUE, 5);
 my $hbox = Gtk2::HPaned->new();
 $lower_pane->add1($hbox);
 
-my $tree_store = Gtk2::TreeStore->new('Glib::String', 'Glib::String', 'Glib::String');
-my $tree_view  = Gtk2::TreeView->new($tree_store);
-$tree_view->signal_connect (button_release_event => \&button_release);
-$tree_view->signal_connect ("row-activated"      => \&execute_code);
-my $col = Gtk2::TreeViewColumn->new_with_attributes("Right click for demo", Gtk2::CellRendererText->new(), text => "0");
-$tree_view->append_column($col);
-$tree_view->set_headers_visible(0);
+my ($tree_store, $tree_view, $left_scroll) = create_tree();
+sub create_tree {
+	my $tree_store = Gtk2::TreeStore->new('Glib::String', 'Glib::String', 'Glib::String');
+	my $tree_view  = Gtk2::TreeView->new($tree_store);
+	$tree_view->signal_connect (button_release_event => \&button_release);
+	$tree_view->signal_connect ("row-activated"      => \&execute_code);
+	my $col = Gtk2::TreeViewColumn->new_with_attributes("Right click for demo", Gtk2::CellRendererText->new(), text => "0");
+	$tree_view->append_column($col);
+	$tree_view->set_headers_visible(0);
 
-my $left_scroll = Gtk2::ScrolledWindow->new;
-$left_scroll->set_shadow_type ('in');
-$left_scroll->set_policy ('never', 'automatic');
-$left_scroll->add($tree_view);
+	my $left_scroll = Gtk2::ScrolledWindow->new;
+	$left_scroll->set_shadow_type ('in');
+	$left_scroll->set_policy ('never', 'automatic');
+	$left_scroll->add($tree_view);
+	return ($tree_store, $tree_view, $left_scroll);
+}
+
 
 #$hbox->pack_start($left_scroll, FALSE, FALSE, 5);
-$hbox->add1($left_scroll);
+my $notebook = Gtk2::Notebook->new();
+$hbox->add($notebook);
+$notebook->append_page($left_scroll, "Files");
+#$notebook->append_page($left_scroll, "Widget");
+
+#$hbox->add1($left_scroll);
 
 list_examples();
 my $buffer = Gtk2::TextBuffer->new();

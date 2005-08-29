@@ -25,6 +25,7 @@ my $exit_button = Gtk2::Button->new("Exit");
 $exit_button->signal_connect(clicked=> sub { Gtk2->main_quit; });
 
 my $notebook = Gtk2::Notebook->new();
+#$notebook->set_tab_hborder(30);
 $vbox->add($notebook);
 $notebook->append_page($button1, "left");
 $notebook->append_page($exit_button, "middle");
