@@ -25,7 +25,6 @@ my $history;
 my $app_title = "GTK+ Perl binding Tutorial and code demos";
 my %files;
 my %widgets;
-my $current_list;
 collect_widgets(\@entries);
  
 ##### Main window
@@ -42,10 +41,6 @@ $window->add($main_vbox);
 ##### Menu row
 my $menu_row = Gtk2::HBox->new();
 $main_vbox->pack_start($menu_row, FALSE, FALSE, 5);
-
-my $toggle_button = Gtk2::Button->new_with_mnemonic("_List Widgets");
-$toggle_button->signal_connect(clicked=> \&toggle_list);
-$menu_row->pack_start($toggle_button, FALSE, FALSE, 5);
 
 my $execute_button = Gtk2::Button->new_from_stock('gtk-execute');
 $execute_button->signal_connect(clicked=> \&execute_code);
@@ -131,7 +126,8 @@ $main_vbox->pack_start($lower_pane, TRUE, TRUE, 5);
 my $hbox = Gtk2::HPaned->new();
 $lower_pane->add1($hbox);
 
-my ($tree_store, $tree_view, $left_scroll) = create_tree();
+my ($files_store, $files_view, $files_scroll) = create_tree();
+my ($widgets_store, $widgets_view, $widgets_scroll) = create_tree();
 sub create_tree {
 	my $tree_store = Gtk2::TreeStore->new('Glib::String', 'Glib::String', 'Glib::String');
 	my $tree_view  = Gtk2::TreeView->new($tree_store);
@@ -149,15 +145,15 @@ sub create_tree {
 }
 
 
-#$hbox->pack_start($left_scroll, FALSE, FALSE, 5);
 my $notebook = Gtk2::Notebook->new();
 $hbox->add($notebook);
-$notebook->append_page($left_scroll, "Files");
-#$notebook->append_page($left_scroll, "Widget");
+$notebook->append_page($files_scroll, "Files");
+$notebook->append_page($widgets_scroll, "Widgets");
 
 #$hbox->add1($left_scroll);
 
 list_examples();
+list_widgets();
 my $buffer = Gtk2::TextBuffer->new();
 show_file($buffer, "welcome.txt", "Welcome");
 
@@ -251,7 +247,7 @@ sub execute_code {
 }
 
 sub add_entries {
-	my ($tree, $parent, $entries) = @_;
+	my ($tree, $tree_store, $parent, $entries) = @_;
 	foreach my $entry (@$entries) {
 		my $child = $tree_store->append($parent);
 		$tree->set($child, 
@@ -259,26 +255,24 @@ sub add_entries {
 			$ENTRY_TYPE => $entry->{type}, 
 			$ENTRY_FILE => $entry->{name});
 		if ($entry->{more}) {
-			add_entries($tree, $child, $entry->{more});
+			add_entries($tree, $tree_store, $child, $entry->{more});
 		}
 	}
 }
 
 sub list_examples {
-	$tree_store->clear();
-	$current_list = "examples";
-	add_entries($tree_store, undef, \@entries);
+	#$files_store->clear();
+	add_entries($files_store, $files_store, undef, \@entries);
 }
 
 sub list_widgets {
-	$tree_store->clear();
-	$current_list = "widgets";
+	#$widgets_store->clear();
 	foreach my $widget (sort keys %widgets) {
-		my $child = $tree_store->append(undef);
-		$tree_store->set($child, 0, $widget);
+		my $child = $widgets_store->append(undef);
+		$widgets_store->set($child, 0, $widget);
 		foreach my $file (sort keys %{$widgets{$widget}}) {
-			my $grandchild = $tree_store->append($child);
-			$tree_store->set($grandchild, 0, $file);
+			my $grandchild = $widgets_store->append($child);
+			$widgets_store->set($grandchild, 0, $file);
 		}
 	}
 }
@@ -296,8 +290,8 @@ sub toggle_list {
 }
 
 sub _translate_tree_selection {
-	my $model     = $tree_view->get_model();
-	my $selection = $tree_view->get_selection();
+	my $model     = $files_view->get_model();
+	my $selection = $files_view->get_selection();
 	my $iter      = $selection->get_selected();
 	return if not defined $iter;
 	return $model->get($iter, $ENTRY_NAME, $ENTRY_TYPE, $ENTRY_FILE);
@@ -305,15 +299,15 @@ sub _translate_tree_selection {
 
 sub button_release {
 	my ($self, $event) = @_;
-	if ($current_list eq "examples") {
-		select_example();
-	} else { #"widgets"
-		select_widget();
+	if ($notebook->get_current_page()) {
+		select_widget(); # 1
+	} else {
+		select_example(); # 0
 	}
 	return;
 }
 sub select_widget {
-	my ($path, $col) = $tree_view->get_cursor(); 
+	my ($path, $col) = $widgets_view->get_cursor(); 
 	my @c = split /:/, $path->to_string;
 	if (@c == 1) {
 		show_text($buffer, "Please select one of the files");	
@@ -449,21 +443,21 @@ sub show_search_results {
 		}
 	}
 
-	my ($tree_view) = $sw->get_children();
-	if ($tree_view) {
-		$tree_view->set_model($model);
+	my ($results_view) = $sw->get_children();
+	if ($results_view) {
+		$results_view->set_model($model);
 		return;
 	}
 
-	$tree_view = Gtk2::TreeView->new_with_model ($model);
+	$results_view = Gtk2::TreeView->new_with_model ($model);
 
-	#$tree_view->set_reorderable (TRUE);
+	#$results_view->set_reorderable (TRUE);
 	#$model->signal_connect (rows_reordered => sub {print "rows reordered\n"});
-	#$tree_view->get_selection->set_mode ('multiple');
-	$tree_view->get_selection->signal_connect (changed => sub {
+	#$results_view->get_selection->set_mode ('multiple');
+	$results_view->get_selection->signal_connect (changed => sub {
 		# $_[0] is a GtkTreeSelection
-		my ($tree_view) = $sw->get_children;
-		my $model  = $tree_view->get_model();
+		my ($some_tree_view) = $sw->get_children;
+		my $model  = $some_tree_view->get_model();
 		my @sel    = $_[0]->get_selected_rows;
 		my $iter   = $_[0]->get_selected();
 		my ($file, $text, $title) = $model->get($iter, $SEARCH_FILENAME, $SEARCH_TEXT, $SEARCH_TITLE); 
@@ -471,7 +465,7 @@ sub show_search_results {
 		search_buffer($text);
 	});
 	
-	$sw->add ($tree_view);
+	$sw->add ($results_view);
 
 
 	my @titles = ("Filename", "_Result Line");
@@ -480,7 +474,7 @@ sub show_search_results {
 		my $column = Gtk2::TreeViewColumn->new_with_attributes ($titles[$i], 
 							$renderer, 
 							text => $i);
-		$tree_view->append_column ($column);
+		$results_view->append_column ($column);
 	}
 }
 
