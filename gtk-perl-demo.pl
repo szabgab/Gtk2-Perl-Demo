@@ -150,9 +150,7 @@ $hbox->add($notebook);
 $notebook->append_page($files_scroll, "Files");
 $notebook->append_page($widgets_scroll, "Widgets");
 
-#$hbox->add1($left_scroll);
-
-list_examples();
+list_examples($files_store, $files_store, undef, \@entries);
 list_widgets();
 my $buffer = Gtk2::TextBuffer->new();
 show_file($buffer, "welcome.txt", "Welcome");
@@ -246,7 +244,7 @@ sub execute_code {
 	return;
 }
 
-sub add_entries {
+sub list_examples {
 	my ($tree, $tree_store, $parent, $entries) = @_;
 	foreach my $entry (@$entries) {
 		my $child = $tree_store->append($parent);
@@ -255,18 +253,13 @@ sub add_entries {
 			$ENTRY_TYPE => $entry->{type}, 
 			$ENTRY_FILE => $entry->{name});
 		if ($entry->{more}) {
-			add_entries($tree, $tree_store, $child, $entry->{more});
+			list_examples($tree, $tree_store, $child, $entry->{more});
 		}
 	}
 }
 
-sub list_examples {
-	#$files_store->clear();
-	add_entries($files_store, $files_store, undef, \@entries);
-}
 
 sub list_widgets {
-	#$widgets_store->clear();
 	foreach my $widget (sort keys %widgets) {
 		my $child = $widgets_store->append(undef);
 		$widgets_store->set($child, 0, $widget);
@@ -277,18 +270,6 @@ sub list_widgets {
 	}
 }
 	
-sub toggle_list {
-	my ($widget) = @_;
-	my $label = $widget->get_label;
-	if ($label eq "_List Widgets") {
-		list_widgets();
-		$widget->set_label("_List Examples");
-	} else {
-		list_examples();
-		$widget->set_label("_List Widgets");
-	}
-}
-
 sub _translate_tree_selection {
 	my $model     = $files_view->get_model();
 	my $selection = $files_view->get_selection();
