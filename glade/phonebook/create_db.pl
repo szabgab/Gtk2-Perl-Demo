@@ -5,8 +5,11 @@ use DBI;
 my $dbfile = "phonebook.db";
 unlink $dbfile;
 my $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile","","");
-my $sql = join "", <DATA>;
-$dbh->do($sql);
+my $sqls = join "", <DATA>;
+foreach my $sql (split /;/, $sqls) {
+	next if $sql !~ /\S/;
+	$dbh->do("$sql;");
+}
 
 
 
@@ -17,5 +20,8 @@ CREATE TABLE names (
 	name  VARCHAR(100),
 	phone VARCHAR(100)
 );
+INSERT INTO names VALUES (1, "Gabor",  123);
+INSERT INTO names VALUES (2, "Thomas", 456);
+INSERT INTO names VALUES (3, "Jonas",  23);
 
 
