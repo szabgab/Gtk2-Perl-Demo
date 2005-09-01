@@ -262,6 +262,11 @@
 			type  => "file",
 			name  => "examples/imagemap.pl",
 		},
+		{
+			title => "Source View",
+			type  => "file",
+			name  => "examples/source_view.pl",
+		},
 		],
 	},
 	{

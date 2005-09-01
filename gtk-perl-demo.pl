@@ -9,8 +9,14 @@ use File::Temp qw(tempfile);
 use Time::HiRes qw(usleep);
 use Getopt::Long qw(GetOptions);
 
+eval "use Gtk2::SourceView;";
+my $sourceview = not $@;
 my $background;
-GetOptions("background|b" => \$background);
+
+GetOptions(
+	"background|b" => \$background,
+	"sourceview|s" => \$sourceview,
+	);
 
 our $VERSION = '0.04';
 my ($ENTRY_NAME, $ENTRY_TYPE, $ENTRY_FILE) = (0, 1, 2);
@@ -156,10 +162,18 @@ $notebook->append_page($widgets_scroll, "Widgets");
 
 list_examples($files_store, $files_store, undef, \@entries);
 list_widgets();
-my $buffer = Gtk2::TextBuffer->new();
+
+my ($buffer, $textview);
+
+if ($sourceview) {
+	($textview, $buffer) = sourceview();
+} else {
+	$buffer = Gtk2::TextBuffer->new();
+	$textview = Gtk2::TextView->new_with_buffer($buffer);
+}
+
 show_file($buffer, "welcome.txt", "Welcome");
 
-my $textview = Gtk2::TextView->new_with_buffer($buffer);
 $textview->set_wrap_mode("word");
 
 my $right_scroll = Gtk2::ScrolledWindow->new;
@@ -489,3 +503,36 @@ sub show_history {
 	return if not $history;
 	show_file($buffer, $history->{filename}, $history->{title});
 }
+
+
+sub sourceview {
+	my $lm = Gtk2::SourceView::LanguagesManager->new;
+	my $lang = $lm->get_language_from_mime_type("application/x-perl");
+	my $sb;
+	if ($lang) {
+		$sb = Gtk2::SourceView::Buffer->new_with_language($lang);
+		$sb->set_highlight(1);
+	} else {
+		$sb = Gtk2::SourceView::Buffer->new(undef);
+		$sb->set_highlight(0);
+	}
+
+	# loading a file should be atomically undoable.
+	#$sb->begin_not_undoable_action();
+	#open my $infile, $0 or die "Unable to open program.pl";
+	#while (<$infile>) {
+	#	$sb->insert($sb->get_end_iter(), $_);
+	#}
+	#$sb->end_not_undoable_action();
+
+	# Gtk2::SourceView::Buffer inherits from Gtk2::TextBuffer.
+	#$sb->set_modified(0);
+	#$sb->place_cursor($sb->get_start_iter());
+	my $view = Gtk2::SourceView::View->new_with_buffer($sb);
+
+	return ($view, $sb);
+}
+
+
+
+
