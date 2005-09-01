@@ -45,8 +45,15 @@ sub on_delete_clicked {
 }
 
 sub on_find_clicked {
-	
+	my $name = $glade->get_widget('name')->get_text;
+	$name = "%" . $name . "%";
+	my $sth = $dbh->prepare("SELECT id, name, phone FROM names WHERE name LIKE ?");
+	$sth->execute($name);
+	my $h = $sth->fetchrow_hashref;
+	$sth->finish;
+	display($h);
 }
+
 sub find_id {
 	my ($id) = @_;
 	my $sth = $dbh->prepare("SELECT id, name, phone FROM names WHERE id =?");

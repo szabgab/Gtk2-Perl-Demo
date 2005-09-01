@@ -21,7 +21,9 @@ CREATE TABLE names (
 	phone VARCHAR(100)
 );
 INSERT INTO names VALUES (1, "Gabor",  123);
-INSERT INTO names VALUES (2, "Thomas", 456);
-INSERT INTO names VALUES (3, "Jonas",  23);
+INSERT INTO names VALUES (2, "Peter",  456);
+INSERT INTO names VALUES (3, "Jozsef",  23);
+INSERT INTO names VALUES (4, "Rezso",  77);
+INSERT INTO names VALUES (5, "Zoltan",  98);
 
 
