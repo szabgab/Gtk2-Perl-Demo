@@ -37,6 +37,12 @@ sub on_save_clicked {
 		$name, $phone);
 	find_id($dbh->func('last_insert_rowid'));
 }
+sub on_delete_clicked {
+	my $id = $glade->get_widget('id')->get_text;
+	my $next = fetch("next");
+	$dbh->do("DELETE FROM names WHERE id = ?", undef, $id);
+	display($next);
+}
 
 sub on_find_clicked {
 	
@@ -55,13 +61,13 @@ sub on_first_clicked {
 }
 
 sub on_prev_clicked {
-	fetch("prev");	
+	display(fetch("prev"));	
 }
 sub on_next_clicked {
-	fetch("next");	
+	display(fetch("next"));	
 }
 sub on_last_clicked {
-	fetch("last");	
+	display(fetch("last"));	
 }
 sub on_new_clicked {
 	display({});
@@ -69,7 +75,7 @@ sub on_new_clicked {
 }
 
 sub show_first {
-	fetch("first");
+	display(fetch("first"));
 }
 
 sub fetch {
@@ -106,7 +112,7 @@ sub fetch {
 	}
 
 	$sth->finish;
-	display($h);
+	return $h;
 }
 
 sub display {
