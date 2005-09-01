@@ -29,13 +29,25 @@ sub on_main_window_destroy {
 	exit;
 }
 
-sub on_add_click {
+sub on_save_clicked {
 	my $name = $glade->get_widget('name')->get_text;
 	my $phone = $glade->get_widget('phone')->get_text;
 	$dbh->do("INSERT INTO names (name, phone) VALUES(?,?)",
 		undef,
 		$name, $phone);
+	find_id($dbh->func('last_insert_rowid'));
+}
+
+sub on_find_clicked {
 	
+}
+sub find_id {
+	my ($id) = @_;
+	my $sth = $dbh->prepare("SELECT id, name, phone FROM names WHERE id =?");
+	$sth->execute($id);
+	my $h = $sth->fetchrow_hashref;
+	$sth->finish;
+	display($h);
 }
 
 sub on_first_clicked {
@@ -43,14 +55,21 @@ sub on_first_clicked {
 }
 
 sub on_prev_clicked {
+	fetch("prev");	
 }
 sub on_next_clicked {
 	fetch("next");	
 }
+sub on_last_clicked {
+	fetch("last");	
+}
+sub on_new_clicked {
+	display({});
+	#$glade->get_widget($_)->set_text('') foreach (qw(id name phone));
+}
 
 sub show_first {
 	fetch("first");
-	
 }
 
 sub fetch {
@@ -70,10 +89,30 @@ sub fetch {
 			}
 		}
 	}	
+	if ($which eq "prev") {
+		$h = $sth->fetchrow_hashref;
+		if ($h->{id} != $id) {
+			while (my $next = $sth->fetchrow_hashref) {
+				last if $next->{id} == $id;
+				$h = $next;
+			}
+		}
+	}
+	if ($which eq "last") {
+		$h = $sth->fetchrow_hashref;
+		while (my $next = $sth->fetchrow_hashref) {
+			$h = $next;
+		}
+	}
+
 	$sth->finish;
-	$glade->get_widget($_)->set_text($h->{$_}) foreach (qw(id name phone));
+	display($h);
 }
 
+sub display {
+	my ($h) = @_;
+	$glade->get_widget($_)->set_text($h->{$_} || '') foreach (qw(id name phone));
+}
 
 
 1;
