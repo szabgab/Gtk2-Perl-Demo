@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use Acme::MetaSyntactic qw(flintstones buffy);
+
 
 use DBI;
 my $dbfile = "phonebook.db";
@@ -11,8 +13,11 @@ foreach my $sql (split /;/, $sqls) {
 	$dbh->do("$sql;");
 }
 
-
-
+for (1..10) {
+	$dbh->do("INSERT INTO names (name, phone) VALUES (?,  ?)", 
+		undef, metaname(), int rand(899999)+100000);
+}
+	
 
 __DATA__
 CREATE TABLE names (
@@ -20,10 +25,4 @@ CREATE TABLE names (
 	name  VARCHAR(100),
 	phone VARCHAR(100)
 );
-INSERT INTO names VALUES (1, "Gabor",  123);
-INSERT INTO names VALUES (2, "Peter",  456);
-INSERT INTO names VALUES (3, "Jozsef",  23);
-INSERT INTO names VALUES (4, "Rezso",  77);
-INSERT INTO names VALUES (5, "Zoltan",  98);
-
 
