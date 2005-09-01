@@ -7,6 +7,10 @@ use Gtk2 '-init';
 use Data::Dumper;
 use File::Temp qw(tempfile);
 use Time::HiRes qw(usleep);
+use Getopt::Long qw(GetOptions);
+
+my $background;
+GetOptions("background|b" => \$background);
 
 our $VERSION = '0.04';
 my ($ENTRY_NAME, $ENTRY_TYPE, $ENTRY_FILE) = (0, 1, 2);
@@ -218,27 +222,19 @@ sub save_code {
 }
 
 sub execute_code {
-	#if ($current_list eq "examples") {
-		#my ($name, $type, $file) = _translate_tree_selection();
-		#return if $type ne "file";
-	#} else {
-	#	my ($path, $col) = $tree_view->get_cursor(); 
-	#	my @c = split /:/, $path->to_string;
-	#	return if @c != 2;
-	#}
-
 	my ($fh, $temp_filename) = tempfile();
 	print $fh $buffer->get_text($buffer->get_start_iter, $buffer->get_end_iter, 0);
 	$fh->flush;
 	close $fh;
+
 	usleep(1000); # to make sure the file was fully flushed by the OS 
 	              # it seems when we started to use fork, and later the background execution
-	              # ocassionally the file was not yet created by them the code reached system()
+	       	      # ocassionally the file was not yet created by them the code reached system()
 	              # very strange
 	if ($^O =~ /win/i) {
 		system("start $^X $temp_filename");
 	} else {
-		system("$^X $temp_filename &");
+		system("$^X $temp_filename" . ($background ? " &" : ""));
 	}
 	unlink $temp_filename;
 	return;
