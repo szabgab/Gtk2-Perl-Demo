@@ -19,7 +19,8 @@ sub new {
 	return bless {}, $class;
 }
 
-
+DESTROY {
+}
 AUTOLOAD {
 	print $AUTOLOAD ." in Phone\n";
 	print Dumper @_;

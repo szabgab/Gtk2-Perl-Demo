@@ -20,8 +20,8 @@ CREATE TABLE names (
 	name  VARCHAR(100),
 	phone VARCHAR(100)
 );
-INSERT INTO names VALUES (1, "Gabor", 123);
-INSERT INTO names VALUES (2, "Peter", 456);
-INSERT INTO names VALUES (3, "Zoli", 23);
+INSERT INTO names VALUES (1, "Gabor",  123);
+INSERT INTO names VALUES (2, "Thomas", 456);
+INSERT INTO names VALUES (3, "Jonas",  23);
 
 
