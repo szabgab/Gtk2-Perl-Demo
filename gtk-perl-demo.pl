@@ -143,6 +143,7 @@ sub create_tree {
 	my $tree_view  = Gtk2::TreeView->new($tree_store);
 	$tree_view->signal_connect (button_release_event => \&button_release);
 	$tree_view->signal_connect ("row-activated"      => \&execute_code);
+	$tree_view->signal_connect ("button_press_event" => \&right_click);
 	my $col = Gtk2::TreeViewColumn->new_with_attributes("Right click for demo", Gtk2::CellRendererText->new(), text => "0");
 	$tree_view->append_column($col);
 	$tree_view->set_headers_visible(0);
@@ -171,6 +172,7 @@ if ($sourceview) {
 	$buffer = Gtk2::TextBuffer->new();
 	$textview = Gtk2::TextView->new_with_buffer($buffer);
 }
+
 
 show_file($buffer, "welcome.txt", "Welcome");
 
@@ -297,13 +299,32 @@ sub button_release {
 	}
 	return;
 }
+
+
+sub build_podview {
+	my ($module) = @_;
+	eval "use Gtk2::PodViewer";
+	my $viewer = Gtk2::PodViewer->new;
+
+	#$viewer->load(’/path/to/file.pod’); 
+	$viewer->load($module);       
+	$viewer->show;                  
+	my $window = Gtk2::Window->new;
+	$window->add($viewer);
+	$window->show;
+
+	$window->signal_connect (destroy => sub { Gtk2->main_quit; });
+
+	Gtk2->main;
+}
+
 sub select_widget {
 	my ($path, $col) = $widgets_view->get_cursor(); 
 	my @c = split /:/, $path->to_string;
+	my $widget = (sort keys %widgets)[$c[0]];
 	if (@c == 1) {
-		show_text($buffer, "Please select one of the files");	
+		show_text($buffer, "Please select one of the files to examples for $widget");
 	} elsif (@c == 2) {
-		my $widget = (sort keys %widgets)[$c[0]];
 	 	my $filename = (sort keys %{$widgets{$widget}})[$c[1]];
 		show_file($buffer, $filename, $widgets{$widget}{$filename});
 	} else {
@@ -533,6 +554,19 @@ sub sourceview {
 	return ($view, $sb);
 }
 
+sub right_click {
+	my ($check, $event) = @_;
+
+	return if not $notebook->get_current_page();
+	#print "click pressed\n";
+	if (3 eq $event->button) {
+		my ($path, $col) = $widgets_view->get_cursor(); 
+		my @c = split /:/, $path->to_string;
+		my $widget = (sort keys %widgets)[$c[0]];
+		build_podview($widget);
+		#print "right click pressed\n";
+	}
+}
 
 
 
