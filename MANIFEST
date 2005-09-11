@@ -1,7 +1,11 @@
 Makefile.PL
 README
 MANIFEST
+
+entries.pl
 about.txt
+welcome.txt
+
 cookbook.txt
 cookbook/buttons.txt
 cookbook/buttons/button-image-custom-stock_id
@@ -23,7 +27,8 @@ cookbook/color/color_list
 cookbook/color/color_snooper
 cookbook/color/window-bg-color
 cookbook/images/gtk-logo-rgb.gif
-entries.pl
+
+
 examples.txt
 examples/accel_groups.pl
 examples/adding_stock_icons.pl
@@ -56,6 +61,9 @@ examples/socket.pl
 examples/testdnd.pl
 examples/thread_usage.pl
 examples/timeouttest.pl
+examples/imagemap.pl
+examples/source_view.pl
+
 gtk-demo/alphatest.png
 gtk-demo/apple-red.png
 gtk-demo/appwindow.pl
@@ -90,6 +98,7 @@ gtk-demo/textview.pl
 gtk-demo/tree_store.pl
 gtk-demo/ui_manager.pl
 gtk-perl-demo.pl
+
 tutorial/box_and_button.pl
 tutorial/button.pl
 tutorial/button_print.pl
@@ -102,4 +111,7 @@ tutorial/signals.txt
 tutorial/simple.pl
 tutorial/vbox.pl
 tutorial/vpaned.pl
-welcome.txt
+tutorial/keyboard.pl
+tutorial/notebook.pl
+tutorial/password.pl
+
