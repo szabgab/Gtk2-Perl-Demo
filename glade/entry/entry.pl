@@ -13,3 +13,13 @@ sub on_main_window_destroy {
 	Gtk2->main_quit;
 }
 
+sub on_button1_clicked {
+	my $text = $gladexml->get_widget('entry1')->get_text;
+	$gladexml->get_widget('label1')->set_text($text)	
+}
+
+
+
+# On the Entry widget set Widget/Activates Default
+# On the Button widget set Common/Can Default, Common/Set Default
+
