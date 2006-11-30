@@ -1,3 +1,7 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
 use Gtk2 -init;
 use Gtk2::GladeXML;
 my $gladexml = Gtk2::GladeXML->new("entry.glade");
