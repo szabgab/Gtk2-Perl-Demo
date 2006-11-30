@@ -11,10 +11,9 @@ use warnings;
 
 use Gtk2 '-init';
 
-# Now we also import some magic TRUE and FALSE values
 # This is mainly a style issue inherited from the underlying C code
 # but we can stay with it for better readability
-use Glib qw/TRUE FALSE/;
+my $TRUE = 1;
 
 my $window = Gtk2::Window->new;
 $window->set_title ("User entry");
@@ -47,10 +46,10 @@ $vbox->add($exit_button);
 # by using the following three lines:
 
 # let the button be able to accept default behavior
-#$show_button->can_default(TRUE);
+#$show_button->can_default($TRUE);
 # tell the entry box that when ENTER is pressed while the focus on it, it will
 # activate the currently default widget
-#$entry->set_activates_default (TRUE);
+#$entry->set_activates_default ($TRUE);
 # finally set the currently default widget
 #$window->set_default($show_button);
 
@@ -70,7 +69,7 @@ sub show_button_clicked {
 	# Once the user types in the word "exit" and presses ENTER the
 	# application will replace the default button. So on the next ENTER
 	# it will exit the application
-	#$exit_button->can_default(TRUE);
+	#$exit_button->can_default($TRUE);
 	#$window->set_default($exit_button) if $text eq "exit";
 }
 

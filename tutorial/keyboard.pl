@@ -3,7 +3,6 @@ use strict;
 use warnings;
 
 use Gtk2 '-init';
-use Glib qw/TRUE FALSE/;
 use Gtk2::Gdk::Keysyms;
 
 my $window = Gtk2::Window->new;

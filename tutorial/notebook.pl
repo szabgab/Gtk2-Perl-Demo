@@ -3,7 +3,6 @@ use strict;
 use warnings;
 
 use Gtk2 '-init';
-use Glib qw/TRUE FALSE/;
 
 my $window = Gtk2::Window->new;
 $window->set_title ("User entry");

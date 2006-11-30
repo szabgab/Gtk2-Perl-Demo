@@ -15,7 +15,7 @@ use Gtk2 '-init';
 my $window = Gtk2::Window->new;
 $window->signal_connect (destroy => sub { Gtk2->main_quit;});
 
-my $button = Gtk2::Button->new("Hello world!");
+my $button = Gtk2::Button->new("Exit");
 $button->signal_connect(clicked=> \&handle_exit);
 $window->add($button);
 
