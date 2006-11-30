@@ -11,6 +11,9 @@ use Getopt::Long qw(GetOptions);
 
 eval "use Gtk2::SourceView;";
 my $sourceview = not $@;
+if ($@) {
+    warn "It would be nicer if you could install Gtk2::SourceView\n";
+}
 my $background;
 
 GetOptions(
@@ -41,14 +44,14 @@ collect_widgets(\@entries);
 my $window = Gtk2::Window->new;
 $window->set_title($app_title);
 $window->signal_connect (destroy => sub { Gtk2->main_quit; });
-$window->set_default_size(900, 650);
+$window->set_default_size(400, 350);
 
 ###### Main box
 my $main_vbox = Gtk2::VBox->new();
 $window->add($main_vbox);
 
 
-##### Menu row
+#### Menu row
 my $menu_row = Gtk2::HBox->new();
 $main_vbox->pack_start($menu_row, FALSE, FALSE, 5);
 
