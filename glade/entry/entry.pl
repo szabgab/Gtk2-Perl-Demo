@@ -10,6 +10,7 @@ Gtk2->main;
 
 
 AUTOLOAD {
+    our $AUTOLOAD;
 	print $AUTOLOAD . "\n";
 }
 
