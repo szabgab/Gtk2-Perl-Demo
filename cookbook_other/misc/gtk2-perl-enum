@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use ODS::Constants;
+
+unless ( @ARGV ) {
+    print STDERR "Need at least one enum/flag to search for!\n";
+    exit( 1 );
+}
+
+my $found = FALSE;
+foreach my $POD ( 'Gnome2::enums', 'Gtk2::enums' ) {
+    if ( open( PD, "/usr/bin/perldoc -otext " . $POD . " |" ) ) {
+        my $line = undef;
+        while ( $line = <PD> ) {
+            if ( $line =~ m!^\s+(?:enum|flags)\s+([:_a-z0-9]+)!i ) {
+                my $enum_flag = $1;
+                if ( grep { /\Q$enum_flag\E/i } @ARGV ) {
+                    $found = TRUE;
+                    print STDOUT "\n" . $line;
+                    next;
+                } else {
+                    foreach my $QUERY ( @ARGV ) {
+                        if ( $enum_flag =~ /\Q$QUERY\E/i ) {
+                            $found = TRUE;
+                            print STDOUT "\n" . $line;
+                            next;
+                        }
+                    }
+                }
+            }
+            if ($found) {
+                if ($line =~ m!^\s+\*.*$!) {
+                    print STDOUT $line;
+                } elsif ($line =~ m!^\s*$!) {
+                    $found = FALSE;
+                }
+            }
+        }
+        close( PD );
+    } else { die( "failed to open command pipe (" . $POD . ")! " . $! ); }
+}
+print STDOUT "\n";
+exit( 0 );
+

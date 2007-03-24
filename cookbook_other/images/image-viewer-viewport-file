@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Gtk2 '-init';
+
+my $mw = Gtk2::Window->new;
+
+my $vp = Gtk2::Viewport->new(undef, undef);
+$mw->add($vp);
+
+&load_image;
+
+$mw->signal_connect('destroy', sub { Gtk2->main_quit });
+Gtk2->main;
+
+##########################################################
+sub load_image {
+
+my $file = <$ARGV[0]> || 'bridget-1.jpg';
+chomp $file;
+
+my $img = Gtk2::Image->new_from_file($file);
+
+my $pb = $img->get_pixbuf;
+my ($x, $y) = ($pb->get_width, $pb->get_height);
+print "$x $y\n";
+
+$vp->add($img);
+
+$mw->set_title("$file ${x}x${y}");
+$mw->show_all();
+
+return 1;
+}
+

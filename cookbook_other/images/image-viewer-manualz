@@ -1,0 +1,64 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Gtk2 '-init';
+use Gtk2::Helper;
+
+my @landscape = qw(800 600);
+my @portrait  = qw(600 800);
+
+my $sw = Gtk2::ScrolledWindow->new(undef, undef);
+$sw->set_policy('automatic','automatic');
+
+my $mw = Gtk2::Window->new;
+$mw->add($sw);
+
+my $vp;
+
+&load_image;
+
+$mw->signal_connect('destroy', sub { Gtk2->main_quit });
+Gtk2->main;
+
+##########################################################
+sub load_image {
+
+my $file = <$ARGV[0]> || 'bridget-1.jpg';
+chomp $file;
+
+$sw->remove($vp) if defined $vp;
+
+my $img = Gtk2::Image->new_from_file($file);
+
+my $pb = $img->get_pixbuf;
+my ($x, $y) = ($pb->get_width, $pb->get_height);
+
+$vp = Gtk2::Viewport->new(undef, undef);
+$vp->add($img);
+
+$sw->add($vp);
+
+if ($x > $y) {
+$mw->resize($x > $landscape[0] ? $landscape[0] : $x + 2,
+$y > $landscape[1] ? $landscape[1] : $y + 2);
+} else {
+$mw->resize($x > $portrait[0] ? $portrait[0] : $x + 2,
+$y > $portrait[1] ? $portrait[1] : $y + 2);
+}
+
+# all these values are the same as default, except the first. these
+# values are just for testing. the eventual plan is to adjust them
+# so the viewport is centered, but even with static values it
+# doesn't work.
+my $ha = Gtk2::Adjustment->new(50, 0, 1, 0.1, 0.9, 1);
+my $va = Gtk2::Adjustment->new(50, 0, 1, 0.1, 0.9, 1);
+
+$sw->set_hadjustment($ha);
+$sw->set_vadjustment($va);
+
+$mw->set_title("$file ${x}x${y}");
+$mw->show_all();
+
+return 1;
+}
+

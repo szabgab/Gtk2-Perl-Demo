@@ -1,0 +1,60 @@
+
+#> How can I set the color of some of the rows in a TreeView ?
+#> I don't mean the alternating colors, I have a few that I would like to
+#> stand out.
+#i do it with custom data function for cell renderer:
+
+my $clist = Gtk2::ListStore->new(@types);
+$tv->set_rules_hint(1);
+$tv->set_model($clist);
+for ( my $i = 0 ; $i < @{$order} ; $i++ ) {
+    my $renderer = Gtk2::CellRendererText->new;
+    $renderer->set( 'editable' => TRUE );
+    $renderer->set( 'mode'     => 'editable' );
+    $renderer->signal_connect(
+        'edited' => sub {
+            my ( $cell, $text_path, $new_text, $i ) = @_;
+            my $tree = $tv->get_model;
+            my $iter = $tree->get_iter_from_string($text_path);
+            if ( defined $iter ) {
+
+                #my $old_text = $tree->get($iter,$i);
+                $tree->set( $iter, $i, $new_text );
+            }
+        },
+        $i
+    );
+    my $title = ${$order}[$i];
+    my $cl    =
+      Gtk2::TreeViewColumn->new_with_attributes( '', $renderer, 'text' => $i );
+    $tv->append_column($cl);
+    $cl->set_clickable(1);
+    $cl->set_resizable(0);
+    $cl->set_sort_column_id($i);
+    $cl->set_title($title);
+    $tv->get_model->set_sort_func( $i, \&sort_by_color, $i );
+
+    # ----->
+    $cl->set_cell_data_func(
+        $renderer,
+        sub {
+            my ( $column, $cell, $model, $iter, $title ) = @_;
+            my $color    = 'white';
+            my ($cursor) = $tv->get_cursor;
+            my $entry    = $entries{$title};
+            if ( !defined $entry ) { $entry = ""; }
+            my $text = $cell->get('text');
+            if ( ( defined $entry ) and ( defined $text ) and ( $text ne "" ) )
+            {
+                if ( $text =~ /$entry/i ) {
+                    $color = 'orange';
+                }
+            }
+            $cell->set( background => $color );
+        },
+        $title
+    );
+
+    # <------
+}
+

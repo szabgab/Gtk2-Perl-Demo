@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Gtk2;
+
+#One possible solution, if you can use images on disk:
+
+# my $rc_style = Gtk2::RcStyle->new;
+# $rc_style->bg_pixmap_name ('normal', 'path/to/image.xpm');
+# $widget->modify_style ($rc_style);
+	    
+# Another possible solution:  make your own widget.  You'll get complete 
+# control over the gdk window and can keep gtk+ from blowing away your 
+# backing pixmap.  Since the $widget->window method currently suffers the 
+# same malady as $style->bg_pixmap (that is, bound as an accessor, not as 
+# a mutator), this may prove difficult.
+#################################################################
+
+my $pixbuf_loader = Gtk2::Gdk::PixbufLoader->new();
+$pixbuf_loader->set_size($config->{'Width'},$config->{'Height'});
+eval { $pixbuf_loader->write($row->{'data'}); };
+eval { $pixbuf_loader->close() };
+my $pixbuf=$pixbuf_loader->get_pixbuf();
+$pixbuf->save($globals->{'bg_file'},'png');
+my $rc_style = Gtk2::RcStyle->new;
+$rc_style->bg_pixmap_name ('normal', $globals->{'bg_file'});
+$window->modify_style ($rc_style);
+
+#Loads the image fine, scales it to screen size then displays.
+

@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+use lib '.';    # so we can use 'local' packages
+use Glib ':constants';
+use Gtk2 -init;
+use Term::ReadLine;
+
+#use LabelledButton;		# Uncomment and it works
+
+BEGIN {      # we need Gnu since this has a callback iface
+    die "Need Term::ReadLine::Gnu\n" unless Term::ReadLine->ReadLine =~ /Gnu/;
+}
+
+package main;
+my $term = new Term::ReadLine 'gish';
+
+#handle every complete line
+$term->callback_handler_install(
+    'gish> ',
+    sub {
+        eval( $_[0] );
+        $| = 1;    # flush STDOUT
+        warn "$@"             if $@;
+        $term->addhistory($_) if /\S/;
+    }
+);
+
+#make Gtk2 mainloop watch STDIN
+Glib::IO->add_watch( fileno( $term->IN ),
+    'in', sub { $term->callback_read_char; return TRUE; } );
+
+Gtk2->main;
+
+sub p { local $^W = 0; print @_, substr( $_[-1], -1 ) eq "\n" ? '' : "\n"; }

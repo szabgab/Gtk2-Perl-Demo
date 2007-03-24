@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Gtk2 -init;
+
+my $hpaned1 = Gtk2::HPaned->new;
+$hpaned1->add1(Gtk2::TextView->new);
+$hpaned1->add2(Gtk2::TextView->new);
+
+my $hpaned2 = Gtk2::HPaned->new;
+$hpaned2->add1(Gtk2::TextView->new);
+$hpaned2->add2(Gtk2::TextView->new);
+
+$hpaned1->set_position(100);
+$hpaned2->set_position(100);
+
+$hpaned1->signal_connect('notify::position' => 
+	sub {
+		$hpaned2->set_position($hpaned1->get_position);
+	}
+);
+
+$hpaned2->signal_connect('notify::position' => 
+	sub {
+		# If I uncomment this line, it'll go into an infinite loop
+		# $hpaned1->set_position($hpaned2->get_position);
+	}
+);
+
+my $vbox = Gtk2::VBox->new;
+$vbox->pack_start($hpaned1, 1,1,0);
+$vbox->pack_start($hpaned2 ,1,1,0);
+my $window = Gtk2::Window->new;
+$window->signal_connect (destroy => sub {Gtk2->main_quit});
+$window->add($vbox);
+$window->set_default_size(200, 300);
+$window->show_all;
+Gtk2->main;

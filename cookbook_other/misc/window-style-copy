@@ -1,0 +1,32 @@
+> All I want is have an individual text label turn red in a window ! How
+> simpler can it get ? It would most certainly be so easy in GTK2+, but I
+> have no choice right now :-(
+
+label is transparent, thus you have to create an eventbox under it, and pait that one.
+
+my $box = new Gtk2::EventBox;
+my $label = new Gtk2::Label('Label');
+my $red = new Gtk2::Gdk::Color(65535,0,0);
+$box->modify_bg('normal',$red);
+$box->add($label);
+######################################################################
+
+That's unfortunate.  It's trivial in gtk2.  You should port at the
+earliest opportunity.
+
+Your problem is likely that the Gtk::Label is just inheriting its
+parent's style, and thus doesn't have one of its own for you to dork
+with.  I can't seem to find a copy of this code that hasn't been ported
+to gtk2-perl, but it goes something like this:
+
+# dupe parent widget's style -- a label isn't guaranteed to have one
+of its own
+my $newstyle = $window->get_style-copy;
+# set up the new style the way you want.
+$font = Gtk::Gdk::Font->load
+("-*-helvetica-bold-r-normal--*-120-*-*-*-*-*");
+$newstyle->font ($font);
+$newstyle->fg (0, $newcolor);  # labels draw text in fg color
+# explicitly tell the label to use this new style
+$label->set_style ($newstyle);
+

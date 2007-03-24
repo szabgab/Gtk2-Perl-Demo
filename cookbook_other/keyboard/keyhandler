@@ -1,0 +1,24 @@
+the signal you want for a key-press event is, oddly
+enough, "key-press-event".  (you can use either - or _, the bindings treat
+them as equivalent.)
+
+once you're inside the key-press-event handler, you peek inside the event to
+see whether the key was the one you wanted.
+
+$entry->signal_connect (key_press_event => \&key_handler);
+
+sub key_handler {
+my ($widget, $event) = @_;
+
+# match the keyval --- in general you don't want to use magic
+# numbers here, use values from %Gtk2::Gdk::Keysyms instead.
+if ($event->keyval == 105) {
+# insert special handling here
+return TRUE;  # tell the system we handled this
+}
+
+return FALSE;  # tell the system we did not handle this
+}
+
+
+

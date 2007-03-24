@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Gtk2 -init;
+use Gtk2::SimpleList;
+
+Gtk2::SimpleList->add_column_type(
+    'mybool',
+    type     => 'Glib::Boolean',
+    renderer => 'Gtk2::CellRendererToggle',
+    attr     => 'active',
+);
+
+my $slist = Gtk2::SimpleList->new(
+    'one'   => 'mybool',
+    'two'   => 'bool',
+    'three' => 'bool'
+);
+my ($renderer) = $slist->get_column(0)->get_cell_renderers;
+$renderer->set( activatable => 1 );
+
+$renderer->signal_connect(
+    toggled => sub {
+        my ( $renderer, $pathstr, $model ) = @_;
+        my $path = Gtk2::TreePath->new_from_string($pathstr);
+        my $iter = $model->get_iter($path);
+        my $val  = $model->get( $iter, 0 );
+
+        $model->set( $iter, 1, !$val );
+        $model->set( $iter, 2, !$val );
+    },
+    $slist->get_model
+);
+
+@{ $slist->{data} } = ( [ 0, 1, 1 ], [ 1, 0, 0 ], [ 0, 1, 1 ], [ 1, 0, 0 ], );
+
+my $window = Gtk2::Window->new;
+$window->add($slist);
+$window->show_all;
+$window->signal_connect( destroy => sub { Gtk2->main_quit } );
+Gtk2->main;
+

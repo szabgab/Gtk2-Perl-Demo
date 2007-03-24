@@ -1,0 +1,1524 @@
+<html>
+  <head>
+    <title>
+      RFC on Gtk2::Ex::ListSwap
+    </title>
+  </head>
+  <link rel="stylesheet" type="text/css" href="?node=print%20displaytype%20stylesheet" />
+  <body>
+    <div id="header">
+      <div class="title">
+        RFC on Gtk2::Ex::ListSwap
+      </div>
+      <div class="subtitle">
+        by <span id="author">japhy</span> on <span id="created">Mar 27, 2005 at 23:01 GMT+11</span>
+      </div>
+    </div>
+    <div id="url">
+        http://perlmonks.org?node_id=442765
+    </div>
+
+    <div id="content">
+      
+<div class="reputation"><center><font size="1">Reputation: 6</font></center></div>
+<p>
+I've spent about 12 hours working on the following module.  I provide its full source code (with POD) and its HTML-ized documentation.  If you've got Gtk2, please try it out and provide any criticism, comments, and suggestions you have.  I haven't done extensive testing on it, so please let me know if you find any bugs!  In a few days, I'll submit it to CPAN.
+
+<p>
+
+<b>Update:</b> fixed a bug in widget() that wasn't calling cell() with the right values.  Now the array-data-set with array-ref-of-column-names technique works.
+
+<p>
+
+<b>Update:</b> fixed the order of insertion when multiple items are moved from one window to the next.  It had been backwards.
+
+<p>
+
+Documentation:
+<div class="readmore">
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#constructor">Constructor</a></li>
+		<li><a href="#options">Options</a></li>
+		<ul>
+
+			<li><a href="#orientation">Orientation</a></li>
+			<li><a href="#swapping_methods">Swapping Methods</a></li>
+			<li><a href="#button_display">Button Display</a></li>
+			<li><a href="#selection_count">Selection Count</a></li>
+			<li><a href="#scrollbar_policy">Scrollbar Policy</a></li>
+		</ul>
+
+		<li><a href="#columns_and_data">Columns and Data</a></li>
+		<ul>
+
+			<li><a href="#examples">Examples</a></li>
+		</ul>
+
+		<li><a href="#subclassing_and_extending">Subclassing and Extending</a></li>
+		<ul>
+
+			<li><a href="#formatting_buttons">Formatting Buttons</a></li>
+			<li><a href="#creating_data_models">Creating Data Models</a></li>
+			<li><a href="#populating_a_cell">Populating a Cell</a></li>
+			<li><a href="#moving_elements_via_buttons">Moving Elements via Buttons</a></li>
+			<li><a href="#moving_elements_via_draganddrop">Moving Elements via Drag-and-Drop</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#limitations">LIMITATIONS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Gtk2::Ex::ListSwap - Item swapping between two or three lists</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use Gtk2::Ex::ListSwap;
+  use Gtk2 -init;</pre>
+<pre>
+  use strict;
+  use warnings;</pre>
+<pre>
+  my $window = Gtk2::Window-&gt;new;
+  $window-&gt;signal_connect(destroy =&gt; sub { Gtk2-&gt;main_quit });</pre>
+<pre>
+  my $list_swap = Gtk2::Ex::ListSwap-&gt;new;</pre>
+<pre>
+  $list_swap-&gt;set_model(a =&gt; <tt><font size="-1">&#91;</font></tt>
+    { id =&gt; 'eggs', name =&gt; 'Eggs' },
+    { id =&gt; 'cmilk', name =&gt; 'Chocolate Milk' },
+    { id =&gt; 'oreo', name =&gt; 'Oreos', },
+    { id =&gt; 'coke', name =&gt; 'Coca-Cola', },
+  ]);
+  $list_swap-&gt;set_model(b =&gt; <tt><font size="-1">&#91;</font></tt>
+    { id =&gt; 'bread', name =&gt; 'Whole Wheat Bread' },
+    { id =&gt; 'lj', name =&gt; 'Lemon Juice' },
+    { id =&gt; 'oj', name =&gt; 'Orange Juice' },
+    { id =&gt; 'beer', name =&gt; 'Guiness' },
+  ]);</pre>
+<pre>
+  $list_swap-&gt;set_column_names(a =&gt; <tt><font size="-1">&#91;</font></tt><tt><font size="-1">&#91;</font></tt>'ID','id'], <tt><font size="-1">&#91;</font></tt>'Name','name']]);
+  $list_swap-&gt;set_column_names(b =&gt; <tt><font size="-1">&#91;</font></tt><tt><font size="-1">&#91;</font></tt>'ID','id'], <tt><font size="-1">&#91;</font></tt>'Name','name']]);</pre>
+<pre>
+  $window-&gt;add($list_swap-&gt;widget);
+  $window-&gt;show_all;
+  Gtk2-&gt;main;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This module provides a simple factory for producing a widget containing
+two or three ScrollingWindow widgets with groups of buttons between them
+allowing for the movement of items from one list to another.  It allows
+for a fair amount of customization:  horizontal or vertical positioning,
+button-based and drag-and-drop methods for swapping elements, selection
+of which buttons to display, how many elements may be selected at once,
+and when scrollbars should be displayed.</p>
+<p>Unlike standard widgets, a ListSwap widget is a Perl object which stores
+data about the widget, and it creates the widget only when the <tt><font size="-1">widget()</font></tt>
+method is called.</p>
+<p>
+</p>
+<h2><a name="constructor">Constructor</a></h2>
+<p>A ListSwap object is created via</p>
+<pre>
+  my $ls = Gtk2::Ex::ListSwap-&gt;new;</pre>
+<p>Upon creation, a set of default options (explained next) are used.</p>
+<p>
+</p>
+<h2><a name="options">Options</a></h2>
+<p>
+</p>
+<h3><a name="orientation">Orientation</a></h3>
+<p>The orientation of the widget is controlled via the <tt><font size="-1">set_orientation()</font></tt>
+method:</p>
+<pre>
+  $ls-&gt;set_orientation($how);</pre>
+<p>The orientation value can either be <tt><font size="-1">GTK_LS_HORIZONTAL</font></tt> or
+<tt><font size="-1">GTK_LS_VERTICAL</font></tt>.  The default is <tt><font size="-1">GTK_LS_HORIZONTAL</font></tt>.</p>
+<p>The <tt><font size="-1">get_orientation()</font></tt> method returns the orientation.</p>
+<p>
+</p>
+<h3><a name="swapping_methods">Swapping Methods</a></h3>
+<p>The methods by which elements can be swapped are controlled via the
+<tt><font size="-1">set_method()</font></tt> method:</p>
+<pre>
+  $ls-&gt;set_method($mask);</pre>
+<p>The method value is any bitwise combination of <tt><font size="-1">GTK_LS_BUTTONS</font></tt> and
+<tt><font size="-1">GTK_LS_DRAG_AND_DROP</font></tt>.  The defaults is
+<tt><font size="-1">GTK_LS_BUTTONS | GTK_LS_DRAG_AND_DROP</font></tt>.</p>
+<p>The <tt><font size="-1">get_method()</font></tt> method returns the swapping method.</p>
+<p>
+</p>
+<h3><a name="button_display">Button Display</a></h3>
+<p>This determines which buttons will be displayed if button-swapping
+is enabled.  The button display is controlled via the <tt><font size="-1">set_buttons()</font></tt>
+method:</p>
+<pre>
+  $ls-&gt;set_buttons($mask);</pre>
+<p>The button mask is any bitwise combination of the following constants:
+<tt><font size="-1">GTK_LS_A_TO_B</font></tt>, <tt><font size="-1">GTK_LS_B_TO_A</font></tt>, <tt><font size="-1">GTK_LS_ALL_A_TO_B</font></tt>, 
+<tt><font size="-1">GTK_LS_ALL_B_TO_A</font></tt>, <tt><font size="-1">GTK_LS_A_TO_C</font></tt>, <tt><font size="-1">GTK_LS_C_TO_A</font></tt>,
+<tt><font size="-1">GTK_LS_B_TO_C</font></tt>, <tt><font size="-1">GTK_LS_C_TO_B</font></tt>, <tt><font size="-1">GTK_LS_ALL_A_TO_C</font></tt>,
+<tt><font size="-1">GTK_LS_ALL_B_TO_C</font></tt>, <tt><font size="-1">GTK_LS_ALL_C_TO_A</font></tt>, <tt><font size="-1">GTK_LS_ALL_C_TO_B</font></tt>.
+Also provided are two comprehensive masks:  <tt><font size="-1">GTK_LS_ALL_AB_BUTTONS</font></tt>
+covers all buttons referring only to lists ``A'' and ``B'';
+<tt><font size="-1">GTK_LS_ALL_BUTTONS</font></tt> covers all buttons referring to lists ``A'', ``B'',
+and ``C''.  If there are only two sets of data, <tt><font size="-1">GTK_LS_ALL_BUTTONS</font></tt> will
+not cause the widget to render buttons relating to the list ``C''.  The
+default is <tt><font size="-1">GTK_LS_ALL_BUTTONS</font></tt>.</p>
+<p>The <tt><font size="-1">get_buttons()</font></tt> method returns the mask of buttons.</p>
+<p>
+</p>
+<h3><a name="selection_count">Selection Count</a></h3>
+<p>The number of items allowed to be selected at once is controlled via the
+<tt><font size="-1">set_selection()</font></tt> method:</p>
+<pre>
+  $ls-&gt;set_selection($count);</pre>
+<p>The selection count is one of <tt><font size="-1">GTK_LS_SINGLE</font></tt>, <tt><font size="-1">GTK_LS_BROWSE</font></tt>, or
+<tt><font size="-1">GTK_LS_MULTIPLE</font></tt>.  They correspond to their similarly-named Gtk
+counterparts (see the documentation at <a href="http://developer.gnome.org/doc/API/2.0/gtk/gtk-Standard-Enumerations.html#GtkSelectionMode">http://developer.gnome.org/doc/API/2.0/gtk/gtk-Standard-Enumerations.html#GtkSelectionMode</a>).
+The default is <tt><font size="-1">GTK_LS_MULTIPLE</font></tt>.</p>
+<p>The <tt><font size="-1">get_selection()</font></tt> method returns the selection mode.</p>
+<p>
+</p>
+<h3><a name="scrollbar_policy">Scrollbar Policy</a></h3>
+<p>The policy for scrollbars on the ScrollWindow widgets is controlled by
+the <tt><font size="-1">get_policy()</font></tt> method:</p>
+<pre>
+  $ls-&gt;set_policy($x_when, $y_when);</pre>
+<p>The policy values are any of <tt><font size="-1">GTK_LS_ALWAYS</font></tt>, <tt><font size="-1">GTK_LS_NEVER</font></tt>, and
+<tt><font size="-1">GTK_LS_AUTOMATIC</font></tt>.  They correspond to their similarly-named Gtk
+counterparts (see the documentation at <a href="http://developer.gnome.org/doc/API/2.0/gtk/gtk-Standard-Enumerations.html#GtkPolicyType">http://developer.gnome.org/doc/API/2.0/gtk/gtk-Standard-Enumerations.html#GtkPolicyType</a>).
+The default is <tt><font size="-1">(GTK_LS_NEVER, GTK_LS_AUTOMATIC)</font></tt>.</p>
+<p>The <tt><font size="-1">get_policy()</font></tt> method returns the scrollbar policies.  It returns an
+array reference or a list, depending on the context in which it is called.</p>
+<p>
+</p>
+<h2><a name="columns_and_data">Columns and Data</a></h2>
+<p>The widget can handle two or three sets of data.  When the widget is
+created, it determines how many lists to render based on how many sets
+of data you have created.  Data sets are created via the <tt><font size="-1">set_model()</font></tt>
+method.</p>
+<pre>
+  $ls-&gt;set_model(a =&gt; <tt><font size="-1">&#91;</font></tt>
+    { id =&gt; 'eggs', name =&gt; 'Eggs' },
+    { id =&gt; 'cmilk', name =&gt; 'Chocolate Milk' },
+    { id =&gt; 'oreo', name =&gt; 'Oreos', },
+    { id =&gt; 'coke', name =&gt; 'Coca-Cola', },
+  ]);</pre>
+<p>The first argument is either 'a', 'b', or 'c'.  The second element is
+an array reference of rows.  The contents of the rows must be references
+to arrays or hashes, and <strong>must be uniform for all data sets</strong>.  That is,
+you cannot have one data set that holds array references and another data
+set that holds hash references within the same ListSwap widget.  You also
+cannot mix the reference types within a single data set.</p>
+<p>You can, of course, have data in your data sets that is not rendered in
+the list box.</p>
+<p>You can retrieve a data set with the <tt><font size="-1">get_model()</font></tt> method, which takes the
+data set's name ('a', 'b', or 'c') as its argument.</p>
+<p>The names of the columns and the mapping of the column name to the
+location in the row is done via the <tt><font size="-1">set_column_names()</font></tt> method:</p>
+<pre>
+  $ls-&gt;set_column_names(a =&gt; <tt><font size="-1">&#91;</font></tt>
+    <tt><font size="-1">&#91;</font></tt>'ID','id'], <tt><font size="-1">&#91;</font></tt>'Name','name']
+  ]);</pre>
+<p>The first argument is either 'a', 'b', or 'c'.  The second element is
+an array reference of column definitions.  In the above example, the
+definitions are array references.  The first element is the name for the
+column, and the second element is the index (or key) of the data set
+that refers to the value in that column.  <tt><font size="-1">&#91;'ID', 'id'&#93;</font></tt> means that the
+column named ``ID'' will contain the values associated with the key ``id''
+in the hash references that define the rows of data.</p>
+<p>You can also use simple strings instead of array references, in which
+case the column names must exactly match the names of keys in the hash
+references that define your data.  If your data is stored in array
+references, then each column name refers to a successive element in the
+array reference.  (Examples follow.)</p>
+<p>You can retrieve the column names and mappings with the <tt><font size="-1">get_column_names()</font></tt>
+method, which takes the data set's name ('a', 'b', or 'c') as its argument.</p>
+<p>If you need to determine the number of data sets in this ListSwap object,
+use the <tt><font size="-1">get_size()</font></tt> method:</p>
+<pre>
+  my $n = $ls-&gt;get_size;</pre>
+<p>
+</p>
+<h3><a name="examples">Examples</a></h3>
+<p>Here is data defined by hash references, with columns based on the keys
+in the hash:</p>
+<pre>
+  $ls-&gt;set_model(a =&gt; <tt><font size="-1">&#91;</font></tt>
+    { ID =&gt; 'A', Name =&gt; 'Alpha', },
+    { ID =&gt; 'B', Name =&gt; 'Beta', },
+    { ID =&gt; 'G', Name =&gt; 'Gamma' },
+  ]);</pre>
+<pre>
+  $ls-&gt;set_column_names(a =&gt; <tt><font size="-1">&#91;</font></tt>
+    qw( ID Name )
+  ]);</pre>
+<p>Here is data defined by hash references, with columns that are mapped to
+keys in the hash:</p>
+<pre>
+  $ls-&gt;set_model(a =&gt; <tt><font size="-1">&#91;</font></tt>
+    { id =&gt; 'A', name =&gt; 'Alpha', },
+    { id =&gt; 'B', name =&gt; 'Beta', },
+    { id =&gt; 'G', name =&gt; 'Gamma' },
+  ]);</pre>
+<pre>
+  $ls-&gt;set_column_names(a =&gt; <tt><font size="-1">&#91;</font></tt>
+    <tt><font size="-1">&#91;</font></tt> Letter =&gt; 'id' ], <tt><font size="-1">&#91;</font></tt> Name =&gt; 'name' ]
+  ]);</pre>
+<p>Here is data defined by array references, with columns that refer to
+sequential elements in the array:</p>
+<pre>
+  $ls-&gt;set_model(a =&gt; <tt><font size="-1">&#91;</font></tt>
+    <tt><font size="-1">&#91;</font></tt>qw( A Alpha )],
+    <tt><font size="-1">&#91;</font></tt>qw( B Beta )],
+    <tt><font size="-1">&#91;</font></tt>qw( G Gamma )],
+  ]);</pre>
+<pre>
+  $ls-&gt;set_column_names(a =&gt; <tt><font size="-1">&#91;</font></tt>
+    qw( ID Name )
+  ]);</pre>
+<p>Here is data defined by array references, with columns that are mapped
+to specific elements in the array:</p>
+<pre>
+  $ls-&gt;set_model(a =&gt; <tt><font size="-1">&#91;</font></tt>
+    <tt><font size="-1">&#91;</font></tt>qw( A Alpha )],
+    <tt><font size="-1">&#91;</font></tt>qw( B Beta )],
+    <tt><font size="-1">&#91;</font></tt>qw( G Gamma )],
+  ]);</pre>
+<pre>
+  $ls-&gt;set_column_names(a =&gt; <tt><font size="-1">&#91;</font></tt>
+    <tt><font size="-1">&#91;</font></tt> ID =&gt; 0 ], <tt><font size="-1">&#91;</font></tt> Name =&gt; 1 ]
+  ]);</pre>
+<p>
+</p>
+<h2><a name="subclassing_and_extending">Subclassing and Extending</a></h2>
+<p>Following is an explanation of the methods used in the creation and
+execution of the ListSwap widget.</p>
+<p>
+</p>
+<h3><a name="formatting_buttons">Formatting Buttons</a></h3>
+<p>The most likely area of customization is the format of the buttons.  Each
+button has two methods associated with it:  one that creates the button
+widget, and one that takes that widget and connects to its ``clicked''
+signal.  For the button that moves the selected elements in list ``a'' to
+list ``b'', those methods are <tt><font size="-1">a_to_b_button()</font></tt> and a_to_b().  For the button
+that moves all elements in list ``a'' to list ``b'' those methods are
+<tt><font size="-1">all_a_to_b_button()</font></tt> and all_a_to_b().  The combinations in ``glob'' format
+are {all_,}{a,b,c}_to_{a,b,c}{_button,}, excluding the a_to_a variety.</p>
+<p>
+</p>
+<h3><a name="creating_data_models">Creating Data Models</a></h3>
+<p>The <tt><font size="-1">make_model()</font></tt> method takes the data structure representing rows of
+data and produces a Gtk2::ListStore object.  The default method is very
+simple in nature:</p>
+<pre>
+  sub make_model {
+    my ($self, $d) = @_;
+    my $model = Gtk2::ListStore-&gt;new('Glib::Scalar');</pre>
+<pre>
+    for (@$d) {
+      my $iter = $model-&gt;append;
+      $model-&gt;set($iter, 0, $_);
+    }</pre>
+<pre>
+    return $model;
+  }</pre>
+<p>If you modify this method, you will most likely need to change all the
+following methods.</p>
+<p>
+</p>
+<h3><a name="populating_a_cell">Populating a Cell</a></h3>
+<p>The <tt><font size="-1">cell()</font></tt> method populates a cell -- the value in a row for a given
+column.  The method defaults to the following:</p>
+<pre>
+  sub cell {
+    my ($self, $col, $cnum, $column, $cell, $model, $iter) = @_;
+    my $info = $model-&gt;get($iter, 0);
+    my $data = ref($info) eq 'ARRAY' ?
+      $info-&gt;<tt><font size="-1">&#91;</font></tt>ref($col) ? $col-&gt;<tt><font size="-1">&#91;</font></tt>1] : $cnum] :
+      $info-&gt;{ref($col) ? $col-&gt;<tt><font size="-1">&#91;</font></tt>1] : $col};
+    $cell-&gt;set(text =&gt; $data);
+  }</pre>
+<p>There are two additional arguments to this function before the standard
+arguments to this GtkTreeCellDataFunc.  They are the column definition
+(such as <tt><font size="-1">&#91;ID =</font></tt> 'letter']&gt;) and the column index (starting at 0).  The
+other arguments are defined in the Gtk API documentation (see
+<a href="http://developer.gnome.org/doc/API/2.0/gtk/GtkTreeViewColumn.html#GtkTreeCellDataFunc">http://developer.gnome.org/doc/API/2.0/gtk/GtkTreeViewColumn.html#GtkTreeCellDataFunc</a>).</p>
+<p>
+</p>
+<h3><a name="moving_elements_via_buttons">Moving Elements via Buttons</a></h3>
+<p>The <tt><font size="-1">move()</font></tt> method takes two indices and an optional third argument which
+determines whether to move all the elements from one list to the other.
+The method defaults to the following:</p>
+<pre>
+  sub move {
+    my ($self, $from_i, $to_i, $all) = @_;
+    my @mod = qw( a b c );
+    my $from = $self-&gt;get_model($mod<tt><font size="-1">&#91;</font></tt>$from_i]);
+    my $to = $self-&gt;get_model($mod<tt><font size="-1">&#91;</font></tt>$to_i]);
+    my $sel = $self-&gt;{trees}<tt><font size="-1">&#91;</font></tt>$from_i]-&gt;get_selection;</pre>
+<pre>
+    $sel-&gt;select_all if $all;
+    my @data = $sel-&gt;get_selected_rows;</pre>
+<pre>
+    for (reverse @data) {
+      my $iter = $from-&gt;get_iter($_);
+      my $info = $from-&gt;get($iter, 0);
+      $from-&gt;remove($iter);</pre>
+<pre>
+      $iter = $to-&gt;append;
+      $to-&gt;set($iter, 0, $info);
+    }
+  }</pre>
+<p>This method is called in the ``clicked'' signal from the buttons created by
+the <tt><font size="-1">a_to_b()</font></tt> method and its siblings.  List ``a'' is represented with 0,
+list ``b'' is represented by 1, and list ``c'' is represented by 2; thus, to
+move the selected elements in ``c'' to ``a'' use <tt><font size="-1">$self-</font></tt>move(2,0)&gt;, and to
+move <strong>all</strong> elements in ``a'' to ``b'' use <tt><font size="-1">$self-</font></tt>move(0,1,1)&gt;.</p>
+<p>It's important to reverse the list of rows, because if you delete a row
+from a list and then move forward, you'll end up skipping what should have
+been the next row.</p>
+<p>
+</p>
+<h3><a name="moving_elements_via_draganddrop">Moving Elements via Drag-and-Drop</a></h3>
+<p><strong>NOTE:</strong> The Gtk2 API does not allow for dragging multiple items at once.</p>
+<p>There are two methods used in dragging and dropping:</p>
+<pre>
+  sub dnd_get {
+    my ($self, $src, $context, $sel, $id) = @_;
+    my @data = $src-&gt;get_selection-&gt;get_selected_rows;
+    my $model = $src-&gt;get_model;</pre>
+<pre>
+    # @data really only holds one element :(
+    for (reverse @data) {       
+      my $iter = $model-&gt;get_iter($_);
+      my $info = $model-&gt;get($iter, 0);
+      $model-&gt;remove($iter);
+      $sel-&gt;set($sel-&gt;target, 8, freeze($info));
+    }
+  }</pre>
+<pre>
+  sub dnd_received {
+    my ($self, $dst, $context, $x, $y, $sel) = @_;
+    my ($path, $how) = $dst-&gt;get_dest_row_at_pos($x, $y);
+    my $model = $dst-&gt;get_model;
+    my $iter;</pre>
+<pre>
+    if ($path) {
+      $iter = $model-&gt;get_iter($path);
+      if ($how eq 'after' or $how eq 'into-or-after') {
+        $iter = $model-&gt;insert_after($iter);
+      }
+      else { $iter = $model-&gt;insert_before($iter) }
+    }
+    else { $iter = $model-&gt;append }</pre>
+<pre>
+    $model-&gt;set($iter, 0, thaw($sel-&gt;data));
+  }</pre>
+<p>The arguments to these methods are defined in the Gtk API documentation
+(see <a href="http://developer.gnome.org/doc/API/2.0/gtk/GtkWidget.html#GtkWidget-drag-data-get">http://developer.gnome.org/doc/API/2.0/gtk/GtkWidget.html#GtkWidget-drag-data-get</a>
+and <a href="http://developer.gnome.org/doc/API/2.0/gtk/GtkWidget.html#GtkWidget-drag-data-received">http://developer.gnome.org/doc/API/2.0/gtk/GtkWidget.html#GtkWidget-drag-data-received</a>).</p>
+<p>The <tt><font size="-1">dnd_get()</font></tt> method is called by the source list once its selected item
+has been dragged into the receiving list and dropped.  After it is done
+executing, then the <tt><font size="-1">dnd_received()</font></tt> method is called by the receiving list.</p>
+<p>
+</p>
+<hr />
+<h1><a name="limitations">LIMITATIONS</a></h1>
+<p>This module currently only provides support for <em>moving</em> elements to
+another list, not <em>copying</em>.  This may change in future versions.</p>
+<p>You can currently only drag one item at a time.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Jeff <tt><font size="-1">japhy</font></tt> Pinyan, <em><a href="mailto:japhy@perlmonk.org">japhy@perlmonk.org</a></em></p>
+</div>
+
+Source code:
+<div class="readmore">
+<pre><tt class="code"><font size="-1">package Gtk2::Ex::ListSwap;
+
+use Gtk2;
+use Carp qw( carp croak );
+use Storable qw( freeze thaw );
+
+use base 'Exporter';
+@EXPORT = qw(
+  GTK_LS_HORIZONTAL GTK_LS_VERTICAL
+
+  GTK_LS_BUTTONS GTK_LS_DRAG_AND_DROP
+
+  GTK_LS_A_TO_B GTK_LS_B_TO_A GTK_LS_ALL_A_TO_B GTK_LS_ALL_B_TO_A
+  GTK_LS_A_TO_C GTK_LS_C_TO_A GTK_LS_ALL_A_TO_C GTK_LS_ALL_C_TO_A
+  GTK_LS_B_TO_C GTK_LS_C_TO_B GTK_LS_ALL_B_TO_C GTK_LS_ALL_C_TO_B
+  GTK_LS_ALL_AB_BUTTONS GTK_LS_ALL_BUTTONS
+
+  GTK_LS_SINGLE GTK_LS_BROWSE GTK_LS_MULTIPLE
+
+  GTK_LS_ALWAYS GTK_LS_NEVER GTK_LS_AUTOMATIC
+);
+
+use constant TRUE =&gt; 1;
+use constant FALSE =&gt; 0;
+
+# orientation constants
+use constant GTK_LS_HORIZONTAL =&gt; 1;
+use constant GTK_LS_VERTICAL =&gt; 2;
+
+# swapping-method constants
+use constant GTK_LS_BUTTONS       =&gt; 1 &lt;&lt; 1;
+use constant GTK_LS_DRAG_AND_DROP =&gt; 1 &lt;&lt; 2;
+
+# button constants
+use constant GTK_LS_A_TO_B         =&gt; 1 &lt;&lt; 1;
+use constant GTK_LS_B_TO_A         =&gt; 1 &lt;&lt; 2;
+use constant GTK_LS_ALL_A_TO_B     =&gt; 1 &lt;&lt; 3;
+use constant GTK_LS_ALL_B_TO_A     =&gt; 1 &lt;&lt; 4;
+use constant GTK_LS_A_TO_C         =&gt; 1 &lt;&lt; 5;
+use constant GTK_LS_C_TO_A         =&gt; 1 &lt;&lt; 6;
+use constant GTK_LS_B_TO_C         =&gt; 1 &lt;&lt; 7;
+use constant GTK_LS_C_TO_B         =&gt; 1 &lt;&lt; 8;
+use constant GTK_LS_ALL_A_TO_C     =&gt; 1 &lt;&lt; 9;
+use constant GTK_LS_ALL_B_TO_C     =&gt; 1 &lt;&lt; 10;
+use constant GTK_LS_ALL_C_TO_A     =&gt; 1 &lt;&lt; 11;
+use constant GTK_LS_ALL_C_TO_B     =&gt; 1 &lt;&lt; 12;
+use constant GTK_LS_ALL_AB_BUTTONS =&gt; (1 &lt;&lt; 5) - 1;
+use constant GTK_LS_ALL_BUTTONS    =&gt; (1 &lt;&lt; 13) - 1;
+
+# selection constants
+use constant GTK_LS_SINGLE   =&gt; 1;
+use constant GTK_LS_BROWSE   =&gt; 2;
+use constant GTK_LS_MULTIPLE =&gt; 3;
+
+# policy constants
+use constant GTK_LS_ALWAYS    =&gt; 1;
+use constant GTK_LS_NEVER     =&gt; 2;
+use constant GTK_LS_AUTOMATIC =&gt; 3;
+
+$VERSION = '0.01b';
+
+use strict;
+use warnings;
+
+sub new {
+  my ($class) = @_;
+  bless {
+    orientation =&gt; GTK_LS_HORIZONTAL,
+    buttons =&gt; GTK_LS_ALL_BUTTONS,
+    selection =&gt; GTK_LS_MULTIPLE,
+    method =&gt; GTK_LS_BUTTONS | GTK_LS_DRAG_AND_DROP,
+    policy =&gt; &#91;'never', 'automatic'&#93;,
+  }, $class;
+}
+
+
+sub widget {
+  my ($self) = @_;
+
+  my $horiz = $self-&gt;get_orientation == GTK_LS_HORIZONTAL;
+  my $num = $self-&gt;get_size;
+  my $bflags = $self-&gt;get_buttons;
+  my $hbox = 'Gtk2::HBox';
+  my $vbox = 'Gtk2::VBox';
+
+  my $main_container = ($vbox, $hbox)&#91;$horiz&#93;;
+  my $button_container = ($vbox, $hbox)&#91;1-$horiz&#93;;
+  my $widget = $main_container-&gt;new(FALSE, 4);
+  my $ab_buttons = $button_container-&gt;new(FALSE, 4);
+  my $bc_buttons = $button_container-&gt;new(FALSE, 4);
+
+  my @lists = map Gtk2::ScrolledWindow-&gt;new, 1 .. $num;
+  $_-&gt;set_policy($self-&gt;get_policy) for @lists;
+
+  my @models = map $self-&gt;get_model($_), ('a' .. 'c')&#91;0..$num-1&#93;;
+  my @trees = map Gtk2::TreeView-&gt;new_with_model($_), @models;
+  my @buttons = (
+    $num == 2 ? &#91;
+      ($bflags &amp; GTK_LS_ALL_A_TO_B ? 'all_a_to_b' : ()),
+      ($bflags &amp; GTK_LS_A_TO_B ? 'a_to_b' : ()),
+      ($bflags &amp; GTK_LS_B_TO_A ? 'b_to_a' : ()),
+      ($bflags &amp; GTK_LS_ALL_B_TO_A ? 'all_b_to_a' : ()),
+    &#93; : (
+      &#91;
+        ($bflags &amp; GTK_LS_ALL_A_TO_C ? 'all_a_to_c' : ()),
+        ($bflags &amp; GTK_LS_A_TO_C ? 'a_to_c' : ()),
+        ($bflags &amp; GTK_LS_ALL_A_TO_B ? 'all_a_to_b' : ()),
+        ($bflags &amp; GTK_LS_A_TO_B ? 'a_to_b' : ()),
+        ($bflags &amp; GTK_LS_B_TO_A ? 'b_to_a' : ()),
+        ($bflags &amp; GTK_LS_ALL_B_TO_A ? 'all_b_to_a' : ()),
+      &#93;,
+      &#91;
+        ($bflags &amp; GTK_LS_ALL_B_TO_C ? 'all_b_to_c' : ()),
+        ($bflags &amp; GTK_LS_B_TO_C ? 'b_to_c' : ()),
+        ($bflags &amp; GTK_LS_C_TO_B ? 'c_to_b' : ()),
+        ($bflags &amp; GTK_LS_ALL_C_TO_B ? 'all_c_to_b' : ()),
+        ($bflags &amp; GTK_LS_C_TO_A ? 'c_to_a' : ()),
+        ($bflags &amp; GTK_LS_ALL_C_TO_A ? 'all_c_to_a' : ()),
+      &#93;
+    )
+  );
+
+  my $sel_mode = (qw( always never automatic ))&#91;$self-&gt;get_selection -
+<font color="red">+</font> 1&#93;;
+  $_-&gt;get_selection-&gt;set_mode('multiple') for @trees;
+
+  if ($self-&gt;get_method &amp; GTK_LS_DRAG_AND_DROP) {
+    my $entry = &#91;'Glib::Scalar', 'same-app', 1&#93;;
+    for (@trees) {
+      $_-&gt;enable_model_drag_source('GDK_BUTTON1_MASK', 'GDK_ACTION_MOV
+<font color="red">+</font>E', $entry),
+      $_-&gt;enable_model_drag_dest('GDK_ACTION_MOVE', $entry);
+      $_-&gt;signal_connect('drag-data-get' =&gt; sub { $self-&gt;dnd_get(@_) }
+<font color="red">+</font>);
+      $_-&gt;signal_connect('drag-data-received' =&gt; sub { $self-&gt;dnd_rece
+<font color="red">+</font>ived(@_) });
+    }
+  }
+
+  $lists&#91;$_&#93;-&gt;add($trees&#91;$_&#93;) for 0 .. $num-1;
+
+  my $cell = Gtk2::CellRendererText-&gt;new;
+  for my $tree (0 .. $num-1) {
+    my $cnum = 0;
+    for my $col ($self-&gt;get_column_names((qw( a b c ))&#91;$tree&#93;)) {
+      my $n = $cnum;
+      my $cname = ref($col) ? $col-&gt;&#91;0&#93; : $col;
+      $trees&#91;$tree&#93;-&gt;insert_column_with_data_func(
+        -1, $cname, $cell, sub { $self-&gt;cell($col, $n, @_) }
+      );
+      ++$cnum;
+    }
+  }
+
+  if ($num == 2) {
+    $widget-&gt;add($lists&#91;0&#93;);
+
+    if ($self-&gt;get_method &amp; GTK_LS_BUTTONS) {
+      my $align = Gtk2::Alignment-&gt;new(0.5, 0.5, 0, 0);
+      $ab_buttons-&gt;pack_start($self-&gt;$_, FALSE, FALSE, 4) for @{ $butt
+<font color="red">+</font>ons&#91;0&#93; };
+      $align-&gt;add($ab_buttons);
+      $widget-&gt;pack_start($align, FALSE, FALSE, 0);
+    }
+
+    $widget-&gt;add($lists&#91;1&#93;);
+  }
+  else {
+    $widget-&gt;add($lists&#91;0&#93;);
+
+    if ($self-&gt;get_method &amp; GTK_LS_BUTTONS) {
+      my $align = Gtk2::Alignment-&gt;new(0.5, 0.5, 0, 0);
+      $ab_buttons-&gt;pack_start($self-&gt;$_, FALSE, FALSE, 4) for @{ $butt
+<font color="red">+</font>ons&#91;0&#93; };
+      $align-&gt;add($ab_buttons);
+      $widget-&gt;pack_start($align, FALSE, FALSE, 0);
+    }
+
+    $widget-&gt;add($lists&#91;1&#93;);
+
+    if ($self-&gt;get_method &amp; GTK_LS_BUTTONS) {
+      my $align = Gtk2::Alignment-&gt;new(0.5, 0.5, 0, 0);
+      $bc_buttons-&gt;pack_start($self-&gt;$_, FALSE, FALSE, 4) for @{ $butt
+<font color="red">+</font>ons&#91;1&#93; };
+      $align-&gt;add($bc_buttons);
+      $widget-&gt;pack_start($align, FALSE, FALSE, 0);
+    }
+
+    $widget-&gt;add($lists&#91;2&#93;);
+  }
+
+  $self-&gt;{trees} = \@trees;
+  return $self-&gt;{widget} = $widget;
+}
+
+
+sub cell {
+  my ($self, $col, $cnum, $column, $cell, $model, $iter) = @_;
+  my $info = $model-&gt;get($iter, 0);
+  my $data = ref($info) eq 'ARRAY' ?
+    $info-&gt;&#91;ref($col) ? $col-&gt;&#91;1&#93; : $cnum&#93; :
+    $info-&gt;{ref($col) ? $col-&gt;&#91;1&#93; : $col};
+  $cell-&gt;set(text =&gt; $data);
+}
+
+
+sub move {
+  my ($self, $from_i, $to_i, $all) = @_;
+  my @mod = qw( a b c );
+  my $from = $self-&gt;get_model($mod&#91;$from_i&#93;);
+  my $to = $self-&gt;get_model($mod&#91;$to_i&#93;);
+  my $sel = $self-&gt;{trees}&#91;$from_i&#93;-&gt;get_selection;
+
+  $sel-&gt;select_all if $all;
+  my @data = $sel-&gt;get_selected_rows;
+
+  my $ins;
+
+  for (reverse @data) {
+    my $iter = $from-&gt;get_iter($_);
+    my $info = $from-&gt;get($iter, 0);
+    $from-&gt;remove($iter);
+
+    $ins = $ins ? $to-&gt;insert_before($ins) : $to-&gt;append;
+    $to-&gt;set($ins, 0, $info);
+  }
+}
+
+
+sub dnd_get {
+  my ($self, $src, $context, $sel, $id) = @_;
+  my @data = $src-&gt;get_selection-&gt;get_selected_rows;
+  my $model = $src-&gt;get_model;
+
+  for (reverse @data) {    
+    my $iter = $model-&gt;get_iter($_);
+    my $info = $model-&gt;get($iter, 0);
+    $model-&gt;remove($iter);
+    $sel-&gt;set($sel-&gt;target, 8, freeze($info));
+  }
+}
+
+
+sub dnd_received {
+  my ($self, $dst, $context, $x, $y, $sel) = @_;
+  my ($path, $how) = $dst-&gt;get_dest_row_at_pos($x, $y);
+  my $model = $dst-&gt;get_model;
+  my $iter;
+
+  if ($path) {
+    $iter = $model-&gt;get_iter($path);
+    if ($how eq 'after' or $how eq 'into-or-after') {
+      $iter = $model-&gt;insert_after($iter);
+    }
+    else { $iter = $model-&gt;insert_before($iter) }
+  }
+  else { $iter = $model-&gt;append }
+
+  $model-&gt;set($iter, 0, thaw($sel-&gt;data));
+}
+
+
+sub get_size {
+  my ($self) = @_;
+  return @{ $self-&gt;{models} };
+}
+
+
+sub set_orientation {
+  my ($self, $o) = @_;
+  croak &quot;orientation must be either GTK_LS_HORIZONTAL or GTK_LS_VERTIC
+<font color="red">+</font>AL&quot;
+    unless $o == GTK_LS_HORIZONTAL or $o == GTK_LS_VERTICAL;
+  $self-&gt;{orientation} = $o;
+}
+
+
+sub get_orientation {
+  my ($self) = @_;
+  return $self-&gt;{orientation};
+}
+
+
+sub set_method {
+  my ($self, $m) = @_;
+  croak &quot;method must be a combination of GTK_LS_BUTTONS and GTK_LS_DRA
+<font color="red">+</font>G_AND_DROP&quot;
+    if $m &amp; ~(GTK_LS_BUTTONS | GTK_LS_DRAG_AND_DROP);
+  $self-&gt;{method} = $m;
+}
+
+
+sub get_method {
+  my ($self) = @_;
+  return $self-&gt;{method};
+}
+
+
+sub set_selection {
+  my ($self, $s) = @_;
+  croak &quot;selection must be one of GTK_LS_SINGLE, GTK_LS_BROWSE, or GTK
+<font color="red">+</font>_LS_MULTIPLE&quot;
+    if $s != GTK_LS_SINGLE and $s != GTK_LS_BROWSE and $s != GTK_LS_MU
+<font color="red">+</font>LTIPLE;
+  $self-&gt;{selection} = $s;
+}
+
+
+sub get_selection {
+  my ($self) = @_;
+  return $self-&gt;{selection};
+}
+
+
+sub set_buttons {
+  my ($self, $b) = @_;
+  my $valid = $self-&gt;get_size == 2 ?
+    &quot;GTK_LS_A_TO_B, GTK_LS_B_TO_A, GTK_LS_ALL_A_TO_B, GTK_LS_ALL_B_TO_
+<font color="red">+</font>A, and GTK_LS_ALL_AB_BUTTONS&quot; :
+    (&quot;GTK_LS_A_TO_B, GTK_LS_B_TO_A, GTK_LS_ALL_A_TO_B, GTK_LS_ALL_B_TO
+<font color="red">+</font>_A, &quot; .
+     &quot;GTK_LS_A_TO_C, GTK_LS_C_TO_A, GTK_LS_ALL_A_TO_C, GTK_LS_ALL_C_TO
+<font color="red">+</font>_A, &quot; .
+     &quot;GTK_LS_B_TO_C, GTK_LS_C_TO_B, GTK_LS_ALL_B_TO_C, GTK_LS_ALL_C_TO
+<font color="red">+</font>_B, &quot; .
+     &quot;GTK_LS_ALL_AB_BUTTONS, and GTK_LS_ALL_BUTTONS&quot;);
+  croak &quot;button flags must be a combination of $valid&quot;
+    if $b &amp; ~($self-&gt;get_size == 2 ? GTK_LS_ALL_AB_BUTTONS : GTK_LS_AL
+<font color="red">+</font>L_BUTTONS);
+  $self-&gt;{buttons} = $b;
+}
+
+
+sub get_buttons {
+  my ($self) = @_;
+  return $self-&gt;{buttons};
+}
+
+
+sub set_model {
+  my ($self, $w, $d) = @_;
+  my $i = { a =&gt; 0, b =&gt; 1, c =&gt; 2 }-&gt;{$w};
+  $self-&gt;{models}&#91;$i&#93; = $self-&gt;make_model($d);
+}
+
+
+sub get_model {
+  my ($self, $w) = @_;
+  my $i = { a =&gt; 0, b =&gt; 1, c =&gt; 2 }-&gt;{$w};
+  return $self-&gt;{models}&#91;$i&#93;;
+}
+
+
+sub make_model {
+  my ($self, $d) = @_;
+  my $model = Gtk2::ListStore-&gt;new('Glib::Scalar');
+
+  for (@$d) {
+    my $iter = $model-&gt;append;
+    $model-&gt;set($iter, 0, $_);
+  }
+
+  return $model;
+}
+
+
+sub set_column_names {
+  my ($self, $w, $d) = @_;
+  my $i = { a =&gt; 0, b =&gt; 1, c =&gt; 2 }-&gt;{$w};
+  $self-&gt;{column_names}&#91;$i&#93; = $d;
+}
+
+
+sub get_column_names {
+  my ($self, $w) = @_;
+  my $i = { a =&gt; 0, b =&gt; 1, c =&gt; 2 }-&gt;{$w};
+  return wantarray() ? @{ $self-&gt;{column_names}&#91;$i&#93; } : $self-&gt;{column
+<font color="red">+</font>_names}&#91;$i&#93;;
+}
+
+
+sub set_policy {
+  my ($self, $x, $y) = @_;
+  croak &quot;policies must be one of GTK_LS_ALWAYS, GTK_LS_NEVER, or GTK_L
+<font color="red">+</font>S_AUTOMATIC&quot;
+    unless ($x == GTK_LS_ALWAYS or $x == GTK_LS_NEVER or $x == GTK_LS_
+<font color="red">+</font>AUTOMATIC) and
+           ($y == GTK_LS_ALWAYS or $y == GTK_LS_NEVER or $y == GTK_LS_
+<font color="red">+</font>AUTOMATIC);
+  $self-&gt;{policy} = &#91;$x, $y&#93;;
+}
+
+
+sub get_policy {
+  my ($self) = @_;
+  return wantarray() ? @{ $self-&gt;{policy} } : $self-&gt;{policy};
+}
+
+
+sub a_to_b {
+  my ($self) = @_;
+  my $button = $self-&gt;a_to_b_button;
+  $button-&gt;signal_connect(clicked =&gt; sub { $self-&gt;move(0,1) });
+  return $button;
+}
+
+
+sub a_to_b_button {
+  my ($self) = @_;
+  my $h = $self-&gt;get_orientation == GTK_LS_HORIZONTAL;
+  return Gtk2::Button-&gt;new($h ? &quot;&gt;&quot; : &quot;v&quot;);
+}
+
+
+sub a_to_c {
+  my ($self) = @_;
+  my $button = $self-&gt;a_to_c_button;
+  $button-&gt;signal_connect(clicked =&gt; sub { $self-&gt;move(0,2) });
+  return $button;
+}
+
+
+sub a_to_c_button {
+  my ($self) = @_;
+  my $h = $self-&gt;get_orientation == GTK_LS_HORIZONTAL;
+  return Gtk2::Button-&gt;new($h ? &quot;-&gt;&quot; : &quot;|\nv&quot;);
+}
+
+
+sub b_to_a {
+  my ($self) = @_;
+  my $button = $self-&gt;b_to_a_button;
+  $button-&gt;signal_connect(clicked =&gt; sub { $self-&gt;move(1,0) });
+  return $button;
+}
+
+
+sub b_to_a_button {
+  my ($self) = @_;
+  my $h = $self-&gt;get_orientation == GTK_LS_HORIZONTAL;
+  return Gtk2::Button-&gt;new($h ? &quot;&lt;&quot; : &quot;^&quot;);
+}
+
+
+sub b_to_c {
+  my ($self) = @_;
+  my $button = $self-&gt;b_to_c_button;
+  $button-&gt;signal_connect(clicked =&gt; sub { $self-&gt;move(1,2) });
+  return $button;
+}
+
+
+sub b_to_c_button {
+  my ($self) = @_;
+  my $h = $self-&gt;get_orientation == GTK_LS_HORIZONTAL;
+  return Gtk2::Button-&gt;new($h ? &quot;&gt;&quot; : &quot;v&quot;);
+}
+
+
+sub c_to_a {
+  my ($self) = @_;
+  my $button = $self-&gt;c_to_a_button;
+  $button-&gt;signal_connect(clicked =&gt; sub { $self-&gt;move(2,0) });
+  return $button;
+}
+
+
+sub c_to_a_button {
+  my ($self) = @_;
+  my $h = $self-&gt;get_orientation == GTK_LS_HORIZONTAL;
+  return Gtk2::Button-&gt;new($h ? &quot;&lt;-&quot; : &quot;^\n|&quot;);
+}
+
+
+sub c_to_b {
+  my ($self) = @_;
+  my $button = $self-&gt;c_to_b_button;
+  $button-&gt;signal_connect(clicked =&gt; sub { $self-&gt;move(2,1) });
+  return $button;
+}
+
+
+sub c_to_b_button {
+  my ($self) = @_;
+  my $h = $self-&gt;get_orientation == GTK_LS_HORIZONTAL;
+  return Gtk2::Button-&gt;new($h ? &quot;&lt;&quot; : &quot;^&quot;);
+}
+
+
+sub all_a_to_b {
+  my ($self) = @_;
+  my $button = $self-&gt;all_a_to_b_button;
+  $button-&gt;signal_connect(clicked =&gt; sub { $self-&gt;move(0,1,1) });
+  return $button;
+}
+
+
+sub all_a_to_b_button {
+  my ($self) = @_;
+  my $h = $self-&gt;get_orientation == GTK_LS_HORIZONTAL;
+  return Gtk2::Button-&gt;new($h ? &quot;&gt;&gt;&quot; : &quot;v\nv&quot;);
+}
+
+
+sub all_a_to_c {
+  my ($self) = @_;
+  my $button = $self-&gt;all_a_to_c_button;
+  $button-&gt;signal_connect(clicked =&gt; sub { $self-&gt;move(0,2,1) });
+  return $button;
+}
+
+
+sub all_a_to_c_button {
+  my ($self) = @_;
+  my $h = $self-&gt;get_orientation == GTK_LS_HORIZONTAL;
+  return Gtk2::Button-&gt;new($h ? &quot;--&gt;&gt;&quot; : &quot;|\n|\nv\nv&quot;);
+}
+
+
+sub all_b_to_a {
+  my ($self) = @_;
+  my $button = $self-&gt;all_b_to_a_button;
+  $button-&gt;signal_connect(clicked =&gt; sub { $self-&gt;move(1,0,1) });
+  return $button;
+}
+
+
+sub all_b_to_a_button {
+  my ($self) = @_;
+  my $h = $self-&gt;get_orientation == GTK_LS_HORIZONTAL;
+  return Gtk2::Button-&gt;new($h ? &quot;&lt;&lt;&quot; : &quot;^\n^&quot;);
+}
+
+
+sub all_b_to_c {
+  my ($self) = @_;
+  my $button = $self-&gt;all_b_to_c_button;
+  $button-&gt;signal_connect(clicked =&gt; sub { $self-&gt;move(1,2,1) });
+  return $button;
+}
+
+
+sub all_b_to_c_button {
+  my ($self) = @_;
+  my $h = $self-&gt;get_orientation == GTK_LS_HORIZONTAL;
+  return Gtk2::Button-&gt;new($h ? &quot;&gt;&gt;&quot; : &quot;v\nv&quot;);
+}
+
+
+sub all_c_to_a {
+  my ($self) = @_;
+  my $button = $self-&gt;all_c_to_a_button;
+  $button-&gt;signal_connect(clicked =&gt; sub { $self-&gt;move(2,0,1) });
+  return $button;
+}
+
+
+sub all_c_to_a_button {
+  my ($self) = @_;
+  my $h = $self-&gt;get_orientation == GTK_LS_HORIZONTAL;
+  return Gtk2::Button-&gt;new($h ? &quot;&lt;&lt;--&quot; : &quot;^\n^\n|\n|&quot;);
+}
+
+
+sub all_c_to_b {
+  my ($self) = @_;
+  my $button = $self-&gt;all_c_to_b_button;
+  $button-&gt;signal_connect(clicked =&gt; sub { $self-&gt;move(2,1,1) });
+  return $button;
+}
+
+
+sub all_c_to_b_button {
+  my ($self) = @_;
+  my $h = $self-&gt;get_orientation == GTK_LS_HORIZONTAL;
+  return Gtk2::Button-&gt;new($h ? &quot;&lt;&lt;&quot; : &quot;^\n^&quot;);
+}
+
+
+1;
+
+__END__
+
+=head1 NAME
+
+Gtk2::Ex::ListSwap - Item swapping between two or three lists
+
+=head1 SYNOPSIS
+
+  use Gtk2::Ex::ListSwap;
+  use Gtk2 -init;
+
+  use strict;
+  use warnings;
+
+  my $window = Gtk2::Window-&gt;new;
+  $window-&gt;signal_connect(destroy =&gt; sub { Gtk2-&gt;main_quit });
+
+  my $list_swap = Gtk2::Ex::ListSwap-&gt;new;
+
+  $list_swap-&gt;set_model(a =&gt; &#91;
+    { id =&gt; 'eggs', name =&gt; 'Eggs' },
+    { id =&gt; 'cmilk', name =&gt; 'Chocolate Milk' },
+    { id =&gt; 'oreo', name =&gt; 'Oreos', },
+    { id =&gt; 'coke', name =&gt; 'Coca-Cola', },
+  &#93;);
+  $list_swap-&gt;set_model(b =&gt; &#91;
+    { id =&gt; 'bread', name =&gt; 'Whole Wheat Bread' },
+    { id =&gt; 'lj', name =&gt; 'Lemon Juice' },
+    { id =&gt; 'oj', name =&gt; 'Orange Juice' },
+    { id =&gt; 'beer', name =&gt; 'Guiness' },
+  &#93;);
+
+  $list_swap-&gt;set_column_names(a =&gt; &#91;&#91;'ID','id'&#93;, &#91;'Name','name'&#93;&#93;);
+  $list_swap-&gt;set_column_names(b =&gt; &#91;&#91;'ID','id'&#93;, &#91;'Name','name'&#93;&#93;);
+
+  $window-&gt;add($list_swap-&gt;widget);
+  $window-&gt;show_all;
+  Gtk2-&gt;main;
+
+=head1 DESCRIPTION
+
+This module provides a simple factory for producing a widget containin
+<font color="red">+</font>g
+two or three ScrollingWindow widgets with groups of buttons between th
+<font color="red">+</font>em
+allowing for the movement of items from one list to another.  It allow
+<font color="red">+</font>s
+for a fair amount of customization:  horizontal or vertical positionin
+<font color="red">+</font>g,
+button-based and drag-and-drop methods for swapping elements, selectio
+<font color="red">+</font>n
+of which buttons to display, how many elements may be selected at once
+<font color="red">+</font>,
+and when scrollbars should be displayed.
+
+Unlike standard widgets, a ListSwap widget is a Perl object which stor
+<font color="red">+</font>es
+data about the widget, and it creates the widget only when the widget(
+<font color="red">+</font>)
+method is called.
+
+=head2 Constructor
+
+A ListSwap object is created via
+
+  my $ls = Gtk2::Ex::ListSwap-&gt;new;
+
+Upon creation, a set of default options (explained next) are used.
+
+=head2 Options
+
+=head3 Orientation
+
+The orientation of the widget is controlled via the set_orientation()
+method:
+
+  $ls-&gt;set_orientation($how);
+
+The orientation value can either be C&lt;GTK_LS_HORIZONTAL&gt; or
+C&lt;GTK_LS_VERTICAL&gt;.  The default is C&lt;GTK_LS_HORIZONTAL&gt;.
+
+The get_orientation() method returns the orientation.
+
+=head3 Swapping Methods
+
+The methods by which elements can be swapped are controlled via the
+set_method() method:
+
+  $ls-&gt;set_method($mask);
+
+The method value is any bitwise combination of C&lt;GTK_LS_BUTTONS&gt; and
+C&lt;GTK_LS_DRAG_AND_DROP&gt;.  The defaults is
+C&lt;GTK_LS_BUTTONS | GTK_LS_DRAG_AND_DROP&gt;.
+
+The get_method() method returns the swapping method.
+
+=head3 Button Display
+
+This determines which buttons will be displayed if button-swapping
+is enabled.  The button display is controlled via the set_buttons()
+method:
+
+  $ls-&gt;set_buttons($mask);
+
+The button mask is any bitwise combination of the following constants:
+C&lt;GTK_LS_A_TO_B&gt;, C&lt;GTK_LS_B_TO_A&gt;, C&lt;GTK_LS_ALL_A_TO_B&gt;, 
+C&lt;GTK_LS_ALL_B_TO_A&gt;, C&lt;GTK_LS_A_TO_C&gt;, C&lt;GTK_LS_C_TO_A&gt;,
+C&lt;GTK_LS_B_TO_C&gt;, C&lt;GTK_LS_C_TO_B&gt;, C&lt;GTK_LS_ALL_A_TO_C&gt;,
+C&lt;GTK_LS_ALL_B_TO_C&gt;, C&lt;GTK_LS_ALL_C_TO_A&gt;, C&lt;GTK_LS_ALL_C_TO_B&gt;.
+Also provided are two comprehensive masks:  C&lt;GTK_LS_ALL_AB_BUTTONS&gt;
+covers all buttons referring only to lists &quot;A&quot; and &quot;B&quot;;
+C&lt;GTK_LS_ALL_BUTTONS&gt; covers all buttons referring to lists &quot;A&quot;, &quot;B&quot;,
+and &quot;C&quot;.  If there are only two sets of data, C&lt;GTK_LS_ALL_BUTTONS&gt; wi
+<font color="red">+</font>ll
+not cause the widget to render buttons relating to the list &quot;C&quot;.  The
+default is C&lt;GTK_LS_ALL_BUTTONS&gt;.
+
+The get_buttons() method returns the mask of buttons.
+
+=head3 Selection Count
+
+The number of items allowed to be selected at once is controlled via t
+<font color="red">+</font>he
+set_selection() method:
+
+  $ls-&gt;set_selection($count);
+
+The selection count is one of C&lt;GTK_LS_SINGLE&gt;, C&lt;GTK_LS_BROWSE&gt;, or
+C&lt;GTK_LS_MULTIPLE&gt;.  They correspond to their similarly-named Gtk
+counterparts (see the documentation at L&lt;http://developer.gnome.org/do
+<font color="red">+</font>c/API/2.0/gtk/gtk-Standard-Enumerations.html#GtkSelectionMode&gt;).
+The default is C&lt;GTK_LS_MULTIPLE&gt;.
+
+The get_selection() method returns the selection mode.
+
+=head3 Scrollbar Policy
+
+The policy for scrollbars on the ScrollWindow widgets is controlled by
+the get_policy() method:
+
+  $ls-&gt;set_policy($x_when, $y_when);
+
+The policy values are any of C&lt;GTK_LS_ALWAYS&gt;, C&lt;GTK_LS_NEVER&gt;, and
+C&lt;GTK_LS_AUTOMATIC&gt;.  They correspond to their similarly-named Gtk
+counterparts (see the documentation at L&lt;http://developer.gnome.org/do
+<font color="red">+</font>c/API/2.0/gtk/gtk-Standard-Enumerations.html#GtkPolicyType&gt;).
+The default is C&lt;(GTK_LS_NEVER, GTK_LS_AUTOMATIC)&gt;.
+
+The get_policy() method returns the scrollbar policies.  It returns an
+array reference or a list, depending on the context in which it is cal
+<font color="red">+</font>led.
+
+=head2 Columns and Data
+
+The widget can handle two or three sets of data.  When the widget is
+created, it determines how many lists to render based on how many sets
+of data you have created.  Data sets are created via the set_model()
+method.
+
+  $ls-&gt;set_model(a =&gt; &#91;
+    { id =&gt; 'eggs', name =&gt; 'Eggs' },
+    { id =&gt; 'cmilk', name =&gt; 'Chocolate Milk' },
+    { id =&gt; 'oreo', name =&gt; 'Oreos', },
+    { id =&gt; 'coke', name =&gt; 'Coca-Cola', },
+  &#93;);
+
+The first argument is either 'a', 'b', or 'c'.  The second element is
+an array reference of rows.  The contents of the rows must be referenc
+<font color="red">+</font>es
+to arrays or hashes, and B&lt;must be uniform for all data sets&gt;.  That i
+<font color="red">+</font>s,
+you cannot have one data set that holds array references and another d
+<font color="red">+</font>ata
+set that holds hash references within the same ListSwap widget.  You a
+<font color="red">+</font>lso
+cannot mix the reference types within a single data set.
+
+You can, of course, have data in your data sets that is not rendered i
+<font color="red">+</font>n
+the list box.
+
+You can retrieve a data set with the get_model() method, which takes t
+<font color="red">+</font>he
+data set's name ('a', 'b', or 'c') as its argument.
+
+The names of the columns and the mapping of the column name to the
+location in the row is done via the set_column_names() method:
+
+  $ls-&gt;set_column_names(a =&gt; &#91;
+    &#91;'ID','id'&#93;, &#91;'Name','name'&#93;
+  &#93;);
+
+The first argument is either 'a', 'b', or 'c'.  The second element is
+an array reference of column definitions.  In the above example, the
+definitions are array references.  The first element is the name for t
+<font color="red">+</font>he
+column, and the second element is the index (or key) of the data set
+that refers to the value in that column.  C&lt;&#91;'ID', 'id'&#93;&gt; means that t
+<font color="red">+</font>he
+column named &quot;ID&quot; will contain the values associated with the key &quot;id&quot;
+in the hash references that define the rows of data.
+
+You can also use simple strings instead of array references, in which
+case the column names must exactly match the names of keys in the hash
+references that define your data.  If your data is stored in array
+references, then each column name refers to a successive element in th
+<font color="red">+</font>e
+array reference.  (Examples follow.)
+
+You can retrieve the column names and mappings with the get_column_nam
+<font color="red">+</font>es()
+method, which takes the data set's name ('a', 'b', or 'c') as its argu
+<font color="red">+</font>ment.
+
+If you need to determine the number of data sets in this ListSwap obje
+<font color="red">+</font>ct,
+use the get_size() method:
+
+  my $n = $ls-&gt;get_size;
+
+=head3 Examples
+
+Here is data defined by hash references, with columns based on the key
+<font color="red">+</font>s
+in the hash:
+
+  $ls-&gt;set_model(a =&gt; &#91;
+    { ID =&gt; 'A', Name =&gt; 'Alpha', },
+    { ID =&gt; 'B', Name =&gt; 'Beta', },
+    { ID =&gt; 'G', Name =&gt; 'Gamma' },
+  &#93;);
+
+  $ls-&gt;set_column_names(a =&gt; &#91;
+    qw( ID Name )
+  &#93;);
+
+Here is data defined by hash references, with columns that are mapped 
+<font color="red">+</font>to
+keys in the hash:
+
+  $ls-&gt;set_model(a =&gt; &#91;
+    { id =&gt; 'A', name =&gt; 'Alpha', },
+    { id =&gt; 'B', name =&gt; 'Beta', },
+    { id =&gt; 'G', name =&gt; 'Gamma' },
+  &#93;);
+
+  $ls-&gt;set_column_names(a =&gt; &#91;
+    &#91; Letter =&gt; 'id' &#93;, &#91; Name =&gt; 'name' &#93;
+  &#93;);
+
+Here is data defined by array references, with columns that refer to
+sequential elements in the array:
+
+  $ls-&gt;set_model(a =&gt; &#91;
+    &#91;qw( A Alpha )&#93;,
+    &#91;qw( B Beta )&#93;,
+    &#91;qw( G Gamma )&#93;,
+  &#93;);
+
+  $ls-&gt;set_column_names(a =&gt; &#91;
+    qw( ID Name )
+  &#93;);
+
+Here is data defined by array references, with columns that are mapped
+to specific elements in the array:
+
+  $ls-&gt;set_model(a =&gt; &#91;
+    &#91;qw( A Alpha )&#93;,
+    &#91;qw( B Beta )&#93;,
+    &#91;qw( G Gamma )&#93;,
+  &#93;);
+
+  $ls-&gt;set_column_names(a =&gt; &#91;
+    &#91; ID =&gt; 0 &#93;, &#91; Name =&gt; 1 &#93;
+  &#93;);
+
+=head2 Subclassing and Extending
+
+Following is an explanation of the methods used in the creation and
+execution of the ListSwap widget.
+
+=head3 Formatting Buttons
+
+The most likely area of customization is the format of the buttons.  E
+<font color="red">+</font>ach
+button has two methods associated with it:  one that creates the butto
+<font color="red">+</font>n
+widget, and one that takes that widget and connects to its &quot;clicked&quot;
+signal.  For the button that moves the selected elements in list &quot;a&quot; t
+<font color="red">+</font>o
+list &quot;b&quot;, those methods are a_to_b_button() and a_to_b().  For the but
+<font color="red">+</font>ton
+that moves all elements in list &quot;a&quot; to list &quot;b&quot; those methods are
+all_a_to_b_button() and all_a_to_b().  The combinations in &quot;glob&quot; form
+<font color="red">+</font>at
+are {all_,}{a,b,c}_to_{a,b,c}{_button,}, excluding the a_to_a variety.
+
+=head3 Creating Data Models
+
+The make_model() method takes the data structure representing rows of
+data and produces a Gtk2::ListStore object.  The default method is ver
+<font color="red">+</font>y
+simple in nature:
+
+  sub make_model {
+    my ($self, $d) = @_;
+    my $model = Gtk2::ListStore-&gt;new('Glib::Scalar');
+
+    for (@$d) {
+      my $iter = $model-&gt;append;
+      $model-&gt;set($iter, 0, $_);
+    }
+
+    return $model;
+  }
+
+If you modify this method, you will most likely need to change all the
+following methods.
+
+=head3 Populating a Cell
+
+The cell() method populates a cell -- the value in a row for a given
+column.  The method defaults to the following:
+
+  sub cell {
+    my ($self, $col, $cnum, $column, $cell, $model, $iter) = @_;
+    my $info = $model-&gt;get($iter, 0);
+    my $data = ref($info) eq 'ARRAY' ?
+      $info-&gt;&#91;ref($col) ? $col-&gt;&#91;1&#93; : $cnum&#93; :
+      $info-&gt;{ref($col) ? $col-&gt;&#91;1&#93; : $col};
+    $cell-&gt;set(text =&gt; $data);
+  }
+
+There are two additional arguments to this function before the standar
+<font color="red">+</font>d
+arguments to this GtkTreeCellDataFunc.  They are the column definition
+(such as C&lt;&#91;ID =&gt; 'letter'&#93;&gt;) and the column index (starting at 0).  T
+<font color="red">+</font>he
+other arguments are defined in the Gtk API documentation (see
+L&lt;http://developer.gnome.org/doc/API/2.0/gtk/GtkTreeViewColumn.html#Gt
+<font color="red">+</font>kTreeCellDataFunc&gt;).
+
+=head3 Moving Elements via Buttons
+
+The move() method takes two indices and an optional third argument whi
+<font color="red">+</font>ch
+determines whether to move all the elements from one list to the other
+<font color="red">+</font>.
+The method defaults to the following:
+
+  sub move {
+    my ($self, $from_i, $to_i, $all) = @_;
+    my @mod = qw( a b c );
+    my $from = $self-&gt;get_model($mod&#91;$from_i&#93;);
+    my $to = $self-&gt;get_model($mod&#91;$to_i&#93;);
+    my $sel = $self-&gt;{trees}&#91;$from_i&#93;-&gt;get_selection;
+
+    $sel-&gt;select_all if $all;
+    my @data = $sel-&gt;get_selected_rows;
+
+    my $ins;
+
+    for (reverse @data) {
+      my $iter = $from-&gt;get_iter($_);
+      my $info = $from-&gt;get($iter, 0);
+      $from-&gt;remove($iter);
+
+      $ins = $ins ? $to-&gt;insert_before($ins) : $to-&gt;append;
+      $to-&gt;set($ins, 0, $info);
+    }
+  }
+
+This method is called in the &quot;clicked&quot; signal from the buttons created
+<font color="red">+</font> by
+the a_to_b() method and its siblings.  List &quot;a&quot; is represented with 0,
+list &quot;b&quot; is represented by 1, and list &quot;c&quot; is represented by 2; thus, 
+<font color="red">+</font>to
+move the selected elements in &quot;c&quot; to &quot;a&quot; use C&lt;$self-&gt;move(2,0)&gt;, and 
+<font color="red">+</font>to
+move B&lt;all&gt; elements in &quot;a&quot; to &quot;b&quot; use C&lt;$self-&gt;move(0,1,1)&gt;.
+
+It's important to reverse the list of rows, because if you delete a ro
+<font color="red">+</font>w
+from a list and then move forward, you'll end up skipping what should 
+<font color="red">+</font>have
+been the next row.
+
+=head3 Moving Elements via Drag-and-Drop
+
+B&lt;NOTE:&gt; The Gtk2 API does not allow for dragging multiple items at on
+<font color="red">+</font>ce.
+
+There are two methods used in dragging and dropping:
+
+  sub dnd_get {
+    my ($self, $src, $context, $sel, $id) = @_;
+    my @data = $src-&gt;get_selection-&gt;get_selected_rows;
+    my $model = $src-&gt;get_model;
+
+    # @data really only holds one element :(
+    for (reverse @data) {    
+      my $iter = $model-&gt;get_iter($_);
+      my $info = $model-&gt;get($iter, 0);
+      $model-&gt;remove($iter);
+      $sel-&gt;set($sel-&gt;target, 8, freeze($info));
+    }
+  }
+
+  sub dnd_received {
+    my ($self, $dst, $context, $x, $y, $sel) = @_;
+    my ($path, $how) = $dst-&gt;get_dest_row_at_pos($x, $y);
+    my $model = $dst-&gt;get_model;
+    my $iter;
+
+    if ($path) {
+      $iter = $model-&gt;get_iter($path);
+      if ($how eq 'after' or $how eq 'into-or-after') {
+        $iter = $model-&gt;insert_after($iter);
+      }
+      else { $iter = $model-&gt;insert_before($iter) }
+    }
+    else { $iter = $model-&gt;append }
+
+    $model-&gt;set($iter, 0, thaw($sel-&gt;data));
+  }
+
+The arguments to these methods are defined in the Gtk API documentatio
+<font color="red">+</font>n
+(see L&lt;http://developer.gnome.org/doc/API/2.0/gtk/GtkWidget.html#GtkWi
+<font color="red">+</font>dget-drag-data-get&gt;
+and L&lt;http://developer.gnome.org/doc/API/2.0/gtk/GtkWidget.html#GtkWid
+<font color="red">+</font>get-drag-data-received&gt;).
+
+The dnd_get() method is called by the source list once its selected it
+<font color="red">+</font>em
+has been dragged into the receiving list and dropped.  After it is don
+<font color="red">+</font>e
+executing, then the dnd_received() method is called by the receiving l
+<font color="red">+</font>ist.
+
+=head1 LIMITATIONS
+
+This module currently only provides support for I&lt;moving&gt; elements to
+another list, not I&lt;copying&gt;.  This may change in future versions.
+
+You can currently only drag one item at a time.
+
+=head1 AUTHOR
+
+Jeff C&lt;japhy&gt; Pinyan, F&lt;japhy@perlmonk.org&gt;
+
+=cut
+</font></tt></pre>
+
+</div>
+
+<!-- Node text goes above. Div tags should contain sig only -->
+<div class="pmsig"><div class="pmsig-1936">
+<font color="#ff0000">_____________________________________________________</font><br />
+Jeff <tt><font color="#0000ff"><a href="?node=japhy">japhy</a></font></tt> Pinyan,
+<a href="?node_id=371157">P.L., P.M., P.O.D, X.S.</a>:
+
+<a href="http://japhy.perlmonk.org/modules/">Perl</a>,
+
+<a href="http://japhy.perlmonk.org/modules/Regexp-Parser/">regex</a>,
+
+and <a href="http://lists.perl.org/showlist.cgi?name=perl5-porters"><tt>perl</tt></a>
+
+<a href="http://foldoc.doc.ic.ac.uk/foldoc/foldoc.cgi?query=hacker">hacker</a>
+
+<br />
+<i>How can we ever be the sold short or the cheated, we who for every service have long ago been overpaid? ~~ <b>Meister Eckhart</b></i>
+</div></div>
+</p><p>
+
+<center><table width='100%' bgcolor='#000066'  cellpadding='1' cellspacing='1' border='0' id='replies_table'><tr><th colspan='2'><a href="?parent=442765;node_id=3333"><font color='white'><u>comment on RFC on Gtk2::Ex::ListSwap</u></font></a><br /><a href="?displaytype=displaycode;node_id=442765"><font size="-1"><font color="white"><u>Download Code</u></font></font></a></th></tr></table></center>
+
+</p><p><center>
+Back to <a href="?node=Meditations">Meditations</a>
+</center></p><br />
+
+    </div>
+  </body>
+</html>

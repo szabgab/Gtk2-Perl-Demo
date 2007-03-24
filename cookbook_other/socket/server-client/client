@@ -1,0 +1,137 @@
+#!/usr/bin/perl
+
+# client-gui.pl - a simple socket client GUI
+
+use strict;
+use Socket;
+use Gtk2;
+
+# initialize some variables
+
+my $port = 7890;    # hard coded port the server runs on
+
+# we could have made this an argument instead
+
+# used by the hbox, vbox and widget packing
+
+my $homogenous = 0;    # a "1" here would make all
+
+# widgets the same height or width
+
+my $spacing = 0;       # spacing between widgets in pixels
+
+my $expand = 1;        # widgets expand to fit available space
+
+my $fill = 0;          # extra space used by widgets or empty
+
+my $padding = 0;       # no padding
+
+# build the GUI
+
+#Gtk2->init( \@ARGV );
+Gtk2->init();
+
+my $window = Gtk2::Window->new('toplevel');
+
+$window->set_title("Network 'w' Monitor GUI");
+
+$window->set_border_width(6);
+
+$window->set_size_request( 400, 180 );
+
+my $vbox = Gtk2::VBox->new( $homogenous, $spacing );
+
+my $hbox = Gtk2::HBox->new( $homogenous, $spacing );
+
+my $label_host = Gtk2::Label->new("Hostname to poll:");
+
+my $entry_host = Gtk2::Entry->new;
+
+my $text_result = Gtk2::TextView->new;
+
+my $scrolled_window = Gtk2::ScrolledWindow->new( undef, undef );
+
+$scrolled_window->set_policy( 'automatic', 'automatic' );
+
+$scrolled_window->add($text_result);
+
+my $buffer = $text_result->get_buffer;
+
+$text_result->set_editable(0);
+
+my $button_poll = Gtk2::Button->new_with_label("Poll");
+
+my $button_exit = Gtk2::Button->new_with_label("Exit");
+
+$hbox->pack_start( $label_host, $expand, $fill, $padding );
+
+$hbox->pack_start( $entry_host, $expand, $fill, $padding );
+
+$vbox->pack_start( $hbox, $expand, $fill, $padding );
+
+$vbox->pack_start( $scrolled_window, $expand, $fill, $padding );
+
+$vbox->pack_start( $button_poll, $expand, $fill, $padding );
+
+$vbox->pack_start( $button_exit, $expand, $fill, $padding );
+
+#Gtk2::GSignal->connect( $button_poll, "clicked", \&poll_host );
+#Gtk2::GSignal->connect( $button_exit, "clicked", \&exit_app );
+$button_poll->signal_connect("clicked", \&poll_host );
+$button_exit->signal_connect("clicked", \&exit_app );
+
+#$button->signal_connect( "clicked", sub { Gtk->exit( 0 ); } );
+
+
+$window->add($vbox);
+
+$window->show_all();
+
+# Gtk2 event loop
+
+Gtk2->main();
+
+exit 0;
+
+# exit routine
+
+sub exit_app {
+    #Gtk2->quit();
+    Gtk2->main_quit();
+    return 0;
+}
+
+# poll routine
+
+sub poll_host {
+    my $host = $entry_host->get_text;
+    if ( $host eq '' ) {
+        gui_err("Empty Host Name!");
+        return;
+    }
+    my $buff  = '';
+    my $proto = getprotobyname('tcp');
+
+    # get the port address
+    my $iaddr = inet_aton($host);
+    my $paddr = sockaddr_in( $port, $iaddr );
+
+    # create the socket, connect to the port
+    socket( SOCKET, PF_INET, SOCK_STREAM, $proto ) or gui_err("socket: $!");
+    connect( SOCKET, $paddr ) or gui_err("connect: $!");
+    while (<SOCKET>) {
+        $buff .= $_;
+    }
+    close SOCKET or gui_err("close: $!");
+    $buffer->set_text( $buff ) if ( $buff ne '' );
+
+}
+
+# error feedback
+
+sub gui_err {
+    my $msg = shift;
+    $buffer->set_text( $msg );
+
+}
+

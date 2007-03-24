@@ -1,0 +1,19 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Glib ':constants';
+use Gtk2 -init;
+
+my $window = Gtk2::Window->new;
+$window->signal_connect (destroy => sub {Gtk2->main_quit});
+$window->set_default_size (400, 300);
+
+my $textview = Gtk2::TextView->new;
+$window->add ($textview);
+
+my $n;
+$textview->get_buffer->signal_connect (
+         changed => sub { print "changed! ".(++$n)."\n"});
+
+$window->show_all;
+Gtk2->main;

@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Glib qw/TRUE FALSE/;
+use Gtk2 '-init';
+use Gnome2::Print;
+
+my $job = Gnome2::Print::Job->new;
+   my $config = $job->get_config;
+   my $pc = $config->get_context;
+
+my ($page_width, $page_height) = $config->get_page_size;
+
+$pc->beginpage("1");
+
+my $img = Gtk2::Gdk::Pixbuf->new_from_file('adis.jpg'); 
+#an image sized 100x48 in 3bytes/pixel
+
+$pc->moveto($page_width/2-$img->get_width/2,
+$page_height/2-$img->getheight/2);
+
+my $pixels = $img->get_pixels;
+my $imgW = $img->get_width;
+my $imgH = $img->get_height;
+my $imgRS = $img->get_rowstride;
+
+printf("%s\n", $pc->rgbimage($pixels, $imgW, $imgH, $imgRS ? 'OK' : 'FAIL');
+
+$pc->showpage;
+$job->render($pc);
+$job->close;
+
+my $preview = Gnome2::Print::JobPreview->new($job, 'Preview Window');
+$preview->show;
+
+Gtk2->main;
+
+

@@ -1,0 +1,78 @@
+<html>
+  <head>
+    <title>
+      Gtk2-Perl issue with fonts
+    </title>
+  </head>
+  <link rel="stylesheet" type="text/css" href="?node=print%20displaytype%20stylesheet" />
+  <body>
+    <div id="header">
+      <div class="title">
+        Gtk2-Perl issue with fonts
+      </div>
+      <div class="subtitle">
+        by <span id="author">japhy</span> on <span id="created">Feb 05, 2005 at 12:09 GMT+11</span>
+      </div>
+    </div>
+    <div id="url">
+        http://perlmonks.org?node_id=428396
+    </div>
+
+    <div id="content">
+      <i>
+<a HREF="?node_id=1936">japhy</a> has asked for the
+wisdom of the Perl Monks concerning the following question:
+</i>
+
+<div class="reputation"><center><font size="1">Reputation: 14</font></center></div>
+<p>
+I've just started using <a href="?node=Gtk2">Gtk2</a>, and I've encountered a problem that I haven't been able to find any helpful information about online.  I want to change the font of a widget.
+
+<p>
+
+I know how to do this in Tk, but not in Gtk2.  I've looked at the Pango docs, and tried to find something slightly helpful in the Gtk2 docs, but to no avail.  Is there anyone out there who knows what to do?
+
+<!-- Node text goes above. Div tags should contain sig only -->
+<div class="pmsig"><div class="pmsig-1936">
+<font color="#ff0000">_____________________________________________________</font><br />
+Jeff <tt><font color="#0000ff"><a href="?node=japhy">japhy</a></font></tt> Pinyan,
+<a href="?node_id=371157">P.L., P.M., P.O.D, X.S.</a>:
+
+<a href="http://japhy.perlmonk.org/modules/">Perl</a>,
+
+<a href="http://japhy.perlmonk.org/modules/Regexp-Parser/">regex</a>,
+
+and <a href="http://lists.perl.org/showlist.cgi?name=perl5-porters"><tt>perl</tt></a>
+
+<a href="http://foldoc.doc.ic.ac.uk/foldoc/foldoc.cgi?query=hacker">hacker</a>
+
+<br />
+<i>How can we ever be the sold short or the cheated, we who for every service have long ago been overpaid? ~~ <b>Meister Eckhart</b></i>
+</div></div>
+</p><p>
+
+<center><table width='100%' bgcolor='#000066'  cellpadding='1' cellspacing='1' border='0' id='replies_table'><tr><th colspan='2'><a href="?parent=428396;node_id=3333"><font color='white'><u>comment on Gtk2-Perl issue with fonts</u></font></a></th></tr><tr class='reply' bgcolor='eeeeee'><td  colspan='2'><a HREF="?node_id=428407">Re: Gtk2-Perl issue with fonts</a><br /><span class="attribution"> by <a HREF="?node_id=241878">zgrim</a> on Feb 05, 2005 at 14:12 GMT+11</span></td></tr>
+<tr class='reply-body pmnote-241878' bgcolor='ffffff'><td ><div class="reputation"><center><font size="1">Reputation: 13</font></center></div><ul><font size='2'>The <a href="http://gtk2-perl.sourceforge.net/doc/pod/Gtk2/Widget.html#_widget_modify_font_">manual</a> and ... some example code:<br />
+
+<p><tt class="code"><font size="-1">my $font = Gtk2::Pango::FontDescription-&gt;from_string('Tahoma 10');<br />
+$view-&gt;modify_font($font);<br />
+</font></tt></p>
+
+
+<!-- Node text goes above. Div tags should contain sig only -->
+<div class="pmsig"><div class="pmsig-241878">
+perl -MLWP::Simple -e'print$_[rand(split(q|%%\n|,
+get(q=http://cpan.org/misc/japh=)))]'
+</div></div></font></td><td  align='right'><font size='2'><a href="?parent=428407;node_id=3333">&nbsp;&#091;reply&#093;</a></font><br /><a href="?displaytype=displaycode;node_id=428407"><font size="-1">d/l code</font></a></ul></td></tr>
+</table></center>
+
+</p>
+
+<p><center>
+  Back to
+  <a href="?node=Seekers%20of%20Perl%20Wisdom">Seekers of Perl Wisdom</a>
+</center></p><br />
+
+    </div>
+  </body>
+</html>

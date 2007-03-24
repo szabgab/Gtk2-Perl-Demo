@@ -1,0 +1,260 @@
+#!/usr/bin/perl
+use warnings;
+#use strict;
+
+use Glib qw/TRUE FALSE/;
+use Gtk2 '-init';
+
+my ( $hscale, $vscale );
+
+sub cb_pos_menu_select {
+    my ( $widget, $pos ) = @_;
+    $hscale->set_value_pos($pos);
+    $vscale->set_value_pos($pos);
+}
+
+sub cb_update_menu_select {
+    my ( $widget, $policy ) = @_;
+    $hscale->set_update_policy($policy);
+    $vscale->set_update_policy($policy);
+}
+
+sub cb_digits_scale {
+    my ($adjustment) = @_;
+
+    # Set the number of decimal places to which adj->value is rounded
+    $hscale->set_digits( $adjustment->value );
+    $vscale->set_digits( $adjustment->value );
+}
+
+# We do not have a Glib::CLAMP function, so we provide it here.
+sub clamp {
+     my ($val, $low, $high) = @_;
+    return ( ( $val > $high ) ? $high : ( ( $val < $low ) ? $low : $val ) );
+}
+
+sub cb_page_size {
+    my ( $get, $set ) = @_;
+
+    # Set the page size and page increment size of the sample
+    # adjustment to the value specified by the "Page Size" scale
+    $set->page_size( $get->value );
+    $set->page_increment( $get->value );
+
+    # This sets the adjustment and make it emit the "changed" signal to
+    # reconfigure all the widgets that are attached to this signal.
+    my $val = $set->value;    
+    my $low = ($set->upper) - ($set->page_size);
+    my $high = $set->lower;
+        
+      $set->set_value( clamp($val,$low,$high)  );
+
+    $set->signal_emit("changed");
+}
+
+sub cb_draw_value {
+    my $button = shift;
+    $hscale->set_draw_value( $button->get_active() );
+    $vscale->set_draw_value( $button->get_active() );
+}
+
+# Convenience functions
+sub make_menu_item {
+    my ( $name, $func, $data ) = @_;
+    $item = Gtk2::MenuItem->new_with_label($name);
+    $item->signal_connect( activate => $func, $data );
+    $item->show;
+
+    return $item;
+}
+
+sub scale_set_default_values {
+    my $scale = shift;
+    $scale->set_update_policy('continuous');
+    $scale->set_digits(1);
+    $scale->set_value_pos('top');
+    $scale->set_draw_value(TRUE);
+}
+
+# makes the sample window
+sub create_range_controls {
+
+    # Standard window-creating stuff
+    $window = Gtk2::Window->new('toplevel');
+    $window->signal_connect( destroy => sub { Gtk2->main_quit; } );
+    $window->set_title("range controls");
+
+    $box1 = Gtk2::VBox->new( FALSE, 0 );
+    $window->add($box1);
+    $box1->show;
+
+    $box2 = Gtk2::HBox->new( FALSE, 10 );
+    $box2->set_border_width(10);
+    $box1->pack_start( $box2, TRUE, TRUE, 0 );
+    $box2->show;
+
+    # value, lower, upper, step_increment, page_increment, page_size
+    # Note that the page_size value only makes a difference for
+    # scrollbar widgets, and the highest value you'll get is actually
+    # (upper - page_size).
+    $adj1 = Gtk2::Adjustment->new( 0.0, 0.0, 101.0, 0.1, 1.0, 1.0 );
+
+    $vscale = Gtk2::VScale->new($adj1);
+    scale_set_default_values($vscale);
+    $box2->pack_start( $vscale, TRUE, TRUE, 0 );
+    $vscale->show;
+
+    $box3 = Gtk2::VBox->new( FALSE, 10 );
+    $box2->pack_start( $box3, TRUE, TRUE, 0 );
+    $box3->show;
+
+    # Reuse the same adjustment
+    $hscale = Gtk2::HScale->new($adj1);
+    $hscale->set_size_request( 200, -1 );
+    scale_set_default_values($hscale);
+    $box3->pack_start( $hscale, TRUE, TRUE, 0 );
+    $hscale->show;
+
+    # Reuse the same adjustment again
+    $scrollbar = Gtk2::HScrollBar->new($adj1);
+
+    # Notice how this causes the scales to always be updated
+    # continuously when the scrollbar is moved
+    $scrollbar->set_update_policy('continuous');
+    $box3->pack_start( $scrollbar, TRUE, TRUE, 0 );
+    $scrollbar->show;
+
+    $box2 = Gtk2::HBox->new( FALSE, 10 );
+    $box2->set_border_width(10);
+    $box1->pack_start( $box2, TRUE, TRUE, 0 );
+    $box2->show;
+
+    # A checkbutton to control whether the value is displayed or not
+    $button = Gtk2::CheckButton->new("Display value on scale widgets");
+    $button->set_active(TRUE);
+    $button->signal_connect( toggled => \&cb_draw_value );
+    $box2->pack_start( $button, TRUE, TRUE, 0 );
+    $button->show;
+
+    $box2 = Gtk2::HBox->new( FALSE, 10 );
+    $box2->set_border_width(10);
+
+    # An option menu to change the position of the value
+    $label = Gtk2::Label->new("Scale Value Position:");
+    $box2->pack_start( $label, FALSE, FALSE, 0 );
+    $label->show;
+
+    $opt  = Gtk2::OptionMenu->new;
+    $menu = Gtk2::Menu->new;
+
+    $item = make_menu_item( "Top", \&cb_pos_menu_select, 'top' );
+    $menu->append($item);
+
+    $item = make_menu_item( "Bottom", \&cb_pos_menu_select, 'bottom' );
+    $menu->append($item);
+
+    $item = make_menu_item( "Left", \&cb_pos_menu_select, 'left' );
+    $menu->append($item);
+
+    $item = make_menu_item( "Right", \&cb_pos_menu_select, 'right' );
+    $menu->append($item);
+
+    $opt->set_menu($menu);
+    $box2->pack_start( $opt, TRUE, TRUE, 0 );
+    $opt->show;
+
+    $box1->pack_start( $box2, TRUE, TRUE, 0 );
+    $box2->show;
+
+    $box2 = Gtk2::HBox->new( FALSE, 10 );
+    $box2->set_border_width(10);
+
+    # Yet another option menu, this time for the update policy of the
+    # scale widgets
+    $label = Gtk2::Label->new("Scale Update Policy:");
+    $box2->pack_start( $label, FALSE, FALSE, 0 );
+    $label->show;
+
+    $opt  = Gtk2::OptionMenu->new;
+    $menu = Gtk2::Menu->new;
+
+    $item =
+      make_menu_item( "Continuous", \&cb_update_menu_select, 'continuous' );
+    $menu->append($item);
+
+    $item =
+      make_menu_item( "Discontinuous", \&cb_update_menu_select,
+        'discontinuous' );
+    $menu->append($item);
+
+    $item = make_menu_item( "Delayed", \&cb_update_menu_select, 'delayed' );
+    $menu->append($item);
+
+    $opt->set_menu($menu);
+    $box2->pack_start( $opt, TRUE, TRUE, 0 );
+    $opt->show;
+
+    $box1->pack_start( $box2, TRUE, TRUE, 0 );
+    $box2->show;
+
+    $box2 = Gtk2::HBox->new( FALSE, 10 );
+    $box2->set_border_width(10);
+
+    # An HScale widget for adjusting the number of digits on the
+    # sample scales.
+    $label = Gtk2::Label->new("Scale Digits:");
+    $box2->pack_start( $label, FALSE, FALSE, 0 );
+    $label->show;
+
+    $adj2 = Gtk2::Adjustment->new( 1.0, 0.0, 5.0, 1.0, 1.0, 0.0 );
+    $adj2->signal_connect( value_changed => \&cb_digits_scale );
+    $scale = Gtk2::HScale->new($adj2);
+    $scale->set_digits(0);
+    $box2->pack_start( $scale, TRUE, TRUE, 0 );
+    $scale->show;
+
+    $box1->pack_start( $box2, TRUE, TRUE, 0 );
+    $box2->show;
+
+    $box2 = Gtk2::HBox->new( FALSE, 10 );
+    $box2->set_border_width(10);
+
+    # And, one last HScale widget for adjusting the page size of the
+    # scrollbar.
+    $label = Gtk2::Label->new("Scrollbar Page Size:");
+    $box2->pack_start( $label, FALSE, FALSE, 0 );
+    $label->show;
+
+    $adj2 = Gtk2::Adjustment->new( 1.0, 1.0, 101.0, 1.0, 1.0, 0.0 );
+    $adj2->signal_connect( value_changed => \&cb_page_size, $adj1 );
+    $scale = Gtk2::HScale->new($adj2);
+    $scale->set_digits(0);
+    $box2->pack_start( $scale, TRUE, TRUE, 0 );
+    $scale->show;
+
+    $box1->pack_start( $box2, TRUE, TRUE, 0 );
+    $box2->show;
+
+    $separator = Gtk2::HSeparator->new;
+    $box1->pack_start( $separator, FALSE, TRUE, 0 );
+    $separator->show;
+
+    $box2 = Gtk2::VBox->new( FALSE, 10 );
+    $box2->set_border_width(10);
+    $box1->pack_start( $box2, FALSE, TRUE, 0 );
+    $box2->show;
+
+    $button = Gtk2::Button->new("Quit");
+    $button->signal_connect( clicked => sub { Gtk2->main_quit; } );
+    $box2->pack_start( $button, TRUE, TRUE, 0 );
+    $button->can_default(TRUE);
+    $button->grab_default;
+    $button->show;
+
+    $window->show;
+}
+
+create_range_controls();
+
+Gtk2->main;
+

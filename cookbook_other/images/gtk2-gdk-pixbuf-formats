@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Gtk2;
+
+my @formats = Gtk2::Gdk::Pixbuf->get_formats();
+foreach my $format ( @formats ) {
+    print "format:\n";
+    foreach my $key ( keys( %$format ) ) {
+        print "\t" . $key . " = ";
+        if ( ref( $format->{ $key } ) eq "ARRAY" ) {
+            print "[";
+            foreach my $elem ( @{ $format->{ $key } } ) {
+                print " " . $elem;
+            }
+            print " ]\n";
+        } else {
+            print $format->{ $key } . "\n";
+        }
+    }
+}

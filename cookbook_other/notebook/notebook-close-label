@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Glib 'FALSE';
+use Gtk2 -init;
+
+my $window = Gtk2::Window->new;
+$window->signal_connect( destroy => sub { Gtk2->main_quit } );
+
+my $notebook = Gtk2::Notebook->new;
+$window->add($notebook);
+
+sub make_label {
+    my ($text) = @_;
+    my $hbox   = Gtk2::HBox->new;
+    my $label  = Gtk2::Label->new($text);
+    my $button = Gtk2::Button->new("x");    # a pixmap would look nicer
+    $button->signal_connect(
+        clicked => sub {
+            $notebook->remove_page( $notebook->get_current_page );
+        }
+    );
+    $hbox->pack_start( $label,  FALSE, FALSE, 0 );
+    $hbox->pack_start( $button, FALSE, FALSE, 0 );
+    $label->show;
+    $button->show;
+
+    $hbox;
+}
+
+$notebook->append_page( Gtk2::Label->new('Page 1'), make_label('Page 1') );
+$notebook->append_page( Gtk2::Label->new('Page 2'), make_label('Page 2') );
+$notebook->append_page( Gtk2::Label->new('Page 3'), make_label('Page 3') );
+
+$window->show_all;
+Gtk2->main;
+

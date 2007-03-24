@@ -1,0 +1,86 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#=====================================================================
+# CellRenderer for time in format hh:mm:ss,sss =======================
+#=====================================================================
+
+package Foo::CellRendererTime;
+
+use Gtk2 -init;
+use Gtk2::Gdk::Keysyms;
+use Glib qw(TRUE FALSE);
+
+use Glib::Object::Subclass 'Gtk2::CellRendererText',;
+
+sub START_EDITING {
+
+    my ( $cell, $event, $list, $path, $bg_area, $cell_area, $flags ) = @_;
+
+    my $entry = Gtk2::Entry->new;
+    $entry->set_text( $cell->get('text') );
+    $entry->set_activates_default(TRUE);
+
+    $entry->signal_connect(
+        'insert-text' => sub {
+            print "Inserted text.\n";
+        }
+    );
+
+    $entry->grab_focus;
+    $entry->show;
+
+    return $entry;
+
+}
+
+#=====================================================================
+# Test app: ==========================================================
+#=====================================================================
+
+package main;
+
+use Gtk2 -init;
+use Glib qw(TRUE FALSE);
+use Gtk2::SimpleList;
+
+my $window = Gtk2::Window->new;
+$window->set_title('Test CR');
+$window->signal_connect( delete_event => sub { Gtk2->main_quit } );
+
+Gtk2::SimpleList->add_column_type(
+    'time',
+    type     => 'Glib::Scalar',
+    renderer => 'Foo::CellRendererTime',
+    attr     => sub {
+        my ( $treecol, $cell, $model, $iter, $col_num ) = @_;
+        my $info = $model->get( $iter, $col_num );
+        $cell->set( text => $info );
+    }
+);
+
+my $list = Gtk2::SimpleList->new(
+    'Time' => 'time',
+    'Text' => 'text',
+);
+
+$list->set_column_editable( 0, TRUE );
+$list->set_column_editable( 1, TRUE );
+
+$list->columns_autosize();
+
+push @{ $list->{data} }, [ '01:12:25,356', '00:24:05,658' ];
+
+my $scroller = Gtk2::ScrolledWindow->new;
+$scroller->set_policy( 'automatic', 'automatic' );
+$scroller->add($list);
+
+$window->add($scroller);
+$window->set_default_size( 200, 100 );
+$window->set_position('center-always');
+$window->show_all;
+
+Gtk2->main;
+

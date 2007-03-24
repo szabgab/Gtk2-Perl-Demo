@@ -1,0 +1,42 @@
+
+create an image without going to disk through the
+Gtk2::Gdk::Pixbuf->new_from_data function. I'm using it e.g. to
+directly display piddles (Perl Data Language structures). Here
+is what I do:
+
+my($w,$h) = ($rgb->dims)[1,2];
+$rgb->make_physical;
+my $img = Gtk2::Gdk::Pixbuf->new_from_data(${$rgb->get_dataref},
+"rgb",
+0, 8,
+$w,$h, $w*3);
+
+The $rgb->get_dataref call returns (a reference to) a scalar
+containing the RGB values.
+The pixbuf is then easily placed in an Gtk::Image .
+There doesn't seem to be a way of doing the same with compressed
+png data though...
+####################################################
+
+
+Gtk2::Gdk::Pixbuf->new_from_data
+
+####################################################
+> There doesn't seem to be a way of doing the same with compressed
+> png data though...
+
+sure there is, it's just nowhere near as straightforward --- you have to use a
+Gtk2::Gdk::PixbufLoader and simulate an incremental read.
+
+my $loader = Gtk2::Gdk::PixbufLoader->new;
+$loader->write ($compressed_data);
+$loader->close;
+
+####################################################
+my $pixbuf = $loader->get_pixbuf;
+####################################################
+
+
+
+my $image = Gtk2::Image->new_from_file ('file_name.pgm');
+

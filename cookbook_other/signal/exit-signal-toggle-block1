@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Glib qw( TRUE FALSE );
+use Gtk2 -init;
+
+my $block  = FALSE;
+my $window = new Gtk2::Window("toplevel");
+my $button = new Gtk2::Button("toggle block");
+$window->add($button);
+$window->set_border_width(3);
+
+$button->signal_connect(
+    clicked => sub {
+        my ( $w, $bl ) = (@_);
+
+        # invert the state
+        $$bl = ( $$bl == TRUE ) ? FALSE: TRUE;
+
+        # report the current state
+        if ( $$bl == TRUE ) {
+            print STDERR "BLOCKED\n";
+        }
+        else {
+            print STDERR "UNBLOCKED\n";
+        }
+    },
+    \$block
+);
+$window->signal_connect(
+    "delete-event" => sub {
+        my ( $w, $e, $bl ) = (@_);
+
+        # unless we're blocked, quit:
+        unless ( $$bl == TRUE ) {
+            main_quit Gtk2;
+        }
+        return ($$bl);
+    },
+    \$block
+);
+$window->show_all();
+main Gtk2;
+

@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Glib qw/TRUE FALSE/;
+use Gtk2 '-init';
+
+my $window = Gtk2::Window->new('toplevel');
+my $window1 = Gtk2::Window->new('popup');
+
+$window ->signal_connect( 'destroy' => \&delete_event );
+$window->set_size_request(300,200);
+$window1->set_size_request(100,100);
+
+my $button = Gtk2::Button->new_from_stock('gtk-quit');
+$window->add( $button );
+$button->signal_connect( clicked => \&delete_event );
+
+$window->set_position('center');
+#$window1->set_position('center');
+
+$window1->move(200,200);
+
+$window->show_all();
+$window1->show_all();
+
+Gtk2->main;
+
+#####################################
+sub delete_event {
+Gtk2->main_quit;
+return FALSE;
+}  

@@ -1,0 +1,18 @@
+
+OT: I like to partition things like into smaller scopes:
+
+    my $pixbuf = do {
+        my $loader = Gtk2::Gdk::PixbufLoader->new();
+        $loader->write( $image_data );
+        $loader->close();
+        $loader->get_pixbuf();
+    };
+
+So the next guy who looks at it doesn't have to wonder if $loader
+is used anywhere later, and can see that the entire point of this
+mumbo jumbo is to load something into $pixbuf.
+
+Regards,
+-- 
+#Aristotle
+

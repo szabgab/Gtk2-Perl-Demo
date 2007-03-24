@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use lib '.';
+use Gtk2::Ex::ListSwap;
+use Gtk2 -init;
+
+my $window = Gtk2::Window->new;
+$window->signal_connect(destroy => sub { Gtk2->main_quit });
+
+my $list_swap = Gtk2::Ex::ListSwap->new;
+
+$list_swap->set_model(a => [
+{ id => 'eggs', name => 'Eggs' },
+{ id => 'cmilk', name => 'Chocolate Milk' },
+{ id => 'oreo', name => 'Oreos', },
+{ id => 'coke', name => 'Coca-Cola', },
+]);
+$list_swap->set_model(b => [
+{ id => 'bread', name => 'Whole Wheat Bread' },
+{ id => 'lj', name => 'Lemon Juice' },
+{ id => 'oj', name => 'Orange Juice' },
+{ id => 'beer', name => 'Guiness' },
+]);
+
+$list_swap->set_column_names(a => [['ID','id'], ['Name','name']]);
+$list_swap->set_column_names(b => [['ID','id'], ['Name','name']]);
+
+$window->add($list_swap->widget);
+$window->show_all;
+Gtk2->main;
+

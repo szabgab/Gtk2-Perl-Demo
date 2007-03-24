@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Glib qw/TRUE FALSE/;
+use Gtk2 '-init';
+
+# dosn't seem to work on fvwm2
+
+my $window = Gtk2::Window->new('popup');
+$window->set_decorated(0);
+Gtk2::Window::set_decorated($window, 0);
+print $window->get_decorated(),"\n";
+
+$window ->signal_connect( 'destroy' => \&delete_event );
+$window->set_border_width(10);
+$window->set_size_request(300,200);
+
+my $button = Gtk2::Button->new_from_stock('gtk-quit');
+$window->add( $button);
+$button->signal_connect( clicked => \&delete_event );
+
+$window->set_position('center');
+
+$window->show_all();
+
+Gtk2->main;
+#####################################
+sub delete_event {
+Gtk2->main_quit;
+return FALSE;
+}  

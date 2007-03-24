@@ -1,0 +1,79 @@
+#!/usr/bin/perl 
+use warnings;
+use strict;
+use Gtk2;
+use Tk;
+
+my $mw = MainWindow->new(-title=>'Tk Window');
+
+Gtk2->init;
+my $gtkwindow = Gtk2::Window->new('toplevel');
+$gtkwindow->set_title('Gtk2 Window');
+
+my $tktimer;
+my $count_gtk = 0;
+my $gtk_timer_control = 1;
+
+####setup gtk2 window###################
+my $vbox = Gtk2::VBox->new( 0, 6 );
+$gtkwindow->add($vbox);
+
+my $frame = Gtk2::Frame->new('Count');
+$vbox->pack_start( $frame, 1, 1, 0 );
+$frame->set_border_width(3);
+
+my $label = Gtk2::Label->new("Count $count_gtk");
+$frame->add( $label);
+
+my $frame1 = Gtk2::Frame->new();
+$vbox->pack_start( $frame1, 1, 1, 0 );
+$frame1->set_border_width(3);
+
+my $button = Gtk2::Button->new('Stop Count');
+$frame1->add($button);
+$button->signal_connect( clicked => 
+           sub { $gtk_timer_control = 0 } );
+
+
+my $quit_button = Gtk2::Button->new('_Quit');
+$vbox->pack_start( $quit_button, 0, 0, 0 );
+$quit_button->signal_connect(
+           clicked => sub {
+            $tktimer->cancel;
+	    $gtkwindow->destroy;
+	        }
+		);
+
+my $timer = Glib::Timeout->add (1000,\&show_loop);
+
+$gtkwindow->show_all;
+
+#do_something_cpu_intensive ($item);
+#while(1){
+#Gtk2->main_iteration while Gtk2->events_pending;
+#}
+###################################################
+
+#setup tk $mw
+my $count_tk = 0;
+my $labtk = $mw->Label(-textvariable =>\$count_tk)->pack; 
+my $quit_tk = $mw->Button(-text =>'Quit',
+        -command=> sub{exit})->pack; 
+
+$tktimer = $mw->repeat(10, sub{      
+    Gtk2->main_iteration while Gtk2->events_pending;
+  });
+
+my $tktimer1 = $mw->repeat(200, sub{      
+    $count_tk++;
+  });
+
+
+MainLoop;
+
+########################################
+sub show_loop{
+  $count_gtk++;
+  $label->set_text("Count $count_gtk");
+  return $gtk_timer_control;  #return FALSE to end gtk2 timer
+}

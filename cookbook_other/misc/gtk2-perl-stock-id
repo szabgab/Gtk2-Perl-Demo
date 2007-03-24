@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Gtk2;
+
+my ( @Gtk2_Stock_IDs ) = list_ids Gtk2::Stock;
+
+if ( @ARGV ) {
+    foreach my $string ( @ARGV ) {
+        $string = lc( $string );
+        if (grep { m!^\Q$string\E$! } @Gtk2_Stock_IDs ) {
+            print "'" . $string . "' is a valid Gtk2 Stock ID.\n";
+        } else {
+            print "'" . $string . "' is not a valid Gtk2 Stock ID.\n";
+            my @Found_IDs = grep { m!$string! } @Gtk2_Stock_IDs;
+            if ( @Found_IDs ) {
+                print "However, '" . $string . "' is similar to the following IDs:\n";
+                print "\t" . join( "\n\t", @Found_IDs ) . "\n";
+            }
+        }
+    }
+} else {
+    print join( "\n", @Gtk2_Stock_IDs )."\n";
+}

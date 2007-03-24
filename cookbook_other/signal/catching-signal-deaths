@@ -1,0 +1,21 @@
+
+$button->signal_connect (clicked => sub {
+              eval {
+                     do_something_that_might_croak_or_die();
+                     # or just
+                     die "a horrible death";
+                    }
+        if( $@ )
+                {
+                  # handle things here
+                }
+    } );
+
+#but not:
+
+$button->signal_connect (clicked => sub {
+               die "a horrible death";
+               } );
+# and try catching it somewhere else
+
+

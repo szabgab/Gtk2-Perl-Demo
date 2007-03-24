@@ -1,0 +1,28 @@
+ At the root of the tree should be a
+Gtk2::Window, which can contain a single child.
+Normally the window will contain either a VBox or
+HBox. In the example above a VBox is used. That
+VBox has two children the first of which is a
+frame and the last of which is a Label. The label
+has no children and therefore is a leaf node in
+the widget hierarchy. A Frame is a simple widget
+with a text label and outline box, it can contain
+a single widget. The frame in this case has the
+text 'Button' and contains a HBox. In that HBox
+are two buttons one with the text 'Click Me' and
+the other with the text 'Quit'. Both of these
+buttons are leaf nodes in that they contain no
+other widgets. A simplistic tree graph of this
+widget hierarchy is shown above.
+
+
+$vbox can contain multiple widgets
+
+A Frame is a simple widget with a text label 
+and outline box, it can contain a single widget.
+
+
+
+
+
+

@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+use Glib qw(FALSE TRUE);
+use Gtk2 -init;
+
+# create a window with a scrolled text view.
+my $window = Gtk2::Window->new;
+$window->signal_connect (destroy => sub {Gtk2->main_quit;return FALSE});
+
+$window->set_size_request(500,300);
+
+my $scroll   = Gtk2::ScrolledWindow->new;
+my $textview = Gtk2::TextView->new;
+$scroll->add($textview);
+$window->add($scroll);
+$window->show_all;
+
+my $buffer = $textview->get_buffer;
+
+# create a mark at the end of the buffer, with right gravity,
+# so that when you insert text, the mark always stays on
+# the right (at the end).
+my $end_mark = $buffer->create_mark( 'end', $buffer->get_end_iter, FALSE );
+
+# every time we insert text, scroll to that mark.
+$buffer->signal_connect(
+    insert_text => sub {
+        $textview->scroll_to_mark( $end_mark, 0.0, TRUE, 0.0, 1.0 );
+    }
+);
+
+# display the output of some long-running command...
+#open IN, "ps auxww; sleep 2; ps auxww; sleep 2; ps auxww; |";
+open IN, "top -b |";
+
+Glib::IO->add_watch(
+    fileno IN,  [ 'in', 'hup' ],
+    sub {
+        my ( $fd, $condition ) = @_;
+        if ( $condition >= 'in' ) {
+            my $lines = (<IN>);  
+	    $buffer->insert( $buffer->get_end_iter, $lines ); #need scalar
+        }
+        if ( $condition >= 'hup' ) {
+            close IN;
+            return FALSE;
+        }
+        return TRUE;
+    }
+);
+
+Gtk2->main;
+

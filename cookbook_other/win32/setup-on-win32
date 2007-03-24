@@ -1,0 +1,25 @@
+From: Gabor Szabo <szabgab@gmail.com>
+
+For ActiveState users
+
+* I assume you already have ActiveState Perl installed on your system.
+If not, download and install ActiveState Perl from
+http://activestate.com/Products/ActivePerl/
+
+* Next you need to install the GTK+ 2.x.x runtime environment. The
+latest version can be downloaded from
+http://gimp-win.sourceforge.net/stable.html
+
+* Ensure that the <INSTALL_PATH>\GTK\2.0\bin directory is in your
+PATH after this installation.
+
+* Next you need to install the Win32 binary packages for gtk2-perl.
+Download and install the latest version of Gtk2.ppd and Glib.ppd from
+http://gtk2-perl.sourceforge.net/win32/ppm/
+(Another way to install these ppds is as follows
+C:\Temp> ppm install http://gtk2-perl.sourceforge.net/win32/ppm/Gtk2.ppd
+C:\Temp> ppm install http://gtk2-perl.sourceforge.net/win32/ppm/Glib.ppd
+)
+
+Your system should be ready to roll !
+

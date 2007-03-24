@@ -1,0 +1,40 @@
+zentara said:
+> Hi,
+>
+> I'm an absolute beginner at Gtk2,  but know Perl/Tk
+> fairly well, and I'm trying to compare how things are done.
+>
+> In Tk, there is a way to loop through the main event loop
+> one time, how would I do it in Gtk2?
+>
+> #!/usr/bin/perl -w
+> use strict;
+> use Gtk2;
+>
+> Gtk2->init;
+> my $window = Gtk2::Window->new;
+> $window->signal_connect('destroy', sub { Gtk2->main_quit });
+>
+> $window->add(Gtk2::Label->new("Hello World"));
+>
+> $window->show_all;
+>
+> print "1\n";
+>
+> #Gtk2->main;  #what simulates looping?
+> while(1){
+> Gtk2->main_do_event ( 'one_loop' );
+> }
+
+Gtk2->main_iteration does one pass through the main loop. it's pretty common
+to see the following:
+    Gtk2->main_iteration while (Gtk2->events_pending);
+in apps. if you're wanting to run a main loop and get time for you to do your
+own stuff then take a look at Glib::Timeout->add and (usually not a good idea
+to run continually) Glib::Idle->add. those two will let the main loop run
+(your program will be responsive) and call the function you provide
+periodically so that you can get some processing time.
+
+-rm
+
+

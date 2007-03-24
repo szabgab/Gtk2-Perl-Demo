@@ -1,0 +1,30 @@
+#!/usr/bin/perl -w
+use strict;
+use Gtk2;
+use Gtk2::ImageViewer;
+use Tk;
+
+my $mw = MainWindow->new(-title=>'Tk Window');
+
+Gtk2->init;
+my $window = Gtk2::Window->new('toplevel');
+$window->set_title('Gtk2 Window');
+
+my $file = shift || 'bridget-1.jpg';
+
+my $imgv = new_from_file Gtk2::ImageViewer($file);
+$window->add($imgv);
+$window->show_all;
+
+my $tktimer = $mw->repeat(10, sub{      
+   Gtk2->main_iteration while Gtk2->events_pending;
+  });
+
+$mw->Label(-text=>'Gtk2-ImageViewer')->pack();
+$mw->Button(-text=>'Quit',
+       -command => sub{exit}
+        )->pack();
+
+MainLoop;
+
+########################################

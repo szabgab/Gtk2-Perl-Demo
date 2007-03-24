@@ -1,0 +1,494 @@
+<!-- MHonArc v2.4.9 -->
+<!--X-Subject: more documentation patches -->
+<!--X-From-R13: erqNpevgvpnyvagrtengvba.pbz -->
+<!--X-Date: Wed, 11 Dec 2002 22:02:43 &#45;0500 (EST) -->
+<!--X-Message-Id: E18MMc0&#45;0006bz&#45;00@tonkatsu.madhouse.org.uk -->
+<!--X-Content-Type: multipart/mixed -->
+<!--X-Head-End-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML//EN">
+<HTML>
+<HEAD>
+<TITLE>more documentation patches</TITLE>
+<LINK REV="made" HREF="mailto:red@criticalintegration.com">
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<!--X-Body-Begin-->
+<!--X-User-Header-->
+<!--X-User-Header-End-->
+<!--X-TopPNI-->
+<HR>
+[<a href="msg00054.html">Date Prev</a>][<a href="msg00056.html">Date Next</a>] &nbsp; [<a href="msg00081.html">Thread Prev</a>][<a href="msg00060.html">Thread Next</a>] &nbsp; 
+[<A HREF="thread.html#00055">Thread Index</A>]
+[<A HREF="date.html#00055">Date Index</A>]
+[<A HREF="author.html#00055">Author Index</A>]
+
+<!--X-TopPNI-End-->
+<!--X-MsgBody-->
+<!--X-Subject-Header-Begin-->
+<h1>more documentation patches</h1>
+<hr>
+<!--X-Subject-Header-End-->
+<!--X-Head-of-Message-->
+<ul>
+<li><em>From</em>: red criticalintegration com</li>
+<li><em>To</em>: gtk-perl-list gnome org</li>
+<li><em>Subject</em>: more documentation patches</li>
+<li><em>Date</em>: Thu, 12 Dec 2002 06:14:20 +0000 (GMT)</li>
+</ul>
+<!--X-Head-of-Message-End-->
+<!--X-Head-Body-Sep-Begin-->
+<hr>
+<!--X-Head-Body-Sep-End-->
+<!--X-Body-of-Message-->
+<pre>
+Label.pm is re-patched to use maintainers prefered style
+of Gtk2::Label-&gt;new(&quot;Boo&quot;);
+
+Window.pm is new.
+
+Regards,
+
+
+Red
+
+</pre>
+<pre>
+Index: Window.pm
+===================================================================
+RCS file: /cvsroot/gtk2-perl/gtk2-perl/Gtk2/Window.pm,v
+retrieving revision 1.20
+diff -c -r1.20 Window.pm
+*** Window.pm	23 Nov 2002 13:39:02 -0000	1.20
+--- Window.pm	12 Dec 2002 02:57:25 -0000
+***************
+*** 51,53 ****
+--- 51,341 ----
+  1;
+  
+  
++ =head1 NAME
++ 
++ Gtk2::Window - Widget for a Window.
++ 
++ =head1 SYNOPSIS
++ 
++ # Load and Initialise Gtk2.
++     use Gtk2;
++     Gtk2-&gt;init;
++ 
++ # Create our Gtk2::Window
++     my $window = Gtk2::Window-&gt;new('toplevel');
++ 
++ # Show our window to the world.
++     $window-&gt;show;
++ 
++ # Pass control to the Gtk2 mainloop.
++     Gtk2-&gt;main;
++ 
++ =head1 DESCRIPTION
++ 
++ Gtk2::Window is the object which represents a Window. 
++ 
++ =head1 METHODS
++ 
++ The following methods are available for this object.  This list is not
++ exhaustive.
++ 
++ =over
++ 
++ =item B&lt;new($type)&gt;
++ 
++ This is the constructor method for this widget.  The first and only
++ argument is the &quot;type&quot; of window.  In Gtk2 there are only two types;
++ 
++     toplevel - Almost all of your windows will be of this type.
++         This is a standard window type.  The window manager has
++ 	full control of it and is able to decorate it (provide
++ 	bars, minimise/iconify/destroy buttons).
++ 
++     popup    - This window type denies the window manager any
++         control over its positioning, sizing, iconifing or
++         decoration.  This window type is typically used for
++         things like pop-up menus.  Use of this type is rare.
++ 
++         If you need a window with no decoration, you should still
++         use type &quot;toplevel&quot; but make a call to the set_decorated
++         method below.
++ 
++ The object or its contents is not rendered until you call the show() or
++ show_all() methods.
++ 
++ The old behaviour catagorised by the type &quot;dialog&quot; is now achieved using
++ calls which are described in the set_transient_for() and set_position()
++ section.
++ 
++ =item B&lt;set_title($text)&gt;
++ 
++ This method allows you to set, or change the text which is displayed as
++ the title of your window as rendered by your window manager.  This
++ defaults to the name of your application.
++ 
++     $window-&gt;set_title(&quot;MyNewsClient: (Browsing: comp.lang.perl)&quot;);
++ 
++ =item B&lt;get_title()&gt;
++ 
++ This method allows you to get the title from your window.  It returns
++ a scalar which contains this text.
++ 
++     my $text = $window-&gt;get_title();
++ 
++ =item B&lt;set_resizable($bool)&gt;
++ 
++ This method allows you to instruct the window manager whether or not the
++ user is allowed to resize the window.  Its single argument is a boolean
++ true or false, or a 1 or 0.
++ 
++     # Allow resizable
++     $window-&gt;set_resizeable(1);
++ 
++     # Disallow resizable
++     $window-&gt;set_resizeable(0);
++ 
++ =item B&lt;get_resizable()&gt;
++ 
++ This method queries your window object to discover if the Window is
++ resizable.  It returns 1 for true (can be resized) or 0 for false
++ (cannot be resized).
++ 
++     if ($window-&gt;get_resizable()) {
++         print(&quot;Window is resizable\n&quot;);
++     }
++ 
++ =item B&lt;set_default_size($width, $height)&gt;
++ 
++ This method allows you set the B&lt;initial&gt; minimum size of your window.
++ If your widgets within your Window request a larger sized window than
++ you specify here this request will be ignored.
++ 
++     # Set the initial size of the window to 100x200 pixels.
++     $window-&gt;set_default_size(100,200);
++ 
++ To change the size of an already rendered window see resize().
++ 
++ To set size of the Window regardless of the consequences, see
++ set_size_request() in Gtk2::Widget.
++ 
++ =item B&lt;set_transient_for($main_window)&gt;
++ 
++ This method allows you to &quot;bind&quot; windows behaviour to another by
++ informing it that the window that you call this method on is
++ &quot;subservient&quot; to $main_window; the first argument you pass.
++ 
++ This may also affect the initial positioning of the window by the
++ window manager a common positioning policy is to place subservient
++ windows on the top of their parents.  You can request a change
++ in this policy using the set_position() method although, again,
++ the window manager does not have to honour this.
++ 
++ =item B&lt;get_transient_for()&gt;
++ 
++ This method allows you to identify the parent window of your
++ window.  It takes no arguments but returns the reference
++ to the parent window.
++ 
++ =item B&lt;set_position($type)&gt;
++ 
++ This method allows you to pass hints to the window manager as to where
++ you want your window to appear.  This is only a request, your window
++ manager does not have to honour it.
++ 
++ Options are:
++ 
++     none     - This instructs the window manager to use its own
++         policy.
++ 
++     center   - This instructs the window manager that you wish
++         the window to appear in the center of the screen.
++ 
++     mouse    - This instructs the window manager that you wish
++         the window to appear at the position that the mouse is.
++ 
++     center_always - This instructs the window manager that you
++         always want the window to appear in the center, even
++         after resize.
++ 
++     center_on_parent - This instructs the window manager to
++         position this window in the center on its parent window.
++ 	See set_transient_for().
++ 
++ Example:
++ 
++     # Create two windows.
++     my $main_window = Gtk2::Window-&gt;new(-toplevel);
++     my $child_window = Gtk2::Window-&gt;new(-toplevel);
++ 
++     # Make $child_window subservient to $main_window
++     $child_window-&gt;set_transient_for($main_window);
++ 
++     # Make $child_window initial placement in the center of
++     # $main_window
++     $child_window-&gt;set_position(-center_on_parent);
++ 
++     # Render $main_window first else $child_window won't be able to
++     # appear in the center on top of it.
++     $main_window-&gt;show;
++     $child_window-&gt;show;
++ 
++ =item B&lt;set_destroy_with_parent($bool)&gt;
++ 
++ This method allows you to set or unset the behaviour whereby the
++ window will destroy itself if its parent window is destroyed (see
++ set_transient_for()).
++ 
++ The first and only argument is boolean, 0 for false and 1 for true.
++ 
++     # Suicidal window on death of parent.
++     $window-&gt;set_destroy_with_parent(1);
++ 
++     # Not suicidal on death of parent.
++     $window-&gt;set_destroy_with_parent(0);
++ 
++ =item B&lt;present()&gt;
++ 
++ This method causes the window to appear in front of the user.
++ 
++ The window may be moved from a different screen, de-iconified, rendered,
++ raised to the top.  It may also give the window focus and move the
++ mouse depending on the configuration of the window manager.
++ 
++     $window-&gt;present();
++ 
++ =item B&lt;iconify()&gt;
++ 
++ This method requests to the window manager than the window be minimised.
++ 
++     $window-&gt;iconify();
++ 
++ =item B&lt;deiconify()&gt;
++ 
++ This method requests to the window manager that the window by de-iconified.
++ You may wish to read the documentation above for present() as this is
++ more likely to be the effect you are looking for in an application
++ design as a window may be de-iconified onto a different screen or under
++ other windows.
++ 
++     $window-&gt;deiconify();
++ 
++ =item B&lt;stick()&gt;
++ 
++ This method causes your window to become sticky.  Sticky windows are
++ windows that stay on the screen even when you change virtual screens.
++ 
++ Support for this request is variable across window managers.
++ 
++ =item B&lt;unstick()&gt;
++ 
++ This method causes your window to cease being sticky.
++ 
++ Support for this request is variable across window managers.
++ 
++ =item B&lt;maximize()&gt;
++ 
++ This method causes your window to maximise the same way as if you had
++ pressed that icon in your window managers decoration.
++ 
++ =item B&lt;unmaximize()&gt;
++ 
++ This method causes your window to un-maximise the same way as if you
++ had pressed that icon in your window managers decoration.  The window
++ is restored to its pre-maximised size.
++ 
++ =item B&lt;fullscreen()&gt; and B&lt;unfullscreen()&gt;
++ 
++ These methods allow you to fullscreen and unfullscreen your window.
++ This is done by changing the resolution of your X server, placing your
++ window in the middle and blacking out the rest of the screen.
++ 
++ Although we allow you to pass the request to the window manager
++ its support is very poor.  Expect bad things to happen if you use
++ this.
++ 
++ =item B&lt;set_decorated($bool)&gt;
++ 
++ This method allows you to instruct the window manager to apply or
++ not apply decorations to your window.  The default is to allow
++ decorations.  Decorations consist of the borders, title and
++ window manager icons surrounding your window.
++ 
++     # Make window un-decorated (borderless)
++     $window-&gt;set_decorated(0);
++ 
++ =item B&lt;get_decorated()&gt;
++ 
++ This method returns whether the window is decorated or not.  The value
++ returned is 0 for undecorated, or 1 for decorated.
++ 
++ =item B&lt;get_size()&gt;
++ 
++ This method allows you to acquire the dimensions of your window.
++ The method returns a list in the for (width, height).
++ 
++     my ($width, $height) = $window-&gt;get_size();
++ 
++ Note, these dimensions do not include any window manager decorations.
++ 
++ =item B&lt;resize($width, $height)&gt;
++ 
++ This method allows you to resize your window object.  This method is
++ typically called after the window has been displayed.  If you call this
++ method before rendering, then its setting overrides that set
++ by set_default_size().
++ 
++ If the widgets in the window request more space than you specify in
++ resize(), then this method is silently ignored.
++ 
++ =back
++ 
++ =head1 AUTHOR
++ 
++ The author of this documentation is Redvers Davies &lt;red@criticalintegration.com&gt;.
++ 
++ (C) Redvers Davies 2002, under the LGPL.
++ 
++ =head1 SEE ALSO
++ 
++ Gtk2
++ 
+</pre>
+<pre>
+Index: Label.pm
+===================================================================
+RCS file: /cvsroot/gtk2-perl/gtk2-perl/Gtk2/Label.pm,v
+retrieving revision 1.8
+diff -c -r1.8 Label.pm
+*** Label.pm	20 Nov 2002 19:54:48 -0000	1.8
+--- Label.pm	12 Dec 2002 02:57:15 -0000
+***************
+*** 39,41 ****
+--- 39,138 ----
+  1;
+  
+  
++ =head1 NAME
++ 
++ Gtk2::Label - Widget for a small to medium amount of text.
++ 
++ =head1 SYNOPSIS
++ 
++ # Load and Initialise Gtk2.
++     use Gtk2;
++     Gtk2-&gt;init;
++ 
++ # Create a window within which we can display our Gtk2::Label.
++     my $window = Gtk2::Window-&gt;new('toplevel');
++ 
++ # Create the Gtk2::Label using the new() constructor method.
++     my $label = Gtk2::Label-&gt;new(&quot;This is the contents of a Gtk2::Label&quot;);
++ 
++ # Alternatively, you can set the text after creation.
++     $label-&gt;set_text(&quot;Or you can set the text of the Label after creation&quot;);
++ 
++ # Or read back the text that is contained within the Gtk2::Label.
++     my $text = $label-&gt;get_text;
++ 
++ # Place the Gtk2::Label within our window and display it and the label.
++     $window-&gt;add($label);
++     $window-&gt;show_all;
++ 
++ # Pass control to the Gtk2 mainloop.
++     Gtk2-&gt;main;
++ 
++ =head1 DESCRIPTION
++ 
++ Gtk2::Label is a widget which allows you to display a small to medium amount of text.
++ It is different from its Gtk.pm breathern with the addition of some rather useful
++ formatting methods.
++ 
++ =head1 METHODS
++ 
++ The following methods are available for this object.  This list is not exhaustive.
++ 
++ =over
++ 
++ =item B&lt;new($text)&gt;
++ 
++ This is the constructor method for this widget.  The single option is a scalar which
++ contains the text you with to display in the widget.  If you specify a carriage return
++ within your text (eg, \n) Gtk2::Label will start a new line at this point.
++ 
++ The argument is optional as it defaults to an empty string.  This is sometimes useful
++ in occasions when you wish to set the contents of the Gtk2::Label after the widget
++ has been rendered.  See B&lt;set_text&gt; method below.
++ 
++ my $label = Gtk2::Label-&gt;new(&quot;This is my text\nwhich is on\nthree lines.&quot;);
++ 
++ =item B&lt;set_text($text)&gt;
++ 
++ This method allows you to set, or change the text which is displayed within your Label.
++ The only argument is a scalar which contains the text to be set.
++ 
++  $label-&gt;set_text(&quot;This is the text\nwhich we set after creation&quot;);
++ 
++ =item B&lt;get_text()&gt;
++ 
++ This method allows you to get the text which is displayed by your Label.  This method
++ takes no arguments but returns the displayed text.
++ 
++  my $text = $label-&gt;get_text();
++ 
++ =item B&lt;set_pattern($pattern)&gt;
++ 
++ This method allows you to specify characters in your Label to be underlined.  A &quot;pattern&quot;
++ consists of a string which contains either a space (' ') or an underscore ('_').  The
++ position where a space is is rendered as a normal character whereas a position with an
++ underscore is rendered as underlined.
++ 
++ The following code produces a Label with the word &quot;Underlined&quot; underlined.
++ 
++ my $label = new Gtk2::Label(&quot;Test Underlined&quot;);
++ $label-&gt;set_pattern(&quot;     __________&quot;);
++ 
++ =item B&lt;set_justify($GtkJustification)&gt;
++ 
++ This is a new method which was not available to the Gtk::Label object.  Its single
++ argument is the string 'left', 'right', 'center' or 'fill' to set the text
++ within that widget to that justification style.
++ 
++ =back
++ 
++ =head1 AUTHOR
++ 
++ The author of this documentation is Redvers Davies &lt;red@criticalintegration.com&gt;.
++ 
++ (C) Redvers Davies 2002, under the LGPL.
++ 
++ =head1 SEE ALSO
++ 
++ Gtk2
++ 
+</pre>
+
+<!--X-Body-of-Message-End-->
+<!--X-MsgBody-End-->
+<!--X-Follow-Ups-->
+<hr>
+<ul><li><strong>Follow-Ups</strong>:
+<ul>
+<li><strong><a name="00060" href="msg00060.html">Re: more documentation patches</a></strong>
+<ul><li><em>From:</em> Guillaume Cottenceau</li></ul></li>
+</ul></li></ul>
+<!--X-Follow-Ups-End-->
+<!--X-References-->
+<!--X-References-End-->
+<!--X-BotPNI-->
+<HR>
+[<a href="msg00054.html">Date Prev</a>][<a href="msg00056.html">Date Next</a>] &nbsp; [<a href="msg00081.html">Thread Prev</a>][<a href="msg00060.html">Thread Next</a>] &nbsp; 
+[<A HREF="thread.html#00055">Thread Index</A>]
+[<A HREF="date.html#00055">Date Index</A>]
+[<A HREF="author.html#00055">Author Index</A>]
+
+<!--X-BotPNI-End-->
+<!--X-User-Footer-->
+<!--X-User-Footer-End-->
+</body>
+</html>

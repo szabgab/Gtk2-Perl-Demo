@@ -1,0 +1,77 @@
+#!/usr/bin/perl -w
+
+=doc
+
+Gtk+ 2.4 introduces a new file dialog to replace the aged Gtk2::FileSelection.
+This new widget is actually an interface known as Gtk2::FileChooser; the
+most-commonly-used implementation of that interface would be
+Gtk2::FileChooserDialog, a Gtk2::Dialog which has all the methods defined by
+Gtk2::FileChooser.
+
+This example shows how to use the file chooser to ask the user for a dir name;
+we also add a preview widget and a shortcut, because we can.
+
+The FileChooser does dirs too, just specify the action
+
+=cut
+
+use Glib qw(TRUE);
+use Gtk2 -init;
+
+die "This example requires gtk+ 2.4.0, but we're compiled for "
+  . join (".", Gtk2->GET_VERSION_INFO)."\n"
+	unless Gtk2->CHECK_VERSION (2,4,0);
+
+# $filechooser = Gtk2::FileChooserDialog->new
+#     ("Choose a directory",
+#     $parent,
+#     'select-folder', # <--- the action
+#     'gtk-cancel' => 'cancel',
+#     'gtk-ok' => 'ok');
+
+
+my $dir_chooser =
+	Gtk2::FileChooserDialog->new (
+	'Choose a Directory',
+	 undef, 'select-folder',
+        'gtk-cancel' => 'cancel',
+        'gtk-ok' => 'ok');
+
+# create a preview widget, which will show a quick summary of information
+# about the selected file, updated whenever the selection changes.
+# note that this assumes you're on a unix-like system with the 'file'
+# utility installed.
+my $preview_widget = Gtk2::Label->new ('wheeeee');
+$preview_widget->set_line_wrap (TRUE);
+$preview_widget->set_size_request (150, -1);
+$dir_chooser->set (preview_widget => $preview_widget,
+                    preview_widget_active => TRUE);
+$dir_chooser->signal_connect (selection_changed => sub {
+	my $dirname = $dir_chooser->get_preview_filename;
+	# we'll hide the preview widget if the selected item is a directory.
+	# in practice, you may find this really annoying, as it causes the
+	# window to change size.
+	my $active = defined $dirname &&  -d $dirname;
+	if ($active) {
+		my $size = sprintf '%.1fK', (-s $dirname) / 1024;
+		my $desc = `file '$dirname'`;
+		$desc =~ s/^$dirname:\s*//;
+		$preview_widget->set_text ("$size\n$desc");
+	}
+	$dir_chooser->set (preview_widget_active => $active);
+});
+
+# add an app-specific entry to the shortcut list.
+$dir_chooser->add_shortcut_folder ('/tmp');
+eval { $dir_chooser->add_shortcut_folder_uri ('http://localhost/'); };
+warn "couldn't add shortcut: $@\n" if $@;
+
+if ('ok' eq $dir_chooser->run) {
+	# you can get the user's selection as a filename or a uri.
+	my $uri = $dir_chooser->get_uri;
+	print "uri $uri\n";
+	my $dirname = $dir_chooser->get_filename;
+	print "dirname $dirname\n";
+}
+
+$dir_chooser->destroy;

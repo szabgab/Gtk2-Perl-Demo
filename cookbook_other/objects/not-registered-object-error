@@ -1,0 +1,21 @@
+> Gtk2::CellRendererMultiline is not registered with gperl as an object
+> type at /usr/local/bin/gtk-gallery line 193.
+>
+> How could this error be caused?
+
+this error message comes from Glib::Object::new(); the first thing it does is
+try to fetch the GType corresponding with the given package name, and the
+error message you posted is what you get when that package is not registered.
+
+basically, this means:
+
+1) you have tried to instantiate an object before the GObject type has been
+registered.  check the order of 'require' and 'use' statements.
+
+2) there may be a typo or something that caused the GType to be registered
+with the wrong package name.  check the package names.  (when you 'use
+Glib::Object::Subclass', the class is registered with __PACKAGE__, so the
+current package name is important.)
+####################################################
+
+

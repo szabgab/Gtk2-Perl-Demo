@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+######################################################################
+#  Trivial use of GtkImageViewer.
+######################################################################
+
+use Gtk2;
+use Gtk2::ImageViewer;
+
+Gtk2->init;
+
+$window = Gtk2::Window->new();
+$window->signal_connect('destroy', sub { Gtk2->main_quit });
+
+my $file = shift || 'bridget-1.jpg';
+
+$imgv = new_from_file Gtk2::ImageViewer($file);
+$window->add($imgv);
+
+$window->show_all();
+
+main Gtk2;

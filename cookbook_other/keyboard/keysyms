@@ -1,0 +1,67 @@
+#!/usr/bin/perl 
+use warnings;
+use strict;
+use Glib ':constants';
+use Gtk2 -init;
+use Gtk2::Gdk::Keysyms;
+
+#by muppet on gtk2-perl maillist
+
+my $window = Gtk2::Window->new;
+$window->signal_connect( destroy => sub { Gtk2->main_quit } );
+$window->set_default_size( 200, 200 );
+
+my $model = Gtk2::ListStore->new('Glib::String');
+foreach (
+    qw(one two three four five six seven eight nine ten eleven
+    twelve)
+  )
+{
+    $model->set( $model->append, 0, $_ );
+}
+
+my $treeview = Gtk2::TreeView->new($model);
+my $cell     = Gtk2::CellRendererText->new;
+$cell->set( editable => TRUE );
+$cell->signal_connect(
+    edited => sub {
+        my ( $cell, $path_string, $new_text ) = @_;
+        $model->set(
+            $model->get_iter( Gtk2::TreePath->new_from_string($path_string) ),
+            0, $new_text );
+    }
+);
+$treeview->insert_column_with_attributes( -1, 'Foo', $cell, text => 0 );
+
+$treeview->signal_connect(
+    key_press_event => sub {
+        my ( $widget, $event ) = @_;
+        if ( $event->keyval == $Gtk2::Gdk::Keysyms{Delete} ) {
+            warn "Delete pressed!\n";
+            my ( $model, $iter ) = $widget->get_selection->get_selected;
+            if ($iter) {
+                warn "  deleting " . $model->get_path($iter)->to_string . "\n";
+                $model->remove($iter);
+                return TRUE;
+            }
+            else {
+                warn "  nothing selected, ignoring\n";
+            }
+        }
+        return FALSE;
+    }
+);
+
+$window->add(
+    Glib::Object::new(
+        'Gtk2::ScrolledWindow',
+        child             => $treeview,
+        shadow_type       => 'in',
+        hscrollbar_policy => 'automatic',
+        vscrollbar_policy => 'automatic'
+    )
+);
+
+$window->show_all;
+Gtk2->main;
+

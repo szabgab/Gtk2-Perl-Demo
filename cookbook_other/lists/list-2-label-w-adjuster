@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Gtk2 -init;
+use constant TRUE  => 1;
+use constant FALSE => !TRUE;
+
+# create a list that contains your data
+my @list;
+push @list, { text => "coke" }, { text => "pepsi" }, { text => "fanta" },
+  { text => "sprite" }, { text => "mountain dew" };
+
+# create a liststore using that list
+my $model = Gtk2::ListStore->new(qw/Glib::String/);
+foreach my $a (@list) {
+    my $iter = $model->append;
+    $model->set( $iter, 0, $a->{text} );
+}
+
+# Create a label where your current selection will be printed out
+my $label = Gtk2::Label->new;
+
+# Create a treeview to display the list that we created
+my $treeview = Gtk2::TreeView->new_with_model($model);
+my $renderer = Gtk2::CellRendererText->new;
+$renderer->set_data( column => 0 );
+$treeview->insert_column_with_attributes( -1, "Drinks", $renderer, text => 0 );
+
+# Here is the logic that you are looking for.
+# This gets triggered when the user selects a row.
+$treeview->get_selection->signal_connect(
+    'changed' => sub {
+        my ($selection) = @_;
+        my $iter = $selection->get_selected;
+        if ($iter) {
+            my $path = $model->get_path($iter);
+            my $i    = ( $path->get_indices )[0];
+            my $x    = $list[$i];
+
+            # Set the label text equal to the selection
+            $label->set_label( $x->{text} );
+        }
+    }
+);
+
+# Add the treeview to a scrolledwindow for fun
+my $scroll = Gtk2::ScrolledWindow->new;
+$scroll->add($treeview);
+
+# I just chose a vpaned to contain both widgets. You can choose anything !
+my $vpaned = Gtk2::VPaned->new;
+$vpaned->add1($label);
+$vpaned->add2($scroll);
+my $window = Gtk2::Window->new;
+$window->signal_connect( destroy => sub { Gtk2->main_quit; } );
+$window->add($vpaned);
+
+$window->set_default_size( 320, 200 );
+$window->show_all;
+Gtk2->main;
+

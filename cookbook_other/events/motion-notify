@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use POSIX;
+use Glib qw/TRUE FALSE/;
+use Gtk2 '-init';
+
+my $window = Gtk2::Window->new;
+
+my @window_size = (0,0);
+
+$window->set_position('center');
+
+my $image = Gtk2::Image->new_from_file('bridget-1.jpg');
+
+$image->set_size_request(0,0);
+
+$window->signal_connect ("destroy", sub { exit(0); });
+$window->signal_connect(key_press_event => \&key_press_event);
+
+my $event_box = Gtk2::EventBox->new;
+
+$event_box->add($image);
+
+$event_box->signal_connect(motion_notify_event => \&motion_notify);
+
+# this will add any mouse motion, not only when B1 is down
+$event_box->set_events([qw/pointer-motion-mask/]);
+# to enable firing the event for every pixel your mouse moves.  
+# If that's too much, look into using pointer-motion-hint-mask[1].
+
+my $scrolled = Gtk2::ScrolledWindow->new;
+
+$scrolled->add_with_viewport($event_box);
+
+$window->add($scrolled);
+
+$window->set_default_size(200,200);
+
+$window->show_all;
+
+Gtk2->main;
+
+sub motion_notify {
+    my $widget = shift;	# GtkWidget         *widget
+        my $event = shift;	# GdkEventButton    *event
+	
+	    my $x = $event->x;
+	        my $y = $event->y;
+		
+		    print "motion_notify $x,$y\n";
+		    
+		    }
+		    

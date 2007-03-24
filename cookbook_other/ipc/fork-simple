@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Gtk2;
+
+my $pid = fork();
+
+die "Fork failed" unless defined $pid;
+
+if ($pid) {
+    Gtk2->init();
+    print "Parent: Child pid is $pid\n";
+}
+else {
+
+    # Child
+    print "Child: My pid is $$\n";
+    sleep(120);
+    exit 0;
+}
+
+# Parent
+my $window = Gtk2::Window->new('toplevel');
+my $button = Gtk2::Button->new('Quit');
+
+$button->signal_connect(
+    clicked => sub {
+        kill $pid;
+        Gtk2->main_quit;
+    }
+);
+$window->add($button);
+$window->show_all;
+Gtk2->main;
+

@@ -1,0 +1,270 @@
+#!/usr/bin/perl
+
+#trying to use strict on previous example, but
+#code is not written well for strict.
+
+use warnings;
+use strict;
+use Glib qw/TRUE FALSE/;
+use Gtk2 '-init';
+
+die "usage: packbox.pl num, where num is 1, 2, or 3.\n"
+  unless defined $ARGV[0];
+
+# Create our window
+my $window = Gtk2::Window->new('toplevel');
+
+# You should always remember to connect the delete_event signal
+# to the main window. This is very important for proper intuitive
+# behavior
+$window->signal_connect( delete_event => \&delete_event );
+$window->set_border_width(10);
+
+# We create a vertical box (vbox) to pack the horizontal boxes into.
+# This allows us to stack the horizontal boxes filled with buttons one
+# on top of the other in this vbox.
+my $box1  = Gtk2::VBox->new( FALSE, 0 );
+my $which = $ARGV[0];
+my $box2;
+
+# which example to show. These correspond to the pictures above.
+if ( 1 == $which ) {
+
+    # create a new label.
+my $label = Gtk2::Label->new("Gtk2::HBox->new (FALSE, 0);");
+
+    # Align the label to the left side.  We'll discuss this function and
+    # others in the section on Widget Attributes.
+    $label->set_alignment( 0.0, 0.0 );
+
+    # Pack the label into the vertical box (vbox box1).  Remember that
+    # widgets added to a vbox will be packed one on top of the other in
+    # order.
+ $box1->pack_start( $label, FALSE, FALSE, 0 );
+
+    # Show the label
+    $label->show;
+
+    # Call our make box function - homogeneous = FALSE, spacing = 0,
+    # expand = FALSE, fill = FALSE, padding = 0
+    $box2 = make_box( FALSE, 0, FALSE, FALSE, 0 );
+    $box1->pack_start( $box2, FALSE, FALSE, 0 );
+    $box2->show;
+
+    # Call our make box function - homogeneous = FALSE, spacing = 0,
+    # expand = TRUE, fill = FALSE, padding = 0
+    $box2 = make_box( FALSE, 0, TRUE, FALSE, 0 );
+    $box1->pack_start( $box2, FALSE, FALSE, 0 );
+    $box2->show;
+
+    # Args are: homogeneous, spacing, expand, fill, padding
+    $box2 = make_box( FALSE, 0, TRUE, TRUE, 0 );
+    $box1->pack_start( $box2, FALSE, FALSE, 0 );
+    $box2->show;
+
+    # Creates a separator, we'll learn more about these later,
+    # but they are quite simple.
+my $separator = Gtk2::HSeparator->new;
+
+    # Pack the separator into the vbox. Remember each of these
+    # widgets is being packed into a vbox, so they'll be stacked
+    # vertically.
+    $box1->pack_start( $separator, FALSE, TRUE, 5 );
+    $separator->show;
+
+    # Create another new label, and show it.
+    $label = Gtk2::Label->new("Gtk2::HBox->new (TRUE, 0);");
+    $label->set_alignment( 0.0, 0.0 );
+    $box1->pack_start( $label, FALSE, FALSE, 0 );
+    $label->show;
+
+    # Args are: homogeneous, spacing, expand, fill, padding
+    $box2 = make_box( TRUE, 0, TRUE, FALSE, 0 );
+    $box1->pack_start( $box2, FALSE, FALSE, 0 );
+    $box2->show;
+
+    # Args are: homogeneous, spacing, expand, fill, padding
+    $box2 = make_box( TRUE, 0, TRUE, TRUE, 0 );
+    $box1->pack_start( $box2, FALSE, FALSE, 0 );
+    $box2->show;
+
+    # Another new separator.
+    $separator = Gtk2::HSeparator->new;
+
+    # The last 3 arguments to gtk_box_pack_start are:
+    # expand, fill, padding.
+    $box1->pack_start( $separator, FALSE, TRUE, 5 );
+    $separator->show;
+}
+elsif ( 2 == $which ) {
+
+    # Create a new label, remember box1 is a vbox as created
+    # near the beginning
+my $label = Gtk2::Label->new("Gtk2::HBox->new (FALSE, 10);");
+    $label->set_alignment( 0.0, 0.0 );
+  $box1->pack_start( $label, FALSE, FALSE, 0 );
+    $label->show;
+
+    # Args are: homogeneous, spacing, expand, fill, padding
+    $box2 = make_box( FALSE, 10, TRUE, FALSE, 0 );
+    $box1->pack_start( $box2, FALSE, FALSE, 0 );
+    $box2->show;
+
+    # Args are: homogeneous, spacing, expand, fill, padding
+    $box2 = make_box( FALSE, 10, TRUE, TRUE, 0 );
+    $box1->pack_start( $box2, FALSE, FALSE, 0 );
+    $box2->show;
+
+my $separator = Gtk2::HSeparator->new;
+
+    # The last 3 arguments to gtk_box_pack_start are:
+    # expand, fill, padding.
+    $box1->pack_start( $separator, FALSE, TRUE, 5 );
+    $separator->show;
+
+    $label = Gtk2::Label->new("Gtk2::HBox->new (FALSE, 0);");
+    $label->set_alignment( 0.0, 0.0 );
+    $box1->pack_start( $label, FALSE, FALSE, 0 );
+    $label->show;
+
+    # Args are: homogeneous, spacing, expand, fill, padding
+    $box2 = make_box( FALSE, 0, TRUE, FALSE, 10 );
+    $box1->pack_start( $box2, FALSE, FALSE, 0 );
+    $box2->show;
+
+    # Args are: homogeneous, spacing, expand, fill, padding
+    $box2 = make_box( FALSE, 0, TRUE, TRUE, 10 );
+    $box1->pack_start( $box2, FALSE, FALSE, 0 );
+    $box2->show;
+
+    $separator = Gtk2::HSeparator->new;
+
+    # The last 3 arguments to gtk_box_pack_start are:
+    # expand, fill, padding.
+    $box1->pack_start( $separator, FALSE, TRUE, 5 );
+    $separator->show;
+}
+elsif ( 3 == $which ) {
+
+    # This demonstrates the ability to use gtk_box_pack_end() to
+    # right justify widgets. First, we create a new box as before.
+   $box2 = make_box( FALSE, 0, FALSE, FALSE, 0 );
+
+    # Create the label that will be put at the end.
+my $label = Gtk2::Label->new("end");
+
+    # Pack it using Gtk2::Box::pack_end(), so it is put on the right
+    # side of the hbox created in the make_box() call.
+    $box2->pack_end( $label, FALSE, FALSE, 0 );
+
+    # Show the label.
+    $label->show;
+
+    # Pack box2 into box1 (the vbox remember ? :)
+    $box1->pack_start( $box2, FALSE, FALSE, 0 );
+    $box2->show;
+
+    # A separator for the bottom.
+my $separator = Gtk2::HSeparator->new;
+
+    # This explicitly sets the separator to 400 pixels wide by 5 pixels
+    # high. This is so the hbox we created will also be 400 pixels wide,
+    # and the "end" label will be separated from the other labels in the
+    # hbox. Otherwise, all the widgets in the hbox would be packed as
+    # close together as possible.
+    $separator->set_size_request( 400, 5 );
+
+    # pack the separator into the vbox (box1) created near the start
+    $box1->pack_start( $separator, FALSE, TRUE, 5 );
+    $separator->show;
+}
+
+# Create another new hbox.. remember we can use as many as we need!
+my $quitbox = Gtk2::HBox->new( FALSE, 0 );
+
+# Our quit button.
+my $button = Gtk2::Button->new("Quit");
+
+# Setup the signal to terminate the program when the button is clicked
+$button->signal_connect( clicked => sub { Gtk2->main_quit; } );
+
+# Pack the button into the quitbox.
+# The last 3 arguments to gtk_box_pack_start are:
+# expand, fill, padding.
+$quitbox->pack_start( $button, TRUE, FALSE, 0 );
+
+# pack the quitbox into the vbox (box1)
+$box1->pack_start( $quitbox, FALSE, FALSE, 0 );
+
+# Pack the vbox (box1) which now contains all our widgets, into the
+# main window.
+$window->add($box1);
+
+# And show everything left
+$button->show;
+$quitbox->show;
+
+$box1->show;
+
+# Showing the window last so everything pops up at once.
+$window->show;
+
+# And of course, our main function.
+Gtk2->main;
+
+# Control returns here when gtk_main_quit() is called, but not when
+# exit() is used.
+0;
+
+#######################################################################
+sub delete_event {
+    Gtk2->main_quit;
+    return FALSE;
+}
+
+# Make a new hbox filled with button-labels. Arguments for the
+# variables we're interested are passed in to this function.
+# We do not show the box, but do show everything inside.
+sub make_box {
+    my ( $homogeneous, $spacing, $expand, $fill, $padding ) = @_;
+
+    # Create a new hbox with the appropriate homogeneous
+    # and spacing settings
+my  $box = Gtk2::HBox->new( $homogeneous, $spacing );
+
+    # Create a series of buttons with the appropriate settings
+    $button = Gtk2::Button->new("Gtk2::HBox::pack");
+    $box->pack_start( $button, $expand, $fill, $padding );
+    $button->show;
+
+    $button = Gtk2::Button->new("(box,");
+    $box->pack_start( $button, $expand, $fill, $padding );
+    $button->show;
+
+    $button = Gtk2::Button->new("button,");
+    $box->pack_start( $button, $expand, $fill, $padding );
+    $button->show;
+
+    # Create a button with the label depending on the value of $expand.
+    if ( $expand == TRUE ) {
+        $button = Gtk2::Button->new("TRUE,");
+    }
+    else {
+        $button = Gtk2::Button->new("FALSE,");
+    }
+
+    $box->pack_start( $button, $expand, $fill, $padding );
+    $button->show;
+
+    # This is the same as the button creation for "expand"
+    # above, but uses the shorthand form.
+    $button = Gtk2::Button->new( $fill ? "TRUE," : "FALSE," );
+    $box->pack_start( $button, $expand, $fill, $padding );
+    $button->show;
+
+    $button = Gtk2::Button->new("$padding");
+    $box->pack_start( $button, $expand, $fill, $padding );
+    $button->show;
+
+    return $box;
+}

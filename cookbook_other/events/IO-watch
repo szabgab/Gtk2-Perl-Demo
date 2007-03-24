@@ -1,0 +1,39 @@
+#!/usr/bin/perl -w
+use strict;
+use Gtk2 -init;
+
+my $window   = Gtk2::Window->new;
+my $scroll   = Gtk2::ScrolledWindow->new;
+my $textview = Gtk2::TextView->new;
+my $buffer   = $textview->get_buffer;
+$window->add($scroll);
+$scroll->add($textview);
+$window->show_all;
+$window->signal_connect( destroy => sub { Gtk2->main_quit } );
+
+open( IN, q^perl -e '$|++; for($i=0;$i<10;$i++) { $sum+= $i; print
+"Line $i: sum = $sum\n"; sleep 1;}'|^
+  )
+  or die "Failed running perl subprocess\n";
+
+Glib::IO->add_watch(
+    fileno(IN),
+    [ 'in', 'hup' ],
+    sub {
+        my ( $fileno, $condition ) = @_;
+        if ( $condition eq 'hup' ) {
+            warn "done\n";
+            close IN;
+            return 0;    # uninstall
+        }
+        warn "reading...\n";
+        my $line;
+        sysread IN, $line, 1024;
+        warn "read $line\n";
+        $buffer->insert( $buffer->get_end_iter, $line );
+        return 1;
+    }
+);
+
+Gtk2->main;
+

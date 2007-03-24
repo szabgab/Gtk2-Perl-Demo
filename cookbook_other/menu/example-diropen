@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+# include my debug-build of Gtk2 and Glib
+#use lib '/home/stephan/Work/imTuS/segv/lib/perl/5.8.4/';
+use Gtk2 '-init';
+
+use constant FALSE => 0;
+use constant TRUE  => 1;
+
+### Hauptfenster
+my %Top;
+$Top{window} = Gtk2::Window->new;
+$Top{window}->set_title('Segmentation fault?');
+$Top{window}->set_default_size( 400, 400 );
+$Top{window}->signal_connect( destroy => sub { Gtk2->main_quit; } );
+
+### Grund-Layout
+# VBox
+$Top{vbox} = Gtk2::VBox->new( FALSE, 5 );
+$Top{window}->add( $Top{vbox} );
+
+### Menu
+# Layout
+my %Menu;
+$Menu{string} = <<"EOS";
+<ui>
+<menubar name='Menu'>
+<menu action='File'>
+<menuitem action='loadDir'/>
+</menu>
+</menubar>
+</ui>
+EOS
+
+# Actions erzeugen
+$Menu{actions} = [
+    [ 'File', undef, 'File' ],
+    [ "loadDir", undef, "Open directory", "<control>O", undef, \&loadDir ]
+];
+$Menu{action_group} = Gtk2::ActionGroup->new('Menu');
+$Menu{action_group}->add_actions( $Menu{actions} );
+
+# UIManager erzeugen
+$Menu{manager} = Gtk2::UIManager->new();
+
+# Actions dem UIManager uebergeben
+$Menu{manager}->insert_action_group( $Menu{action_group}, 0 );
+
+# Mit UIManager Men_ aus Menu{string} erzeugen
+$Menu{manager}->add_ui_from_string( $Menu{string} );
+
+# Accelerators (automatisch erzeugt) abfragen und dem Toplevel-Window zuweisen
+$Menu{accel_group} = $Menu{manager}->get_accel_group();
+$Top{window}->add_accel_group( $Menu{accel_group} );
+
+# Menu der Top-VBox zuweisen
+$Top{vbox}->pack_start( $Menu{manager}->get_widget('/Menu'), 0, 0, 0 );
+
+$Top{window}->show_all;
+Gtk2->main;
+
+###
+sub loadDir {
+    print "Entering sub loadDir...\n";
+    my $dlg = Gtk2::FileChooserDialog->new(
+        'Select directory', undef,
+        'select-folder',
+        'gtk-cancel' => 'cancel',
+        'gtk-open'   => 'ok'
+    );
+    my $response = $dlg->run();
+    if ( $response ne 'ok' ) {
+        print "You aborted.\n";
+    }
+    else {
+        print 'You selected: >' . $dlg->get_filename . "<\n";
+    }
+
+    $dlg->destroy();
+    print "Leaving sub loadDir...\n";
+}
+

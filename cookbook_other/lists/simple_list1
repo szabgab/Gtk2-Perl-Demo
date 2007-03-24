@@ -1,0 +1,45 @@
+#!/usr/bin/perl -w
+use Data::Dumper;
+
+use Gtk2 -init;
+use Gtk2::Ex::Simple::List;
+
+my $win = Gtk2::Window->new;
+$win->set_title ('Gtk2::Ex::Simple::List exapmle');
+$win->set_border_width (6);
+$win->set_default_size (500, 300);
+$win->signal_connect (delete_event => sub { Gtk2->main_quit; });
+
+my $hbox = Gtk2::HBox->new (0, 6);
+$win->add ($hbox);
+
+my $scwin = Gtk2::ScrolledWindow->new;
+$hbox->pack_start ($scwin, 1, 1, 0);
+$scwin->set_policy (qw/automatic automatic/);
+
+my $slist = Gtk2::Ex::Simple::List->new (
+    'Setting'       => 'bool',
+    'Configuration' => 'int',
+    'Name'          => 'text',
+    'Description'   => 'text',
+);
+
+@{$slist->{data}} = (
+    [ 0,   1, 'Configuration 1',       'Description' ],
+    [ 0,   2, 'Another Configuration', 'Another Description' ],
+    [ 0, 102, 'Third configuration',   'Third description' ],
+);
+
+$scwin->add ($slist);
+
+my $vbox = Gtk2::VBox->new (0, 6);
+$hbox->pack_start($vbox, 0, 1, 0);
+
+# finally, a button to end it all
+$btn = Gtk2::Button->new_from_stock ('gtk-quit');
+$btn->signal_connect (clicked => sub  { Gtk2->main_quit; });
+$vbox->pack_end($btn, 0, 1, 0);
+
+
+$win->show_all;
+Gtk2->main;

@@ -1,0 +1,99 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+use Glib qw/TRUE FALSE/;
+use Gtk2 '-init';
+
+my $greyh = Gtk2::Gdk::Color->new (0xCCCC,0xCCCC,0xCCCC);
+my $greyl = Gtk2::Gdk::Color->new (0x9999,0x9999,0x9999);
+
+my $redh = Gtk2::Gdk::Color->new (0xFFFF,0,0);
+my $redl = Gtk2::Gdk::Color->new (0xAAAA,0,0);
+
+my $greenh = Gtk2::Gdk::Color->new (0,0xFFFF,0xEEEE);
+my $greenl = Gtk2::Gdk::Color->new (0,0xFFFF,0xCCCC);
+
+my $blueh = Gtk2::Gdk::Color->new (0,0xFFFF,0xFFFF);
+my $bluel = Gtk2::Gdk::Color->new (0,0xCCCC,0xFFFF);
+
+
+my $window = Gtk2::Window->new('toplevel');
+$window->signal_connect( destroy => sub { Gtk2->main_quit; } );
+
+$window->set_title("Label");
+my $vbox = Gtk2::VBox->new( FALSE, 5 );
+my $hbox = Gtk2::HBox->new( FALSE, 5 );
+$window->add($hbox);
+$hbox->pack_start( $vbox, FALSE, FALSE, 0 );
+$window->set_border_width(5);
+$window->modify_bg('normal',$greyl);
+
+
+my $frame = Gtk2::Frame->new("Normal Label");
+my $label = Gtk2::Label->new("This is a Normal label");
+$frame->add($label);
+$vbox->pack_start( $frame, FALSE, FALSE, 0 );
+
+$frame = Gtk2::Frame->new("Multi-line Label");
+$label =  Gtk2::Label->new(
+    "This is a Multi-line label.\nSecond line\n" . "Third line" );
+
+$frame->add($label);
+$vbox->pack_start( $frame, FALSE, FALSE, 0 );
+
+$frame = Gtk2::Frame->new("Right Justified Label");
+$label =  Gtk2::Label->new(
+    "This is a Right-Justified\nMulti-line label.\n" . "Fourth line, (j/k)" );
+$label->set_justify('right');
+$frame->add($label), $vbox->pack_start( $frame, FALSE, FALSE, 0 );
+
+$vbox = Gtk2::VBox->new( FALSE, 5 );
+$hbox->pack_start( $vbox, FALSE, FALSE, 0 );
+$frame = Gtk2::Frame->new("Line wrapped label");
+$label =
+  Gtk2::Label->new( "This is an example of a line-wrapped label.  It "
+      . "should not be taking up the entire              "
+      . "width allocated to it, but automatically "
+      . "wraps the words to fit.  "
+      . "The time has come, for all good men, to come to "
+      . "the aid of their party.  "
+      . "The sixth sheik's six sheep's sick.\n"
+      . "     It supports multiple paragraphs correctly, "
+      . "and  correctly   adds "
+      . "many          extra  spaces." );
+$label->set_line_wrap(TRUE);
+$frame->add($label);
+$vbox->pack_start( $frame, FALSE, FALSE, 0 );
+
+$frame = Gtk2::Frame->new("Filled, wrapped label");
+$label =
+  Gtk2::Label->new( "This is an example of a line-wrapped, filled label.  "
+      . "It should be taking "
+      . "up the entire              width allocated to it.  "
+      . "Here is a sentence to preve "
+      . "my point.  Here is another sentence. "
+      . "Here comes the sun, do de do de do.\n"
+      . "    This is a new paragraph.\n"
+      . "    This is another news, longer, better "
+      . "paragraph.  It is coming to an end, "
+      . "unfortunately." );
+$label->set_justify('fill');
+$label->set_line_wrap(TRUE);
+$frame->add($label);
+$vbox->pack_start( $frame, FALSE, FALSE, 0 );
+
+$frame = Gtk2::Frame->new("Underlined label");
+$label =
+  Gtk2::Label->new( "This label is underlined!\n"
+      . "This one is underlined in quite a funky fashion" );
+$label->set_justify('left');
+$label->set_pattern(
+    "_________________________ _ _________ _ ________ _______ ___");
+$frame->add($label);
+$vbox->pack_start( $frame, FALSE, FALSE, 0 );
+
+$window->show_all;
+
+Gtk2->main;
+

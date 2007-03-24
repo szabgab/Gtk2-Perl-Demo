@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Gtk2;
+
+Gtk2->init();
+
+my $window = new Gtk2::Window;
+my $pbar = new Gtk2::ProgressBar;
+my $vb = new Gtk2::VBox(0, 0);
+my $b = new Gtk2::Button('Quit');
+$window->add($vb);
+$vb->add($pbar);
+$vb->add($b);
+
+$b->signal_connect('clicked', sub {Gtk2->main_quit});
+$window->signal_connect('destroy', sub {Gtk2->main_quit});
+
+$window->show_all();
+my $i = 0;
+my $count = 0;
+$pbar->set_fraction($i);
+
+my $timer = Glib::Timeout->add (100,\&show_progress);
+# timer will run until callback returns false
+
+Gtk2->main;
+
+#####################################################
+sub show_progress{
+ 
+    $i += 0.01;
+      if($i >= 1){ 
+         $count++; 
+         if($count > 2){return 0}  #stops timer
+         $i = 0; 
+    	 }
+
+  $pbar->set_fraction($i);
+return 1;
+}
+

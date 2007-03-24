@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+use Gtk2 -init;
+
+# Copy the entire file into a string (str)
+my $str;
+my $file = shift || $0;
+open( TEST, "< $file" ) or die "Cannot open test.txt\n";
+while (<TEST>) {
+    $str .= $_;
+}
+close TEST;
+
+# Create a textbuffer to contain that string
+my $textbuffer = Gtk2::TextBuffer->new();
+$textbuffer->set_text($str);
+
+# Create a textview using that textbuffer
+my $textview = Gtk2::TextView->new_with_buffer($textbuffer);
+
+# Add the textview to a scrolledwindow
+my $scrolledwindow = Gtk2::ScrolledWindow->new( undef, undef );
+$scrolledwindow->add($textview);
+
+# And finally add that scrolledwindow to a window
+my $window = Gtk2::Window->new;
+$window->signal_connect( destroy => sub { Gtk2->main_quit; } );
+$window->add($scrolledwindow);
+$window->set_default_size( 500, 400 );
+$window->show_all;
+Gtk2->main;
+
