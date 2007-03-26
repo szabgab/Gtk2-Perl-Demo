@@ -1,0 +1,12 @@
+
+
+- I am not sure I understand the way the Connector filters (Any/None/Pipe/List/Record) work.
+  Selecting "Connector In"="Any", "Connector Out"="Any" shows all the connectors
+  Selecting "Connector In"="None", "Connector Out"="Any" shows only the input connectors.
+
+
+- Is it possible to show all the gears that can connect after a specific gear that is
+  my last gear in the workspace? (Or those that can connect before my first gear?)
+
+- How can I create a gear of my own ?
+

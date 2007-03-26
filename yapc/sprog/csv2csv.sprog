@@ -1,0 +1,37 @@
+- Sprog
+- 1
+- run_on_drop: 0
+-
+  - CLASS: Sprog::Gear::ListToCSV
+    ID: 6
+    NEXT: 1
+    X: 47
+    Y: 121
+    prop:
+      title: List to CSV
+  - CLASS: Sprog::Gear::CSVSplit
+    ID: 4
+    NEXT: 6
+    X: 47
+    Y: 81
+    prop:
+      title: CSV Split
+  - CLASS: Sprog::Gear::TextWindow
+    ID: 1
+    NEXT: ~
+    X: 47
+    Y: 161
+    prop:
+      auto_scroll: ''
+      clear_on_run: 1
+      show_end_events: ''
+      show_start_events: ''
+      title: Text Window
+  - CLASS: Sprog::Gear::ReadFile
+    ID: 3
+    NEXT: ~
+    X: 47
+    Y: 41
+    prop:
+      filename: /home/gabor/gtk/phonebook.csv
+      title: Read File

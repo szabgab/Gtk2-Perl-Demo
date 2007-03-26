@@ -1,0 +1,45 @@
+- Sprog
+- 1
+- run_on_drop: 0
+-
+  - CLASS: Sprog::Gear::TextWindow
+    ID: 6
+    NEXT: ~
+    X: 48
+    Y: 202
+    prop:
+      auto_scroll: ''
+      clear_on_run: 1
+      show_end_events: 1
+      show_start_events: ''
+      title: Text Window
+  - CLASS: Sprog::Gear::ListToRecord
+    ID: 4
+    NEXT: ~
+    X: 48
+    Y: 122
+    prop:
+      title: List to Record
+  - CLASS: Sprog::Gear::ReadFile
+    ID: 1
+    NEXT: ~
+    X: 48
+    Y: 42
+    prop:
+      filename: /home/gabor/gtk/phonebook.csv
+      title: Read File
+  - CLASS: Sprog::Gear::CSVSplit
+    ID: 3
+    NEXT: 4
+    X: 48
+    Y: 82
+    prop:
+      title: CSV Split
+  - CLASS: Sprog::Gear::PerlCodeHP
+    ID: 5
+    NEXT: ~
+    X: 48
+    Y: 162
+    prop:
+      perl_code: 'print join ";", keys %rec;'
+      title: Perl Code

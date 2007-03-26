@@ -1,0 +1,31 @@
+
+
+                                             Szabo Gabor
+                                           www.szabgab.com
+
+                                               GTK+Perl
+
+
+
+
+
+
+
+
+
+* Archway
+* Sprog
+* Zim
+
+* GTK+Perl Demo (in several languages)       www.szabgab.com
+
+
+
+* Simple example
+    gtk2/tutorial/box_and_button.pl
+    Tutorial/Data Entry and Label Change
+
+* Glade example    (gtk2/glade/phonebook)
+    gtk2/glade/entry/
+
+
