@@ -1,0 +1,22 @@
+#!/usr/bin/perl -w
+use strict;
+
+#use Gtk2::TestHelper tests => 2;
+
+#ok(1);
+use X11::GUITest qw(:ALL);
+
+StartApp('gedit');
+
+my ($GEditWinId) = WaitWindowViewable('gedit');
+die "Couldn't find gedit window in time!" if not $GEditWinId;
+
+SendKeys("Hello, how are you?\n");
+# Close Application (Alt-f, q).
+SendKeys('%(f)q');
+#if (WaitWindowViewable('Question', undef, 5)) {
+if (WaitWindowViewable('', $GEditWinId, 5)) {
+  # DoN't Save (Alt-n)
+	SendKeys('%(n)');
+}
+
