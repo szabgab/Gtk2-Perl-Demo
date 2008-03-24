@@ -31,9 +31,7 @@ my $sw;
 my $history_opt;
 my ($widgets_store, $widgets_view, $widgets_scroll);
 my ($files_store, $files_view, $files_scroll);
-my $notebook;
 my $window;
-my $search_entry;
 my $widgets;
 
 {
@@ -74,10 +72,8 @@ sub build_gui {
     ###### Main box
     my $main_vbox = Gtk2::VBox->new();
     $window->add($main_vbox);
-    
-    
-    _add_menu_row($main_vbox);
-
+    my $menu_row = _create_menu_row();
+    $main_vbox->pack_start($menu_row, FALSE, FALSE, 5);
    
     ####################### History row
     my $history_row = Gtk2::HBox->new();
@@ -108,10 +104,11 @@ sub build_gui {
     
     ($files_store, $files_view, $files_scroll) = create_tree();
     ($widgets_store, $widgets_view, $widgets_scroll) = create_tree();
-    $notebook = Gtk2::Notebook->new();
+    my $notebook = Gtk2::Notebook->new();
     $hbox->add($notebook);
     $notebook->append_page($files_scroll, "Files");
     $notebook->append_page($widgets_scroll, "Widgets");
+    set_widget(notebook => $notebook);
     
     list_examples($files_store, $files_store, undef, $entries);
     list_widgets($widgets);
@@ -149,9 +146,9 @@ sub build_gui {
     ################ Add accelerators to the code
     my @accels = (
         { key => 'S', mod => 'control-mask', 
-                func => sub {$search_entry->grab_focus(); get_widget('button_all')->set_active(TRUE);} },
+                func => sub {get_widget('search_entry')->grab_focus(); get_widget('button_all')->set_active(TRUE);} },
         { key => 'F', mod => 'control-mask', 
-                func => sub {$search_entry->grab_focus(); get_widget('button_buffer')->set_active(TRUE); }},
+                func => sub {get_widget('search_entry')->grab_focus(); get_widget('button_buffer')->set_active(TRUE); }},
         { key => 'N', mod => 'control-mask', 
                 func => \&search_again},
     );
@@ -315,7 +312,7 @@ sub _translate_tree_selection {
 
 sub button_release {
     my ($self, $event) = @_;
-    if ($notebook->get_current_page()) {
+    if (get_widget('notebook')->get_current_page()) {
         select_widget(); # 1
     } else {
         select_example(); # 0
@@ -394,7 +391,7 @@ sub show_text {
 
 
 sub search {
-    my $search_text = $search_entry->get_text;
+    my $search_text = get_widget('search_entry')->get_text;
     if (get_widget('button_all')->get_active()) {
         my %hits = _search($search_text, $entries); 
         show_search_results(%hits);
@@ -406,7 +403,7 @@ sub search {
 }
 
 sub search_again {
-    my $search_text = $search_entry->get_text;
+    my $search_text = get_widget('search_entry')->get_text;
     return if not $search_text;
     search_buffer($search_text, "next");
 }
@@ -527,7 +524,7 @@ sub sourceview {
 sub right_click {
     my ($check, $event) = @_;
 
-    return if not $notebook->get_current_page();
+    return if not get_widget('notebook')->get_current_page();
     #print "click pressed\n";
     if (3 eq $event->button) {
         my ($path, $col) = $widgets_view->get_cursor(); 
@@ -564,11 +561,8 @@ sub _add_radio_buttons {
     set_widget(button_buffer => $button_buffer);
 }
 
-sub _add_menu_row {
-    my $main_vbox = shift;
-    #### Menu row
+sub _create_menu_row {
     my $menu_row = Gtk2::HBox->new();
-    $main_vbox->pack_start($menu_row, FALSE, FALSE, 5);
     
     my $execute_button = Gtk2::Button->new_from_stock('gtk-execute');
     $execute_button->signal_connect(clicked=> \&execute_code);
@@ -578,9 +572,10 @@ sub _add_menu_row {
     $save_button->signal_connect(clicked=> \&save_code);
     $menu_row->pack_start($save_button, FALSE, FALSE, 5);
     
-    $search_entry = Gtk2::Entry->new;
+    my $search_entry = Gtk2::Entry->new;
     $search_entry->set_activates_default (TRUE);
     $menu_row->pack_start($search_entry, FALSE, FALSE, 5);
+    set_widget(search_entry => $search_entry);
    
     _add_radio_buttons($menu_row);
     
@@ -593,6 +588,7 @@ sub _add_menu_row {
     my $exit_button = Gtk2::Button->new_from_stock('gtk-quit');
     $exit_button->signal_connect(clicked=> sub { Gtk2->main_quit; });
     $menu_row->pack_end($exit_button, FALSE, FALSE, 5);
+    return $menu_row;
 }    
   
 1;
