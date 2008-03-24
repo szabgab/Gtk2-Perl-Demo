@@ -9,6 +9,8 @@ use File::Temp qw(tempfile);
 use Time::HiRes qw(usleep);
 use Getopt::Long qw(GetOptions);
 
+sub say { print @_, "\n"; }
+
 eval "use Gtk2::SourceView;";
 my $sourceview = not $@;
 if ($@) {
@@ -44,7 +46,9 @@ collect_widgets(\@entries);
 my $window = Gtk2::Window->new;
 $window->set_title($app_title);
 $window->signal_connect (destroy => sub { Gtk2->main_quit; });
-$window->set_default_size(400, 350);
+my $HEIGHT = 700;
+my $WIDTH = 600;
+$window->set_default_size($WIDTH, $HEIGHT);
 
 ###### Main box
 my $main_vbox = Gtk2::VBox->new();
@@ -138,6 +142,7 @@ $main_vbox->pack_start($lower_pane, TRUE, TRUE, 5);
 ###### Left pane, file or Widget listing
 my $hbox = Gtk2::HPaned->new();
 $lower_pane->add1($hbox);
+#$lower_pane->add($hbox);
 
 my ($files_store, $files_view, $files_scroll) = create_tree();
 my ($widgets_store, $widgets_view, $widgets_scroll) = create_tree();
@@ -195,8 +200,7 @@ my $sw = Gtk2::ScrolledWindow->new;
 $sw->set_shadow_type ('in');
 $sw->set_policy ('automatic', 'automatic');
 $lower_pane->add2($sw);
-$lower_pane->set_position(450);
-show_search_results();
+$lower_pane->set_position($HEIGHT-300);
 
 
 ################ Add accelerators to the code
@@ -216,9 +220,49 @@ foreach my $a (@accels) {
 }
 $window->add_accel_group ($accel_group);
 #################
+_add_results_box();
 
 $window->show_all();
 Gtk2->main;
+
+####### building gui
+sub _add_results_box {
+    my $model = Gtk2::ListStore->new ('Glib::String', 'Glib::String', 'Glib::String');
+	my $results_view = Gtk2::TreeView->new_with_model ($model);
+
+	# double click:
+	#$results_view->signal_connect ('row-activated' => sub { print "clicked\n"; } );
+    # click:
+	$results_view->signal_connect ('cursor-changed' => sub {
+		# $_[0] is a GtkTreeSelection
+        #Gtk2::TreeView
+		#print "xxx $_[0]\n";
+        #return;
+		my ($some_tree_view) = $_[0]; #$sw->get_children;
+		my $model  = $some_tree_view->get_model();
+		my $tree_selection  = $some_tree_view->get_selection();
+		#my @sel    = $_[0]->get_selected_rows;
+		my $iter   = $tree_selection->get_selected();
+        #print "iter: $iter\n";
+		my ($file, $text, $title) = $model->get($iter, $SEARCH_FILENAME, $SEARCH_TEXT, $SEARCH_TITLE); 
+		show_file($buffer, $file, $title);
+		search_buffer($text);
+	});
+	
+	$sw->add ($results_view);
+
+    #$results_view->set_position(200);
+
+	my @titles = ("Filename", "_Result Line");
+	foreach my $i (0..@titles-1) {
+		my $renderer = Gtk2::CellRendererText->new;
+		my $column = Gtk2::TreeViewColumn->new_with_attributes ($titles[$i], 
+							$renderer, 
+							text => $i);
+		$results_view->append_column ($column);
+	}
+}
+
 
 ############################### END ################################
 
@@ -443,8 +487,12 @@ sub _search {
 	return %resp;
 }
 
+
+
 sub show_search_results {
 	my (%hits) = @_;
+    return if not %hits;
+#print Dumper \%hits;
 	my $model = Gtk2::ListStore->new ('Glib::String', 'Glib::String', 'Glib::String');
 
 	foreach my $file (keys %hits) {
@@ -460,37 +508,11 @@ sub show_search_results {
 
 	my ($results_view) = $sw->get_children();
 	if ($results_view) {
+        #print "$results_view\n";
 		$results_view->set_model($model);
-		return;
+        $results_view->set_cursor(Gtk2::TreePath->new(0));
 	}
-
-	$results_view = Gtk2::TreeView->new_with_model ($model);
-
-	#$results_view->set_reorderable (TRUE);
-	#$model->signal_connect (rows_reordered => sub {print "rows reordered\n"});
-	#$results_view->get_selection->set_mode ('multiple');
-	$results_view->get_selection->signal_connect (changed => sub {
-		# $_[0] is a GtkTreeSelection
-		my ($some_tree_view) = $sw->get_children;
-		my $model  = $some_tree_view->get_model();
-		my @sel    = $_[0]->get_selected_rows;
-		my $iter   = $_[0]->get_selected();
-		my ($file, $text, $title) = $model->get($iter, $SEARCH_FILENAME, $SEARCH_TEXT, $SEARCH_TITLE); 
-		show_file($buffer, $file, $title);
-		search_buffer($text);
-	});
-	
-	$sw->add ($results_view);
-
-
-	my @titles = ("Filename", "_Result Line");
-	foreach my $i (0..@titles-1) {
-		my $renderer = Gtk2::CellRendererText->new;
-		my $column = Gtk2::TreeViewColumn->new_with_attributes ($titles[$i], 
-							$renderer, 
-							text => $i);
-		$results_view->append_column ($column);
-	}
+	return;
 }
 
 sub search_buffer {
