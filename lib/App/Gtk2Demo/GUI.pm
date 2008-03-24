@@ -15,9 +15,9 @@ my ($ENTRY_NAME, $ENTRY_TYPE, $ENTRY_FILE) = (0, 1, 2);
 my ($SEARCH_FILENAME, $SEARCH_TEXT, $SEARCH_TITLE) = (0, 1, 2);
 
 my $background;
-my @entries;
+my $entries;
 sub set_entries {
-    @entries = @_;
+    $entries = shift;
 }
 
 my $HISTORY_LIMIT = 20;
@@ -26,7 +26,6 @@ my $history;
 
 my $app_title = "GTK+ Perl binding Tutorial and code demos";
 my %files;
-my %widgets;
 my ($buffer, $textview);
 my $sw;
 my $history_opt;
@@ -36,8 +35,23 @@ my $notebook;
 my $window;
 my $search_entry;
 my $button_all;
+my $widgets;
+
+{
+    my %widget;
+    sub get_widget {
+        my ($name) = @_;
+        return $widget{$name};
+    }
+    sub set_widget {
+        my ($name, $value) = @_;
+        $widget{$name} = $value;
+        return;
+    }
+}
 
 sub build_gui {
+    ($widgets) = @_;
     eval "use Gtk2::SourceView;";
     my $sourceview = not $@;
     if ($@) {
@@ -49,8 +63,6 @@ sub build_gui {
         "sourceview|s" => \$sourceview,
         );
 
-
-    collect_widgets(\@entries);
  
     ##### Main window
     $window = Gtk2::Window->new;
@@ -148,8 +160,8 @@ sub build_gui {
     $notebook->append_page($files_scroll, "Files");
     $notebook->append_page($widgets_scroll, "Widgets");
     
-    list_examples($files_store, $files_store, undef, \@entries);
-    list_widgets();
+    list_examples($files_store, $files_store, undef, $entries);
+    list_widgets($widgets);
     
     
     if ($sourceview) {
@@ -329,10 +341,11 @@ sub list_examples {
 
 
 sub list_widgets {
-    foreach my $widget (sort keys %widgets) {
+    my ($widgets) = @_;
+    foreach my $widget (sort keys %$widgets) {
         my $child = $widgets_store->append(undef);
         $widgets_store->set($child, 0, $widget);
-        foreach my $file (sort keys %{$widgets{$widget}}) {
+        foreach my $file (sort keys %{$widgets->{$widget}}) {
             my $grandchild = $widgets_store->append($child);
             $widgets_store->set($grandchild, 0, $file);
         }
@@ -378,12 +391,12 @@ sub build_podview {
 sub select_widget {
     my ($path, $col) = $widgets_view->get_cursor(); 
     my @c = split /:/, $path->to_string;
-    my $widget = (sort keys %widgets)[$c[0]];
+    my $widget = (sort keys %$widgets)[$c[0]];
     if (@c == 1) {
         show_text($buffer, "Please select one of the files to examples for $widget");
     } elsif (@c == 2) {
-        my $filename = (sort keys %{$widgets{$widget}})[$c[1]];
-        show_file($buffer, $filename, $widgets{$widget}{$filename});
+        my $filename = (sort keys %{$widgets->{$widget}})[$c[1]];
+        show_file($buffer, $filename, $widgets->{$widget}{$filename});
     } else {
         show_text($buffer, "Internal error, bad tree item: " . $path->to_string);
     }
@@ -427,32 +440,10 @@ sub show_text {
 }
 
 
-sub collect_widgets {
-    my ($entries) = @_;
-
-    foreach my $entry (@$entries) {
-        if ($entry->{type} eq "file") {
-            analyze_file($entry->{name}, $entry->{title});
-        }
-        collect_widgets($entry->{more}) if $entry->{more};
-    }
-    return;
-}
-
-sub analyze_file {
-    my ($file, $title) = @_;
-    open my $fh, $file or return;
-    while (my $line = <$fh>) {
-        if ($line =~ /(Gtk2::\w+(:?::\w+)*)/) {
-            $widgets{$1}{$file} = $title;
-        }
-    }
-}   
-
 sub search {
     my $search_text = $search_entry->get_text;
     if ($button_all->get_active()) {
-        my %hits = _search($search_text, \@entries); 
+        my %hits = _search($search_text, $entries); 
         show_search_results(%hits);
 
     } else { # $button_buffer (this is the default if nothing is selected)
@@ -588,7 +579,7 @@ sub right_click {
     if (3 eq $event->button) {
         my ($path, $col) = $widgets_view->get_cursor(); 
         my @c = split /:/, $path->to_string;
-        my $widget = (sort keys %widgets)[$c[0]];
+        my $widget = (sort keys %$widgets)[$c[0]];
         build_podview($widget);
         #print "right click pressed\n";
     }

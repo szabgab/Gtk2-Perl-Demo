@@ -7,8 +7,10 @@ our $VERSION = '0.05';
 use App::Gtk2Demo::GUI;
 
 sub run {
-    App::Gtk2Demo::GUI::set_entries(entries());
-    App::Gtk2Demo::GUI::build_gui;
+    my $entries = entries();
+    collect_widgets($entries);
+    App::Gtk2Demo::GUI::set_entries($entries);
+    App::Gtk2Demo::GUI::build_gui(get_widgets());
 
 }
 
@@ -36,12 +38,11 @@ sub run {
 #}
 
 sub check_entries {
-    my @entries = entries();
-    check_files(\@entries);
+    check_files(entries());
     print "All the files are readable\n";
 }
 
-# check if we can read all the files listed in the entries.pl file
+# check if we can read all the files listed here
 sub check_files {
     my ($entries) = @_;
     foreach my $entry (@$entries) {
@@ -50,9 +51,36 @@ sub check_files {
     }
 }
 
+{
+    my %widgets;
+    sub collect_widgets {
+        my ($entries) = @_;
+    
+        foreach my $entry (@$entries) {
+            if ($entry->{type} eq "file") {
+                analyze_file($entry->{name}, $entry->{title});
+            }
+            collect_widgets($entry->{more}) if $entry->{more};
+        }
+        return;
+    }
+    
+    sub analyze_file {
+        my ($file, $title) = @_;
+        open my $fh, $file or return;
+        while (my $line = <$fh>) {
+            if ($line =~ /(Gtk2::\w+(:?::\w+)*)/) {
+                $widgets{$1}{$file} = $title;
+            }
+        }
+    }
+    sub get_widgets {
+        return \%widgets;
+    }
+}
 
 sub entries {
-    return (
+    return [ 
     {
         title => "Welcome",
         type  => "text",
@@ -435,7 +463,7 @@ sub entries {
         type  => "text",
         name  => "about.txt",
     },
-    );
+    ];
 }
 
 1;
