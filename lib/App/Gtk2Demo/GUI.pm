@@ -92,12 +92,7 @@ sub build_gui {
     $search_entry = Gtk2::Entry->new;
     $search_entry->set_activates_default (TRUE);
     $menu_row->pack_start($search_entry, FALSE, FALSE, 5);
-    #$search_entry->signal_connect ('insert-text' => sub {
-    #       my ($widget, $string, $len, $position) = @_;
-    #       #$window->set_default($search_button);
-    #       return();
-    #});
-    
+   
     #### Radio buttons
     my $radio_buttons = Gtk2::HBox->new();
     $menu_row->pack_start($radio_buttons, FALSE, FALSE, 0);
@@ -113,13 +108,11 @@ sub build_gui {
     $button_buffer->show;
     ###############
     
-    my $search_button = Gtk2::Button->new_from_stock('gtk-find');
-    $search_button->signal_connect(clicked=> \&search);
+    my $search_button = _create_search_button();
     $menu_row->pack_start($search_button, FALSE, FALSE, 5);
-    $search_button->can_default(TRUE);
     $window->set_default($search_button);
-    
-    
+    set_widget(search_button => $search_button);
+   
     
     my $exit_button = Gtk2::Button->new_from_stock('gtk-quit');
     $exit_button->signal_connect(clicked=> sub { Gtk2->main_quit; });
@@ -585,6 +578,13 @@ sub right_click {
     }
 }
 
+sub _create_search_button {
+    my $button = Gtk2::Button->new_from_stock('gtk-find');
+    $button->signal_connect(clicked=> \&search);
+    $button->can_default(TRUE);
+    return $button;
+}
+ 
 1;
 
 
