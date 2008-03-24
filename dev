@@ -1,0 +1,2 @@
+perl -I lib create_glade
+perl -I lib bin/gtk2demo.pl $@
