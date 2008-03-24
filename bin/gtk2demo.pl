@@ -1,6 +1,6 @@
 #!/usr/bin/perl 
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 use App::Gtk2Demo;
 
