@@ -34,7 +34,6 @@ my ($files_store, $files_view, $files_scroll);
 my $notebook;
 my $window;
 my $search_entry;
-my $button_all;
 my $widgets;
 
 {
@@ -93,20 +92,7 @@ sub build_gui {
     $search_entry->set_activates_default (TRUE);
     $menu_row->pack_start($search_entry, FALSE, FALSE, 5);
    
-    #### Radio buttons
-    my $radio_buttons = Gtk2::HBox->new();
-    $menu_row->pack_start($radio_buttons, FALSE, FALSE, 0);
-    
-    $button_all = Gtk2::RadioButton->new(undef, "All files");
-    $radio_buttons->pack_start($button_all, TRUE, TRUE, 0);
-    $button_all->set_active(TRUE);
-    $button_all->show;
-    my @group = $button_all->get_group;
-    
-    my $button_buffer = Gtk2::RadioButton->new_with_label(@group, "Current buffer");
-    $radio_buttons->pack_start($button_buffer, TRUE, TRUE, 0);
-    $button_buffer->show;
-    ###############
+    _add_radio_buttons($menu_row);
     
     my $search_button = _create_search_button();
     $menu_row->pack_start($search_button, FALSE, FALSE, 5);
@@ -189,9 +175,9 @@ sub build_gui {
     ################ Add accelerators to the code
     my @accels = (
         { key => 'S', mod => 'control-mask', 
-                func => sub {$search_entry->grab_focus(); $button_all->set_active(TRUE);} },
+                func => sub {$search_entry->grab_focus(); get_widget('button_all')->set_active(TRUE);} },
         { key => 'F', mod => 'control-mask', 
-                func => sub {$search_entry->grab_focus(); $button_buffer->set_active(TRUE); }},
+                func => sub {$search_entry->grab_focus(); get_widget('button_buffer')->set_active(TRUE); }},
         { key => 'N', mod => 'control-mask', 
                 func => \&search_again},
     );
@@ -435,11 +421,11 @@ sub show_text {
 
 sub search {
     my $search_text = $search_entry->get_text;
-    if ($button_all->get_active()) {
+    if (get_widget('button_all')->get_active()) {
         my %hits = _search($search_text, $entries); 
         show_search_results(%hits);
 
-    } else { # $button_buffer (this is the default if nothing is selected)
+    } else { # button_buffer (this is the default if nothing is selected)
         #print "Search in text\n";
         search_buffer($search_text);
     }
@@ -584,6 +570,26 @@ sub _create_search_button {
     $button->can_default(TRUE);
     return $button;
 }
+
+sub _add_radio_buttons {
+    my $menu_row = shift;
+
+    my $radio_buttons = Gtk2::HBox->new();
+    $menu_row->pack_start($radio_buttons, FALSE, FALSE, 0);
+    
+    my $button_all = Gtk2::RadioButton->new(undef, "All files");
+    $radio_buttons->pack_start($button_all, TRUE, TRUE, 0);
+    $button_all->set_active(TRUE);
+    $button_all->show;
+    my @group = $button_all->get_group;
+    set_widget(button_all => $button_all);
+    
+    my $button_buffer = Gtk2::RadioButton->new_with_label(@group, "Current buffer");
+    $radio_buttons->pack_start($button_buffer, TRUE, TRUE, 0);
+    $button_buffer->show;
+    set_widget(button_buffer => $button_buffer);
+}
+
  
 1;
 
