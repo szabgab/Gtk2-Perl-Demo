@@ -76,35 +76,9 @@ sub build_gui {
     $window->add($main_vbox);
     
     
-    #### Menu row
-    my $menu_row = Gtk2::HBox->new();
-    $main_vbox->pack_start($menu_row, FALSE, FALSE, 5);
-    
-    my $execute_button = Gtk2::Button->new_from_stock('gtk-execute');
-    $execute_button->signal_connect(clicked=> \&execute_code);
-    $menu_row->pack_start($execute_button, FALSE, FALSE, 5);
-    
-    my $save_button = Gtk2::Button->new_from_stock('gtk-save');
-    $save_button->signal_connect(clicked=> \&save_code);
-    $menu_row->pack_start($save_button, FALSE, FALSE, 5);
-    
-    $search_entry = Gtk2::Entry->new;
-    $search_entry->set_activates_default (TRUE);
-    $menu_row->pack_start($search_entry, FALSE, FALSE, 5);
+    _add_menu_row($main_vbox);
+
    
-    _add_radio_buttons($menu_row);
-    
-    my $search_button = _create_search_button();
-    $menu_row->pack_start($search_button, FALSE, FALSE, 5);
-    $window->set_default($search_button);
-    set_widget(search_button => $search_button);
-   
-    
-    my $exit_button = Gtk2::Button->new_from_stock('gtk-quit');
-    $exit_button->signal_connect(clicked=> sub { Gtk2->main_quit; });
-    $menu_row->pack_end($exit_button, FALSE, FALSE, 5);
-    
-    
     ####################### History row
     my $history_row = Gtk2::HBox->new();
     $main_vbox->pack_start($history_row, FALSE, FALSE, 5);
@@ -590,7 +564,37 @@ sub _add_radio_buttons {
     set_widget(button_buffer => $button_buffer);
 }
 
- 
+sub _add_menu_row {
+    my $main_vbox = shift;
+    #### Menu row
+    my $menu_row = Gtk2::HBox->new();
+    $main_vbox->pack_start($menu_row, FALSE, FALSE, 5);
+    
+    my $execute_button = Gtk2::Button->new_from_stock('gtk-execute');
+    $execute_button->signal_connect(clicked=> \&execute_code);
+    $menu_row->pack_start($execute_button, FALSE, FALSE, 5);
+    
+    my $save_button = Gtk2::Button->new_from_stock('gtk-save');
+    $save_button->signal_connect(clicked=> \&save_code);
+    $menu_row->pack_start($save_button, FALSE, FALSE, 5);
+    
+    $search_entry = Gtk2::Entry->new;
+    $search_entry->set_activates_default (TRUE);
+    $menu_row->pack_start($search_entry, FALSE, FALSE, 5);
+   
+    _add_radio_buttons($menu_row);
+    
+    my $search_button = _create_search_button();
+    $menu_row->pack_start($search_button, FALSE, FALSE, 5);
+    $window->set_default($search_button);
+    set_widget(search_button => $search_button);
+   
+    
+    my $exit_button = Gtk2::Button->new_from_stock('gtk-quit');
+    $exit_button->signal_connect(clicked=> sub { Gtk2->main_quit; });
+    $menu_row->pack_end($exit_button, FALSE, FALSE, 5);
+}    
+  
 1;
 
 
