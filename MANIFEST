@@ -1,9 +1,9 @@
 Makefile.PL
+Build.PL
 README
 MANIFEST
 Changes
 
-entries.pl
 about.txt
 welcome.txt
 

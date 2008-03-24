@@ -14,10 +14,7 @@ my $build = Module::Build->new(
     script_files       => 'bin/gtk2demo.pl',
     requires           => {
             'Gtk2'                   => '1.080', 
-            'Gtk2::GladeXML'         => '0',
-            'App::Ack'               => '1.64',
-            'File::HomeDir'          => '0',
-            'YAML'                   => '0',
+#            'Gtk2::GladeXML'         => '0',
 
             'Carp'                   => '0',
             'Cwd'                    => '0',
@@ -25,8 +22,6 @@ my $build = Module::Build->new(
     },
     build_requires     => {
             'Test::More'             => '0',
-            'Test::Pod'              => '0',
-            'Test::Pod::Coverage'    => '0',
     },
 );
 

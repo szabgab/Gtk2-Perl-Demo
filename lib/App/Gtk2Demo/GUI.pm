@@ -15,7 +15,11 @@ my ($ENTRY_NAME, $ENTRY_TYPE, $ENTRY_FILE) = (0, 1, 2);
 my ($SEARCH_FILENAME, $SEARCH_TEXT, $SEARCH_TITLE) = (0, 1, 2);
 
 my $background;
-my @entries = do "entries.pl"; 
+my @entries;
+sub set_entries {
+    @entries = @_;
+}
+
 my $HISTORY_LIMIT = 20;
 my @history;
 my $history;

@@ -1,4 +1,7 @@
 
 0.05
     - add tutorial/password.pl
+    - move the code of the GUI to App::Gtk2Demo::GUI
+    - release the whole application as CPAN module App::Gtk2Demo
+    - use Module::Build for distribution
 
