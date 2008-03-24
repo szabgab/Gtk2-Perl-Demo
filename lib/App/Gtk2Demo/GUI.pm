@@ -27,8 +27,6 @@ my $history;
 my $app_title = "GTK+ Perl binding Tutorial and code demos";
 my %files;
 my ($buffer, $textview);
-my $sw;
-my $history_opt;
 my ($widgets_store, $widgets_view, $widgets_scroll);
 my ($files_store, $files_view, $files_scroll);
 my $window;
@@ -82,10 +80,10 @@ sub build_gui {
     my $history_label = Gtk2::Label->new("History");
     $history_row->pack_start($history_label, FALSE, FALSE, 5);
     
-    $history_opt = Gtk2::OptionMenu->new;
-
+    my $history_opt = Gtk2::OptionMenu->new;
     #$history_opt->set_history (1);
     $history_row->pack_start($history_opt, FALSE, FALSE, 5);
+    set_widget(history_opt => $history_opt);
     
     my $history_button = Gtk2::Button->new_from_stock('gtk-jump-to');
     $history_button->signal_connect(clicked=> \&show_history);
@@ -113,15 +111,12 @@ sub build_gui {
     list_examples($files_store, $files_store, undef, $entries);
     list_widgets($widgets);
     
-    
     if ($sourceview) {
         ($textview, $buffer) = sourceview();
     } else {
         $buffer = Gtk2::TextBuffer->new();
         $textview = Gtk2::TextView->new_with_buffer($buffer);
     }
-    
-    
     show_file($buffer, "welcome.txt", "Welcome");
     
     $textview->set_wrap_mode("word");
@@ -134,65 +129,36 @@ sub build_gui {
     $hbox->add2($right_scroll);
     $hbox->set_position(200);
     
-    
     # pane for search results
-    $sw = Gtk2::ScrolledWindow->new;
+    my $sw = Gtk2::ScrolledWindow->new;
     $sw->set_shadow_type ('in');
     $sw->set_policy ('automatic', 'automatic');
     $lower_pane->add2($sw);
     $lower_pane->set_position($HEIGHT-300);
+    set_widget(sw => $sw);
     
+    my $results_view = _add_results_box();
+    $sw->add($results_view);
     
-    ################ Add accelerators to the code
-    my @accels = (
-        { key => 'S', mod => 'control-mask', 
-                func => sub {get_widget('search_entry')->grab_focus(); get_widget('button_all')->set_active(TRUE);} },
-        { key => 'F', mod => 'control-mask', 
-                func => sub {get_widget('search_entry')->grab_focus(); get_widget('button_buffer')->set_active(TRUE); }},
-        { key => 'N', mod => 'control-mask', 
-                func => \&search_again},
-    );
-    my $accel_group = Gtk2::AccelGroup->new;
-    use Gtk2::Gdk::Keysyms;
-    foreach my $a (@accels) {
-        $accel_group->connect ($Gtk2::Gdk::Keysyms{$a->{key}}, $a->{mod},
-                               'visible', $a->{func});
-    }
-    $window->add_accel_group ($accel_group);
-    #################
-    _add_results_box();
-    
+    _add_accelerators($window);
     $window->show_all();
     Gtk2->main;
 }
 
-####### building gui
 sub _add_results_box {
     my $model = Gtk2::ListStore->new ('Glib::String', 'Glib::String', 'Glib::String');
     my $results_view = Gtk2::TreeView->new_with_model ($model);
 
-    # double click:
-    #$results_view->signal_connect ('row-activated' => sub { print "clicked\n"; } );
-    # click:
     $results_view->signal_connect ('cursor-changed' => sub {
-        # $_[0] is a GtkTreeSelection
-        #Gtk2::TreeView
-        #print "xxx $_[0]\n";
-        #return;
-        my ($some_tree_view) = $_[0]; #$sw->get_children;
+        my ($some_tree_view) = $_[0]; #Gtk2::TreeView
         my $model  = $some_tree_view->get_model();
         my $tree_selection  = $some_tree_view->get_selection();
-        #my @sel    = $_[0]->get_selected_rows;
         my $iter   = $tree_selection->get_selected();
-        #print "iter: $iter\n";
         my ($file, $text, $title) = $model->get($iter, $SEARCH_FILENAME, $SEARCH_TEXT, $SEARCH_TITLE); 
         show_file($buffer, $file, $title);
         search_buffer($text);
     });
     
-    $sw->add ($results_view);
-
-    #$results_view->set_position(200);
 
     my @titles = ("Filename", "_Result Line");
     foreach my $i (0..@titles-1) {
@@ -202,6 +168,7 @@ sub _add_results_box {
                             text => $i);
         $results_view->append_column ($column);
     }
+    return $results_view;
 }
 
 sub create_tree {
@@ -232,7 +199,7 @@ sub list_history {
         $item->show;
         $history_menu->append ($item);
     }
-    $history_opt->set_menu ($history_menu);
+    get_widget('history_opt')->set_menu($history_menu);
 }
 
 
@@ -448,7 +415,7 @@ sub show_search_results {
         }
     }
 
-    my ($results_view) = $sw->get_children();
+    my ($results_view) = get_widget('sw')->get_children();
     if ($results_view) {
         #print "$results_view\n";
         $results_view->set_model($model);
@@ -590,7 +557,27 @@ sub _create_menu_row {
     $menu_row->pack_end($exit_button, FALSE, FALSE, 5);
     return $menu_row;
 }    
-  
+
+sub _add_accelerators {
+    my $window = shift;
+    my @accels = (
+        { key => 'S', mod => 'control-mask', 
+                func => sub {get_widget('search_entry')->grab_focus(); get_widget('button_all')->set_active(TRUE);} },
+        { key => 'F', mod => 'control-mask', 
+                func => sub {get_widget('search_entry')->grab_focus(); get_widget('button_buffer')->set_active(TRUE); }},
+        { key => 'N', mod => 'control-mask', 
+                func => \&search_again},
+    );
+    my $accel_group = Gtk2::AccelGroup->new;
+    use Gtk2::Gdk::Keysyms;
+    foreach my $a (@accels) {
+        $accel_group->connect ($Gtk2::Gdk::Keysyms{$a->{key}}, $a->{mod},
+                               'visible', $a->{func});
+    }
+    $window->add_accel_group($accel_group);
+}
+
+ 
 1;
 
 
