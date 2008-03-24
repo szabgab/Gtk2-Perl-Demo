@@ -35,6 +35,21 @@ sub run {
 #sub DESTROY {
 #}
 
+sub check_entries {
+    my @entries = entries();
+    check_files(\@entries);
+    print "All the files are readable\n";
+}
+
+# check if we can read all the files listed in the entries.pl file
+sub check_files {
+    my ($entries) = @_;
+    foreach my $entry (@$entries) {
+        open my $fh, $entry->{name} or die "Could not open $entry->{name} $!";
+        check_files($entry->{more}) if $entry->{more};
+    }
+}
+
 
 sub entries {
     return (
