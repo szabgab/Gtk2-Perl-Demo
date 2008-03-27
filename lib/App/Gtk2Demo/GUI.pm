@@ -25,8 +25,6 @@ my @history;
 my $history;
 
 my $app_title = "GTK+ Perl binding Tutorial and code demos";
-my %files;
-my ($buffer, $textview);
 my ($widgets_store, $widgets_view, $widgets_scroll);
 my ($files_store, $files_view, $files_scroll);
 my $window;
@@ -73,51 +71,29 @@ sub build_gui {
     my $menu_row = _create_menu_row();
     $main_vbox->pack_start($menu_row, FALSE, FALSE, 5);
    
-    ####################### History row
-    my $history_row = Gtk2::HBox->new();
+    my $history_row = _create_history_row();
     $main_vbox->pack_start($history_row, FALSE, FALSE, 5);
-    
-    my $history_label = Gtk2::Label->new("History");
-    $history_row->pack_start($history_label, FALSE, FALSE, 5);
-    
-    my $history_opt = Gtk2::OptionMenu->new;
-    #$history_opt->set_history (1);
-    $history_row->pack_start($history_opt, FALSE, FALSE, 5);
-    set_widget(history_opt => $history_opt);
-    
-    my $history_button = Gtk2::Button->new_from_stock('gtk-jump-to');
-    $history_button->signal_connect(clicked=> \&show_history);
-    $history_row->pack_start($history_button, FALSE, FALSE, 5);
-    
-    
+   
     ################# Add lower panes
     my $lower_pane = Gtk2::VPaned->new();
     $main_vbox->pack_start($lower_pane, TRUE, TRUE, 5);
     
-    
-    ###### Left pane, file or Widget listing
-    my $hbox = Gtk2::HPaned->new();
+    my $hbox = _create_left_pane();
     $lower_pane->add1($hbox);
-    #$lower_pane->add($hbox);
-    
-    ($files_store, $files_view, $files_scroll) = create_tree();
-    ($widgets_store, $widgets_view, $widgets_scroll) = create_tree();
-    my $notebook = Gtk2::Notebook->new();
-    $hbox->add($notebook);
-    $notebook->append_page($files_scroll, "Files");
-    $notebook->append_page($widgets_scroll, "Widgets");
-    set_widget(notebook => $notebook);
-    
     list_examples($files_store, $files_store, undef, $entries);
     list_widgets($widgets);
-    
+
+
+    my ($textview, $buffer);
     if ($sourceview) {
         ($textview, $buffer) = sourceview();
     } else {
         $buffer = Gtk2::TextBuffer->new();
         $textview = Gtk2::TextView->new_with_buffer($buffer);
     }
-    show_file($buffer, "welcome.txt", "Welcome");
+    set_widget(buffer   => $buffer);
+    set_widget(textview => $textview);
+    show_file("welcome.txt", "Welcome");
     
     $textview->set_wrap_mode("word");
     
@@ -155,7 +131,7 @@ sub _add_results_box {
         my $tree_selection  = $some_tree_view->get_selection();
         my $iter   = $tree_selection->get_selected();
         my ($file, $text, $title) = $model->get($iter, $SEARCH_FILENAME, $SEARCH_TEXT, $SEARCH_TITLE); 
-        show_file($buffer, $file, $title);
+        show_file($file, $title);
         search_buffer($text);
     });
     
@@ -216,6 +192,7 @@ sub save_code {
         if (-e $filename) {
             #print "filename $filename already exists\n";
         }
+        my $buffer = get_widget('buffer');
         if (open my $fh, ">", $filename) {
             print $fh $buffer->get_text($buffer->get_start_iter, $buffer->get_end_iter, 0);
         }
@@ -225,6 +202,7 @@ sub save_code {
 
 sub execute_code {
     my ($fh, $temp_filename) = tempfile();
+    my $buffer = get_widget('buffer');
     print $fh $buffer->get_text($buffer->get_start_iter, $buffer->get_end_iter, 0);
     $fh->flush;
     close $fh;
@@ -310,12 +288,12 @@ sub select_widget {
     my @c = split /:/, $path->to_string;
     my $widget = (sort keys %$widgets)[$c[0]];
     if (@c == 1) {
-        show_text($buffer, "Please select one of the files to examples for $widget");
+        show_text("Please select one of the files to examples for $widget");
     } elsif (@c == 2) {
         my $filename = (sort keys %{$widgets->{$widget}})[$c[1]];
-        show_file($buffer, $filename, $widgets->{$widget}{$filename});
+        show_file($filename, $widgets->{$widget}{$filename});
     } else {
-        show_text($buffer, "Internal error, bad tree item: " . $path->to_string);
+        show_text("Internal error, bad tree item: " . $path->to_string);
     }
 }
 
@@ -323,12 +301,12 @@ sub select_example {
     my ($name, $type, $file) = _translate_tree_selection();
     return if not $name; # maybe some error message ?
 
-    show_file($buffer, $file, $name);
+    show_file($file, $name);
     return;
 }
 
 sub show_file {
-    my ($buffer, $filename, $title) = @_;
+    my ($filename, $title) = @_;
     if ($filename =~ /.pl$/) {
         push @history, {
             filename => $filename,
@@ -347,15 +325,15 @@ sub show_file {
     } else {
         $code = "ERROR: Could not open $filename; $!";
     }
-    show_text($buffer, $code);
+    show_text($code);
 }
 
 sub show_text {
-    my ($buffer, $text) = @_;
+    my ($text) = @_;
+    my $buffer = get_widget('buffer'); 
     $buffer->delete($buffer->get_start_iter, $buffer->get_end_iter);
     $buffer->insert($buffer->get_iter_at_line(0), $text);
 }
-
 
 sub search {
     my $search_text = get_widget('search_entry')->get_text;
@@ -428,6 +406,7 @@ sub search_buffer {
     my ($text, $direction) = @_;
 
     #TextBuffer
+    my $buffer = get_widget('buffer');
     my $cont = $buffer->get_text($buffer->get_start_iter, $buffer->get_end_iter, 0);
     my $start_index = 0;
     if ($direction) {
@@ -446,6 +425,7 @@ sub search_buffer {
     my $start_iter = $buffer->get_iter_at_offset($start);
     my $end_iter   = $buffer->get_iter_at_offset($start+length($text));
     $buffer->select_range($start_iter, $end_iter);
+    my $textview = get_widget('textview');
     #$textview->scroll_to_iter($start_iter, 0.4, TRUE, 0.0, 0.0);
     my $mark = $buffer->create_mark("xxx", $start_iter, TRUE);
     $textview->scroll_to_mark($mark, 0.4, TRUE, 0.5, 0.5);
@@ -456,7 +436,7 @@ sub show_history {
     #my $item = $menu->get_active or return;
     #print Dumper $history;
     return if not $history;
-    show_file($buffer, $history->{filename}, $history->{title});
+    show_file($history->{filename}, $history->{title});
 }
 
 
@@ -577,7 +557,38 @@ sub _add_accelerators {
     $window->add_accel_group($accel_group);
 }
 
- 
+sub _create_history_row {
+    my $history_row = Gtk2::HBox->new();
+    
+    my $history_label = Gtk2::Label->new("History");
+    $history_row->pack_start($history_label, FALSE, FALSE, 5);
+    
+    my $history_opt = Gtk2::OptionMenu->new;
+    #$history_opt->set_history (1);
+    $history_row->pack_start($history_opt, FALSE, FALSE, 5);
+    set_widget(history_opt => $history_opt);
+    
+    my $history_button = Gtk2::Button->new_from_stock('gtk-jump-to');
+    $history_button->signal_connect(clicked=> \&show_history);
+    $history_row->pack_start($history_button, FALSE, FALSE, 5);
+    return $history_row;
+} 
+
+###### file or Widget listing
+sub _create_left_pane {
+    my $hbox = Gtk2::HPaned->new();
+    ($files_store, $files_view, $files_scroll) = create_tree();
+    ($widgets_store, $widgets_view, $widgets_scroll) = create_tree();
+    my $notebook = Gtk2::Notebook->new();
+    $hbox->add($notebook);
+    $notebook->append_page($files_scroll, "Files");
+    $notebook->append_page($widgets_scroll, "Widgets");
+    set_widget(notebook => $notebook);
+
+    return $hbox; 
+}
+
+  
 1;
 
 
