@@ -9,8 +9,6 @@ use File::Temp qw(tempfile);
 use Time::HiRes qw(usleep);
 use Getopt::Long qw(GetOptions);
 
-sub say { print @_, "\n"; }
-
 my ($ENTRY_NAME, $ENTRY_TYPE, $ENTRY_FILE) = (0, 1, 2);
 my ($SEARCH_FILENAME, $SEARCH_TEXT, $SEARCH_TITLE) = (0, 1, 2);
 
@@ -51,12 +49,6 @@ sub build_gui {
         warn "It would be nicer if you could install Gtk2::SourceView\n";
     }
 
-    GetOptions(
-        "background|b" => \$background,
-        "sourceview|s" => \$sourceview,
-        );
-
- 
     ##### Main window
     $window = Gtk2::Window->new;
     $window->set_title($app_title);
@@ -194,7 +186,7 @@ sub save_code {
         }
         my $buffer = get_widget('buffer');
         if (open my $fh, ">", $filename) {
-            print $fh $buffer->get_text($buffer->get_start_iter, $buffer->get_end_iter, 0);
+            print {$fh} $buffer->get_text($buffer->get_start_iter, $buffer->get_end_iter, 0);
         }
     }
     $file_chooser->destroy;
@@ -203,13 +195,13 @@ sub save_code {
 sub execute_code {
     my ($fh, $temp_filename) = tempfile();
     my $buffer = get_widget('buffer');
-    print $fh $buffer->get_text($buffer->get_start_iter, $buffer->get_end_iter, 0);
+    print {$fh} $buffer->get_text($buffer->get_start_iter, $buffer->get_end_iter, 0);
     $fh->flush;
     close $fh;
 
     usleep(1000); # to make sure the file was fully flushed by the OS 
-                  # it seems when we started to use fork, and later the background execution
-                  # ocassionally the file was not yet created by them the code reached system()
+                  # it seems when we started to use fork, and later the background execution mode
+                  # ocassionally the file was not yet created before the code reached system()
                   # very strange
     if ($^O =~ /win/i) {
         system("start $^X $temp_filename");
@@ -268,15 +260,20 @@ sub button_release {
 
 sub build_podview {
     my ($module) = @_;
-    eval "use Gtk2::PodViewer";
-    my $viewer = Gtk2::PodViewer->new;
-
+    eval "use Gtk2::Ex::PodViewer";
+    return if $@;
+    return;
+    print "display\n";
+    my $viewer = Gtk2::Ex::PodViewer->new;
+    print "V: $viewer\n";
     #$viewer->load(’/path/to/file.pod’); 
-    $viewer->load($module);       
-    $viewer->show;                  
+    $viewer->load($module);
+    print "loaded\n";
+    $viewer->show;
     my $window = Gtk2::Window->new;
     $window->add($viewer);
     $window->show;
+    print "showed\n";
 
     $window->signal_connect (destroy => sub { Gtk2->main_quit; });
 
@@ -418,7 +415,6 @@ sub search_buffer {
         $start_index = $iter->get_offset;
     }
     
-    
     my $start = index ($cont, $text, $start_index);
     return if $start == -1;
     #print "start: $start\n";
@@ -472,13 +468,15 @@ sub right_click {
     my ($check, $event) = @_;
 
     return if not get_widget('notebook')->get_current_page();
-    #print "click pressed\n";
+    #print "clicked\n";
     if (3 eq $event->button) {
+        print "right clicked\n";
         my ($path, $col) = $widgets_view->get_cursor(); 
         my @c = split /:/, $path->to_string;
         my $widget = (sort keys %$widgets)[$c[0]];
+        print "display pod for $widget\n";
         build_podview($widget);
-        #print "right click pressed\n";
+        print "right click done\n";
     }
 }
 
