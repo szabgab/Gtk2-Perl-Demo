@@ -3,9 +3,9 @@
 #
 # Copyright (C) 2003 by the gtk2-perl team (see the file AUTHORS for the full
 # list, See LICENSE for full terms.)
-# 
+#
 # -rm
-# 
+#
 # $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Gtk2/examples/adding_stock_icons.pl,v 1.2 2004/03/14 08:55:31 muppetman Exp $
 #
 

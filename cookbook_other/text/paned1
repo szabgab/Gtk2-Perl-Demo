@@ -19,13 +19,13 @@ $hpaned1->signal_connect( 'notify::position' => sub {
    my $pos2 = $hpaned2->get_position;
    $hpaned2->set_position( $pos1 ) if $pos1 != $pos2;
    } );
-			       
+
 $hpaned2->signal_connect( 'notify::position' => sub {
    my $pos1 = $hpaned1->get_position;
    my $pos2 = $hpaned2->get_position;
    $hpaned1->set_position( $pos2 ) if $pos1 != $pos2;
    } );
-							       
+
 my $vbox = Gtk2::VBox->new;
 $vbox->pack_start($hpaned1, 1,1,0);
 $vbox->pack_start($hpaned2 ,1,1,0);

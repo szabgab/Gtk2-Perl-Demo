@@ -3,17 +3,17 @@
 
 # flush the event queue
     Gtk2->main_iteration while Gtk2->events_pending;
-	
-#if you're blocking on IO, then you want to look at 
+
+#if you're blocking on IO, then you want to look at
     Glib::IO->add_watch().
-	
-#if you have a function call that blocks or an intensive algorithm, you 
-#may want to fork a child process to do that work, and monitor its 
+
+#if you have a function call that blocks or an intensive algorithm, you
+#may want to fork a child process to do that work, and monitor its
 #progress over a pipe.
 
 ##############################################################
 $toplevel->queue_draw;
-    
-will place a complete-redraw event on the queue to be handled at the 
-next idle.  you can call this on any widget if you want finer 
+
+will place a complete-redraw event on the queue to be handled at the
+next idle.  you can call this on any widget if you want finer
 granularity.

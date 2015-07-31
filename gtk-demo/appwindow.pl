@@ -16,7 +16,7 @@ my $window = undef;
 
 sub menuitem_cb {
   my ($callback_data, $callback_action, $widget) = @_;
-  
+
   my $dialog = Gtk2::MessageDialog->new ($callback_data,
                                          'destroy-with-parent',
                                          'info',
@@ -26,7 +26,7 @@ sub menuitem_cb {
 
   # Close dialog on user response
   $dialog->signal_connect (response => sub { $dialog->destroy; 1 });
-  
+
   $dialog->show;
 }
 
@@ -59,14 +59,14 @@ my @menu_items = (
 
 sub toolbar_cb {
   my ($button, $data) = @_;
-  
+
   my $dialog = Gtk2::MessageDialog->new ($data, 'destroy-with-parent',
                                          'info', 'close',
                                          "You selected a toolbar button");
 
   # Close dialog on user response
   $dialog->signal_connect (response => sub { $_[0]->destroy; 1 });
-  
+
   $dialog->show;
 }
 
@@ -87,12 +87,12 @@ sub register_stock_icons {
            label => "_GTK!",
         },
       );
-      
+
       $registered = TRUE;
 
       # Register our stock items
       Gtk2::Stock->add (@items);
-      
+
       # Add our custom icon factory to the list of defaults
       my $factory = Gtk2::IconFactory->new;
       $factory->add_default;
@@ -112,7 +112,7 @@ sub register_stock_icons {
 
              # The gtk-logo-rgb icon has a white background, make it transparent
              my $transparent = $pixbuf->add_alpha (TRUE, 0xff, 0xff, 0xff);
-          
+
              my $icon_set = Gtk2::IconSet->new_from_pixbuf ($transparent);
              $factory->add ("demo-gtk-logo", $icon_set);
           };
@@ -144,14 +144,14 @@ sub mark_set_callback {
 }
 
 
-sub do {  
+sub do {
   if (!$window) {
       register_stock_icons ();
-     
-      # 
+
+      #
       # Create the toplevel window
       #
-      
+
       $window = Gtk2::Window->new;
       $window->set_title ("Application Window");
 
@@ -159,17 +159,17 @@ sub do {
       $window->signal_connect (destroy => sub { $window = undef; 1 });
 
       my $table = Gtk2::Table->new (1, 4, FALSE);
-      
+
       $window->add ($table);
-      
+
       #
       # Create the menubar
       #
-      
+
       my $accel_group = Gtk2::AccelGroup->new;
       $window->add_accel_group ($accel_group);
-      
-      my $item_factory = Gtk2::ItemFactory->new ("Gtk2::MenuBar", "<main>", 
+
+      my $item_factory = Gtk2::ItemFactory->new ("Gtk2::MenuBar", "<main>",
                                                  $accel_group);
 
       # Set up item factory to go away with the window
@@ -227,7 +227,7 @@ sub do {
       $sw->set_policy ('automatic', 'automatic');
 
       $sw->set_shadow_type ('in');
-      
+
       $table->attach ($sw,
                       #  X direction     Y direction
                       0, 1,              2, 3,
@@ -235,7 +235,7 @@ sub do {
                       0,                 0);
 
       $window->set_default_size (200, 200);
-      
+
       my $contents = Gtk2::TextView->new;
 
       $sw->add ($contents);
@@ -251,18 +251,18 @@ sub do {
 
       # Show text widget info in the statusbar
       my $buffer = $contents->get_buffer;
-      
+
       $buffer->signal_connect (changed => \&update_statusbar, $statusbar);
 
       # mark-set means cursor moved
       $buffer->signal_connect (mark_set => \&mark_set_callback, $statusbar);
-      
+
       update_statusbar ($buffer, $statusbar);
   }
 
   if (!$window->visible) {
       $window->show_all;
-  } else {    
+  } else {
       $window->destroy;
       $window = undef;
   }

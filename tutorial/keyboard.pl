@@ -32,7 +32,7 @@ sub duplicate_keynames {
 $window->signal_connect (key_press_event => sub {
     my ($widget, $event) = @_;
     print "Keyval: ", $event->keyval, "\n";
-    print "Name  : ", $Values{$event->keyval}, "\n"; 
+    print "Name  : ", $Values{$event->keyval}, "\n";
     #return  unless $event->keyval == $Gtk2::Gdk::Keysyms{Escape};
     return 0;
 });

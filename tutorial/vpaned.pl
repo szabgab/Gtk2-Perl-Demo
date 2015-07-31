@@ -36,6 +36,6 @@ $main->add($lower_textview);
 $window->show_all();
 Gtk2->main;
 
-sub handle_exit { 
-	Gtk2->main_quit; 
+sub handle_exit {
+	Gtk2->main_quit;
 }

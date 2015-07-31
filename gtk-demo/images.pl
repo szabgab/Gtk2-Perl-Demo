@@ -39,7 +39,7 @@ sub error_popup {
 
 sub progressive_prepared_callback {
   my ($loader, $image) = @_;
-  
+
   my $pixbuf = $loader->get_pixbuf;
 
   #
@@ -47,7 +47,7 @@ sub progressive_prepared_callback {
   # isn't filled in yet.
   #
   $pixbuf->fill (0xaaaaaaff);
-  
+
   $image->set_from_pixbuf ($pixbuf);
 }
 
@@ -61,14 +61,14 @@ sub progressive_updated_callback {
   # instead of a GtkImage, so we could control the exact position of
   # the pixbuf on the display, then we could queue a draw for only
   # the updated area of the image.
-  # 
-  
+  #
+
   $image->queue_draw;
 }
 
 sub progressive_timeout {
   my $image = shift;
-  
+
   #
   # This shows off fully-paranoid error handling, so looks scary.
   # You could factor out the error handling code into a nice separate
@@ -105,7 +105,7 @@ sub progressive_timeout {
 
          close $image_stream;
          $image_stream = undef;
-	  
+
          $load_timeout = 0;
 
          return FALSE; # uninstall the timeout
@@ -124,12 +124,12 @@ sub progressive_timeout {
 	     error_popup ($window, "Failed to load image: $@");
 
 	     $pixbuf_loader = undef;
-	      
+
 	     $load_timeout = 0;
-	      
+
 	     return FALSE; # uninstall the timeout
 	  }
-	  
+
 	  $pixbuf_loader = undef;
      }
   } else {
@@ -161,12 +161,12 @@ sub progressive_timeout {
 	  $pixbuf_loader->close;
 	  $pixbuf_loader = undef;
       }
-      
+
       $pixbuf_loader = Gtk2::Gdk::PixbufLoader->new;
-      
+
       $pixbuf_loader->signal_connect (area_prepared =>
 			\&progressive_prepared_callback, $image);
-      
+
       $pixbuf_loader->signal_connect (area_updated =>
 			\&progressive_updated_callback, $image);
     }
@@ -195,7 +195,7 @@ sub cleanup_callback {
       Glib::Source->remove ($load_timeout);
       $load_timeout = 0;
   }
-  
+
   if ($pixbuf_loader) {
       $pixbuf_loader->close;
       $pixbuf_loader = undef;
@@ -217,7 +217,7 @@ sub toggle_sensitivity_callback {
            if $child != $togglebutton;
   }
 }
-  
+
 
 sub do {
   if (!$window) {
@@ -236,7 +236,7 @@ sub do {
       my $label = Gtk2::Label->new;
       $label->set_markup ("<u>Image loaded from a file</u>");
       $vbox->pack_start ($label, FALSE, FALSE, 0);
-      
+
       my $frame = Gtk2::Frame->new;
       $frame->set_shadow_type ('in');
       #
@@ -268,7 +268,7 @@ sub do {
           error_popup ($window,
                        "Unable to open image file 'gtk-logo-rgb.gif': $@");
       }
-	  
+
       my $image = Gtk2::Image->new_from_pixbuf ($pixbuf);
 
       $frame->add ($image);
@@ -279,7 +279,7 @@ sub do {
       $label = Gtk2::Label->new;
       $label->set_markup ("<u>Animation loaded from a file</u>");
       $vbox->pack_start ($label, FALSE, FALSE, 0);
-      
+
       $frame = Gtk2::Frame->new;
       $frame->set_shadow_type ('in');
       #
@@ -297,15 +297,15 @@ sub do {
       $image = Gtk2::Image->new_from_file ($filename);
 
       $frame->add ($image);
-      
+
 
       # Progressive
-      
-      
+
+
       $label = Gtk2::Label->new;
       $label->set_markup ("<u>Progressive image loading</u>");
       $vbox->pack_start ($label, FALSE, FALSE, 0);
-      
+
       $frame = Gtk2::Frame->new;
       $frame->set_shadow_type ('in');
       #

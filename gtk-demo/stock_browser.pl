@@ -18,7 +18,7 @@ my $window = undef;
 #
 # The C version of this sample defines a structure called StockItemInfo
 # to hold information about the stock items; it makes StockItemInfo into
-# a new boxed type so that, when used with the GtkListStore, all the 
+# a new boxed type so that, when used with the GtkListStore, all the
 # memory management happens properly.
 #
 # in perl we don't do such things.  the StockItemInfo structure becomes
@@ -55,17 +55,17 @@ sub create_model {
        if ($icon_set) {
            # See at which sizes this stock icon really exists
            my @sizes = $icon_set->get_sizes;
- 
+
            # Use menu size if it exists, otherwise first size found
            my $size = grep (@sizes, 'menu')
                     ? 'menu'
                     : $sizes[0];
-          
+
            $info{small_icon} = $window->render_icon ($info{id}, $size);
-          
+
            if ($size ne 'menu') {
                # Make the result the proper size for our thumbnail
-               $info{small_icon} = 
+               $info{small_icon} =
                          Gtk2::Gdk::Pixbuf->scale_simple ($info{small_icon},
                                          Gtk2::Icon->size_lookup ('menu'),
                                          'bilinear');
@@ -79,14 +79,14 @@ sub create_model {
 
        $info{macro} = id_to_macro ($info{id});
 
-       # something about redhat9's gnome setup registers a whole slew of 
+       # something about redhat9's gnome setup registers a whole slew of
        # stock items which don't return icons in this context.  i don't
        # know if it's because we don't do Gnome2::Program->init or what,
        # but it's really annoying, because it messes with lots of things,
        # and since you can't pass undef/null for an object property, we
        # can't tell the cell renderers to use NULL for the pixbufs.
        # so, we only add an entry for stock items which have icons.
-       if ($info{small_icon}) { 
+       if ($info{small_icon}) {
          my $iter = $store->append;
          $store->set ($iter, 0, \%info, 1, $id);
        }
@@ -121,7 +121,7 @@ sub selection_changed {
   my $selection = shift;
 
 #  warn "\n\nselection_changed  $selection";
-  
+
   my $treeview = $selection->get_tree_view;
   my $display = $treeview->{stock_display};
 
@@ -166,9 +166,9 @@ sub selection_changed {
 
 sub macro_set_func_text {
   my ($tree_column, $cell, $model, $iter) = @_;
-  
+
   my ($info) = $model->get ($iter, 0);
-  
+
   $cell->set (text => $info->{macro});
 }
 
@@ -180,9 +180,9 @@ sub macro_set_func_pixbuf {
 
 sub id_set_func {
   my ($tree_column, $cell, $model, $iter) = @_;
-  
+
   my ($info) = $model->get ($iter, 0);
-  
+
   $cell->set (text => $info->{id});
 }
 
@@ -217,11 +217,11 @@ sub do {
       $hbox->pack_start ($sw, FALSE, FALSE, 0);
 
       my $model = create_model ();
-      
+
       my $treeview = Gtk2::TreeView->new_with_model ($model);
 
       $sw->add ($treeview);
-      
+
       my $column = Gtk2::TreeViewColumn->new;
       $column->set_title ("Macro");
 
@@ -255,10 +255,10 @@ sub do {
                                                "ID",
                                                $cell_renderer,
                                                \&id_set_func);
-      
+
       my $align = Gtk2::Alignment->new (0.5, 0.0, 0.0, 0.0);
       $hbox->pack_end ($align, FALSE, FALSE, 0);
-      
+
       my $frame = Gtk2::Frame->new ("Selected Item");
       $align->add ($frame);
 
@@ -275,21 +275,21 @@ sub do {
       };
       $treeview->{stock_display} = $display;
 
-      $vbox->pack_start ($display->{type_label}, FALSE, FALSE, 0); 
-      $vbox->pack_start ($display->{icon_image}, FALSE, FALSE, 0); 
+      $vbox->pack_start ($display->{type_label}, FALSE, FALSE, 0);
+      $vbox->pack_start ($display->{icon_image}, FALSE, FALSE, 0);
       $vbox->pack_start ($display->{label_accel_label}, FALSE, FALSE, 0);
       $vbox->pack_start ($display->{macro_label}, FALSE, FALSE, 0);
       $vbox->pack_start ($display->{id_label}, FALSE, FALSE, 0);
 
       my $selection = $treeview->get_selection;
       $selection->set_mode ('single');
-      
+
       $selection->signal_connect (changed => \&selection_changed);
   }
 
   if (!$window->visible) {
       $window->show_all;
-  } else {	 
+  } else {
       $window->destroy;
       $window = undef;
   }

@@ -26,7 +26,7 @@ $event_box->signal_connect(motion_notify_event => \&motion_notify);
 
 # this will add any mouse motion, not only when B1 is down
 $event_box->set_events([qw/pointer-motion-mask/]);
-# to enable firing the event for every pixel your mouse moves.  
+# to enable firing the event for every pixel your mouse moves.
 # If that's too much, look into using pointer-motion-hint-mask[1].
 
 my $scrolled = Gtk2::ScrolledWindow->new;
@@ -44,11 +44,11 @@ Gtk2->main;
 sub motion_notify {
     my $widget = shift;	# GtkWidget         *widget
         my $event = shift;	# GdkEventButton    *event
-	
+
 	    my $x = $event->x;
 	        my $y = $event->y;
-		
+
 		    print "motion_notify $x,$y\n";
-		    
+
 		    }
-		    
+

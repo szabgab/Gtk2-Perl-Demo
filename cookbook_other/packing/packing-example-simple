@@ -14,15 +14,15 @@ my $vbox = Gtk2::VBox->new( FALSE, 6 );
 
 #$box = Gtk2->HBox->new($homogenous, $spacing);
 
-#The $homogeneous argument to Gtk2::HBox::new() 
-#(and the same for Gtk2::VBox::new()) controls 
-#whether each object in the box has the same size 
-#(i.e., the same width in an hbox, or the same 
-#height in a vbox). If it is set, the 
-#Gtk2::Box::pack() routines function essentially 
+#The $homogeneous argument to Gtk2::HBox::new()
+#(and the same for Gtk2::VBox::new()) controls
+#whether each object in the box has the same size
+#(i.e., the same width in an hbox, or the same
+#height in a vbox). If it is set, the
+#Gtk2::Box::pack() routines function essentially
 #as if the $expand argument was always turned on.
 
-#Spacing is added between objects, and padding is 
+#Spacing is added between objects, and padding is
 #added on either side of an object.
 
 $window->add($vbox);

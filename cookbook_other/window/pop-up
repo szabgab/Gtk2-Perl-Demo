@@ -39,4 +39,4 @@ return 0;
 sub delete_event {
 Gtk2->main_quit;
 return FALSE;
-}  
+}

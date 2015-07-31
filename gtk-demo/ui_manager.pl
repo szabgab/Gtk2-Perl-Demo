@@ -31,9 +31,9 @@ my @entries = (
   [ "ColorMenu",       undef,     "_Color"       ],
   [ "ShapeMenu",       undef,     "_Shape"       ],
   [ "HelpMenu",        undef,     "_Help"        ],
-  # name,      stock id,  label,    accelerator,  tooltip  
-  [ "New",    'gtk-new',  "_New",   "<control>N", "Create a new file", \&activate_action ],      
-  [ "Open",   'gtk-open', "_Open",  "<control>O", "Open a file",       \&activate_action ], 
+  # name,      stock id,  label,    accelerator,  tooltip
+  [ "New",    'gtk-new',  "_New",   "<control>N", "Create a new file", \&activate_action ],
+  [ "Open",   'gtk-open', "_Open",  "<control>O", "Open a file",       \&activate_action ],
   [ "Save",   'gtk-save', "_Save",  "<control>S", "Save current file", \&activate_action ],
   [ "SaveAs", 'gtk-save', "Save _As...", undef,   "Save to a file",    \&activate_action ],
   [ "Quit",   'gtk-quit', "_Quit",  "<control>Q", "Quit",              \&activate_action ],
@@ -43,8 +43,8 @@ my @entries = (
 
 my @toggle_entries = (
   [ "Bold", 'gtk-bold', "_Bold",               # name, stock id, label
-     "<control>B", "Bold",                     # accelerator, tooltip 
-    \&activate_action, TRUE ],                 # is_active 
+     "<control>B", "Bold",                     # accelerator, tooltip
+    \&activate_action, TRUE ],                 # is_active
 );
 
 use constant COLOR_RED   => 0;
@@ -52,7 +52,7 @@ use constant COLOR_GREEN => 1;
 use constant COLOR_BLUE  => 2;
 
 my @color_entries = (
-  # name,    stock id, label,    accelerator,  tooltip, value 
+  # name,    stock id, label,    accelerator,  tooltip, value
   [ "Red",   undef,    "_Red",   "<control>R", "Blood", COLOR_RED   ],
   [ "Green", undef,    "_Green", "<control>G", "Grass", COLOR_GREEN ],
   [ "Blue",  undef,    "_Blue",  "<control>B", "Sky",   COLOR_BLUE  ],
@@ -63,7 +63,7 @@ use constant SHAPE_RECTANGLE => 1;
 use constant SHAPE_OVAL      => 2;
 
 my @shape_entries = (
-  # name,        stock id, label,        accelerator,  tooltip,     value 
+  # name,        stock id, label,        accelerator,  tooltip,     value
   [ "Square",    undef,    "_Square",    "<control>S", "Square",    SHAPE_SQUARE ],
   [ "Rectangle", undef,    "_Rectangle", "<control>R", "Rectangle", SHAPE_RECTANGLE ],
   [ "Oval",      undef,    "_Oval",      "<control>O", "Egg",       SHAPE_OVAL ],
@@ -108,12 +108,12 @@ sub do {
   my $do_widget = shift;
 
   ###static GtkWidget *window = NULL;
-  
+
   if (!$window)
     {
       $window = Gtk2::Window->new;
       $window->set_screen ($do_widget->get_screen);
-      
+
       $window->signal_connect (destroy => sub { $window = undef });
       $window->signal_connect (delete_event => sub {TRUE});
 
@@ -130,7 +130,7 @@ sub do {
       $window->add_accel_group ($ui->get_accel_group);
       $window->set_title ("UI Manager");
       $window->set_border_width (0);
-      
+
 #      eval {
           $ui->add_ui_from_string ($ui_info);
 #	  Glib->message (undef, "building menus failed: %s", error->message);
@@ -139,7 +139,7 @@ sub do {
 
       my $box1 = Gtk2::VBox->new (FALSE, 0);
       $window->add ($box1);
-      
+
       $box1->pack_start ($ui->get_widget ("/MenuBar"), FALSE, FALSE, 0);
 
       my $label = Gtk2::Label->new ("Type\n<alt>\nto start");

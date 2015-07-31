@@ -62,7 +62,7 @@ $go->signal_connect (clicked => sub {
 
 my $quit = Gtk2::Button->new_from_stock ('gtk-quit');
 $vbox->pack_start ($quit, FALSE, FALSE, 0);
-$quit->signal_connect (clicked => sub { 
+$quit->signal_connect (clicked => sub {
 		$go->set_sensitive (FALSE);
 		$quit->set_sensitive (FALSE);
 		Worker->all_fired;
@@ -132,7 +132,7 @@ sub new
 	bless $self, $class;
 
 	# gui section
-	
+
 	my $label = Gtk2::Label->new ('Worker:');
 	$self->pack_start ($label, FALSE, FALSE, 0);
 
@@ -143,13 +143,13 @@ sub new
 	$self->{label} = $label;
 	$self->{progress} = $progress;
 	$self->{worklog} = $worklog;
-	
+
 	# thread section
 
 	$self->{child} = threads->new (\&_worker_thread, $self);
 
 	$_nworkers++;
-	
+
 	return $self;
 }
 
@@ -214,7 +214,7 @@ sub new
 	my $class = shift;
 
 	my $self = Gtk2::ScrolledWindow->new;
-	
+
 	my $buffer = Gtk2::TextBuffer->new;
 
 	my $view = Gtk2::TextView->new_with_buffer ($buffer);
@@ -223,21 +223,21 @@ sub new
 
 	$self->{view} = $view;
 	$self->{buffer} = $buffer;
-	
+
 	bless $self, $class;
-	
+
 	$self->insert_msg ("Start...\n-------------------------------------\n");
-	
+
 	return $self;
 }
-  
+
 sub insert_msg
 {
 	my $self = shift;
 	my $msg = shift;
 
 	my $buffer = $self->{buffer};
-	
+
 	Gtk2::Gdk::Threads->enter;
 	my $iter = $buffer->get_end_iter;
 	$buffer->insert ($iter, $msg);

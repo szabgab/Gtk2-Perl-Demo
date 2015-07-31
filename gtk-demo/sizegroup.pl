@@ -4,9 +4,9 @@
 #
 # GtkSizeGroup provides a mechanism for grouping a number of
 # widgets together so they all request the same amount of space.
-# This is typically useful when you want a column of widgets to 
+# This is typically useful when you want a column of widgets to
 # have the same size, but you can't use a GtkTable widget.
-# 
+#
 # Note that size groups only affect the amount of space requested,
 # not the size that the widgets finally receive. If you want the
 # widgets in a GtkSizeGroup to actually be the same size, you need
@@ -41,7 +41,7 @@ sub create_option_menu {
   } else {
     # on older versions, Gtk2::ComboBox is not available.
     my $menu = Gtk2::Menu->new;
- 
+
     foreach my $str (@strings) {
       my $menu_item = Gtk2::MenuItem->new_with_label ($str);
       $menu_item->show;
@@ -65,7 +65,7 @@ sub add_row {
 		  0, 1,              $row, $row + 1,
 		  [qw/expand fill/], [],
 		  0,                 0);
-  
+
   my $option_menu = create_option_menu (@options);
   $label->set_mnemonic_widget ($option_menu);
   $size_group->add_widget ($option_menu);
@@ -84,7 +84,7 @@ sub toggle_grouping {
   my $new_mode = $check_button->get_active
             ? 'horizontal'
             : 'none';
-  
+
   $size_group->set_mode ($new_mode);
 }
 
@@ -92,12 +92,12 @@ sub do {
   my @color_options = qw/Red Green Blue/;
   my @dash_options  = qw/Solid Dashed Dotted/;
   my @end_options   = qw/Square Round Arrow/;
-  
+
   if (!$window) {
       $window = Gtk2::Dialog->new_with_buttons ("GtkSizeGroup", undef, [],
                                                 'gtk-close' => 'none');
       $window->set_resizable (FALSE);
-      
+
       $window->signal_connect (response => sub { $window->destroy; 1 });
       $window->signal_connect (destroy => sub { $window = undef; 1 });
 
@@ -106,7 +106,7 @@ sub do {
       $vbox->set_border_width (5);
 
       my $size_group = Gtk2::SizeGroup->new ('horizontal');
-      
+
       # Create one frame holding color options
       #
       my $frame = Gtk2::Frame->new ("Color Options");
@@ -138,7 +138,7 @@ sub do {
       # And a check button to turn grouping on and off
       my $check_button = Gtk2::CheckButton->new ("_Enable grouping");
       $vbox->pack_start ($check_button, FALSE, FALSE, 0);
-      
+
       $check_button->set_active (TRUE);
       $check_button->signal_connect (toggled => \&toggle_grouping, $size_group);
   }

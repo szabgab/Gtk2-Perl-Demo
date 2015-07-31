@@ -62,7 +62,7 @@ sub scribble_expose_event {
                                   $event->area->x, $event->area->y,
                                   $event->area->x, $event->area->y,
                                   $event->area->width, $event->area->height);
-  
+
   return FALSE;
 }
 
@@ -92,7 +92,7 @@ sub scribble_button_press_event {
 
   return FALSE unless defined $pixmap;
     # paranoia check, in case we haven't gotten a configure event
-  
+
   if ($event->button == 1) {
     draw_brush ($widget, $event->x, $event->y);
   }
@@ -118,9 +118,9 @@ sub scribble_motion_notify_event {
   # we avoid getting a huge number of events faster than we
   # can cope.
   #
-  
+
   my (undef, $x, $y, $state) = $event->window->get_pointer;
-    
+
 #  if (state & GDK_BUTTON1_MASK)
 #  if (grep 'button1-mask', @$state) {
   if (grep (/button1-mask/, @$state)) {
@@ -135,10 +135,10 @@ my $color;
 
 sub checkerboard_expose {
   my ($da, $event, $data) = @_;
-  
+
 use constant CHECK_SIZE => 10;
 use constant SPACING => 2;
-  
+
   #
   # At the start of an expose handler, a clip region of event->area
   # is set on the window, and event->area has been cleared to the
@@ -160,7 +160,7 @@ use constant SPACING => 2;
 #  $color = Gtk2::Gdk::Color->new (65535, 65535, 65535);
   $color = Gtk2::Gdk::Color->parse ('white');
   $gc2->set_rgb_fg_color ($color);
-  
+
   my $xcount = 0;
   my $i = SPACING;
   while ($i < $da->allocation->width) {
@@ -186,10 +186,10 @@ use constant SPACING => 2;
       $i += CHECK_SIZE + SPACING;
       ++$xcount;
     }
-  
+
 #  g_object_unref (gc1);
 #  g_object_unref (gc2);
-  
+
   #
   # return TRUE because we've handled this event, so no
   # further processing is required.
@@ -217,11 +217,11 @@ sub do {
       my $label = Gtk2::Label->new;
       $label->set_markup ("<u>Checkerboard pattern</u>");
       $vbox->pack_start ($label, FALSE, FALSE, 0);
-      
+
       my $frame = Gtk2::Frame->new;
       $frame->set_shadow_type ('in');
       $vbox->pack_start ($frame, TRUE, TRUE, 0);
-      
+
       my $da = Gtk2::DrawingArea->new;
       # set a minimum size
       $da->set_size_request (100, 100);
@@ -237,7 +237,7 @@ sub do {
       $label = Gtk2::Label->new;
       $label->set_markup ("<u>Scribble area</u>");
       $vbox->pack_start ($label, FALSE, FALSE, 0);
-      
+
       $frame = Gtk2::Frame->new;
       $frame->set_shadow_type ('in');
       $vbox->pack_start ($frame, TRUE, TRUE, 0);
@@ -249,12 +249,12 @@ sub do {
       $frame->add ($da);
 
       # Signals used to handle backing pixmap
-      
+
       $da->signal_connect (expose_event => \&scribble_expose_event);
       $da->signal_connect (configure_event => \&scribble_configure_event);
-      
+
       # Event signals
-      
+
       $da->signal_connect (motion_notify_event => \&scribble_motion_notify_event);
       $da->signal_connect (button_press_event => \&scribble_button_press_event);
 
@@ -272,7 +272,7 @@ sub do {
 
   if (!$window->visible) {
       $window->show_all;
-  } else {	 
+  } else {
       $window->destroy;
       $window = undef;
   }

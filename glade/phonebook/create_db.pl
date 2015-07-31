@@ -14,10 +14,10 @@ foreach my $sql (split /;/, $sqls) {
 }
 
 for (1..10) {
-	$dbh->do("INSERT INTO names (name, phone) VALUES (?,  ?)", 
+	$dbh->do("INSERT INTO names (name, phone) VALUES (?,  ?)",
 		undef, metaname(), int rand(899999)+100000);
 }
-	
+
 
 __DATA__
 CREATE TABLE names (

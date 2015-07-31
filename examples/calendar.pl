@@ -3,20 +3,20 @@
 #
 # Copyright (C) 1998 Cesar Miquel, Shawn T. Amundson, Mattias Grönlund
 # Copyright (C) 2000 Tony Gale
-# 
+#
 # Copyright (C) 2003 by the gtk2-perl team (see the file AUTHORS for the full
 # list)
-# 
+#
 # This library is free software; you can redistribute it and/or modify it under
 # the terms of the GNU Library General Public License as published by the Free
 # Software Foundation; either version 2.1 of the License, or (at your option)
 # any later version.
-# 
+#
 # This library is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 # FOR A PARTICULAR PURPOSE.  See the GNU Library General Public License for
 # more details.
-# 
+#
 # You should have received a copy of the GNU Library General Public License
 # along with this library; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307  USA.
@@ -88,12 +88,12 @@ sub create_calendar
 	my $label;
 	my $bbox;
 	my $i;
-  
+
     	my %signals = ();
 
 	$window = Gtk2::Window->new("toplevel");
   	$window->set_title('GtkCalendar Example');
-  
+
 	$window->set_border_width(5);
 	$window->signal_connect( 'destroy' => sub {
 			Gtk2->main_quit;
@@ -109,7 +109,7 @@ sub create_calendar
 
 	$hbox = Gtk2::HBox->new(FALSE, DEF_PAD);
 	$vbox->pack_start($hbox, TRUE, TRUE, DEF_PAD);
-  
+
 	$hbbox = Gtk2::HButtonBox->new;
 	$hbox->pack_start($hbbox, FALSE, FALSE, DEF_PAD);
 	$hbbox->set_layout('spread');
@@ -125,38 +125,38 @@ sub create_calendar
 	$calendar->display_options([]);
 
 	$calendar->signal_connect( 'month_changed' => sub {
-			my ($year, $month, $day) = $calendar->get_date; 
+			my ($year, $month, $day) = $calendar->get_date;
 			calendar_set_signal_strings($_[1], 'month changed: '.
 				sprintf("%02d/%d/%d", $month+1, $day, $year) );
 		}, \%signals );
 	$calendar->signal_connect( 'day_selected' => sub {
-			my ($year, $month, $day) = $calendar->get_date; 
+			my ($year, $month, $day) = $calendar->get_date;
 			calendar_set_signal_strings($_[1], 'day selected: '.
 				sprintf("%02d/%d/%d", $month+1, $day, $year) );
 		}, \%signals );
 	$calendar->signal_connect( 'day_selected_double_click' => sub {
-			my ($year, $month, $day) = $calendar->get_date; 
-			calendar_set_signal_strings($_[1], 
+			my ($year, $month, $day) = $calendar->get_date;
+			calendar_set_signal_strings($_[1],
 				'day selected double click: '.
 				sprintf("%02d/%d/%d", $month+1, $day, $year) );
 		}, \%signals );
 	$calendar->signal_connect( 'prev_month' => sub {
-			my ($year, $month, $day) = $calendar->get_date; 
+			my ($year, $month, $day) = $calendar->get_date;
 			calendar_set_signal_strings($_[1], 'prev month: '.
 				sprintf("%02d/%d/%d", $month+1, $day, $year) );
 		}, \%signals );
 	$calendar->signal_connect( 'next_month' => sub {
-			my ($year, $month, $day) = $calendar->get_date; 
+			my ($year, $month, $day) = $calendar->get_date;
 			calendar_set_signal_strings($_[1], 'next month: '.
 				sprintf("%02d/%d/%d", $month+1, $day, $year) );
 		}, \%signals );
 	$calendar->signal_connect( 'prev_year' => sub {
-			my ($year, $month, $day) = $calendar->get_date; 
+			my ($year, $month, $day) = $calendar->get_date;
 			calendar_set_signal_strings($_[1], 'prev year: '.
 				sprintf("%02d/%d/%d", $month+1, $day, $year) );
 		}, \%signals );
 	$calendar->signal_connect( 'next_year' => sub {
-			my ($year, $month, $day) = $calendar->get_date; 
+			my ($year, $month, $day) = $calendar->get_date;
 			calendar_set_signal_strings($_[1], 'next year: '.
 				sprintf("%02d/%d/%d", $month+1, $day, $year) );
 		}, \%signals );
@@ -166,7 +166,7 @@ sub create_calendar
 
 	$vbox2 = Gtk2::VBox->new(FALSE, DEF_PAD);
 	$hbox->pack_start($vbox2, FALSE, FALSE, DEF_PAD);
-  
+
 	# Build the Right frame with the flags in
 
 	$frame = Gtk2::Frame->new('Flags');
@@ -203,7 +203,7 @@ sub create_calendar
 		$_ =~ s/\s/-/g;
 		$_ = lc($_);
 	}
-	
+
 	# Build the right font-button
 	$button = Gtk2::Button->new('Font...');
 	$button->signal_connect( 'clicked' => sub {
@@ -220,7 +220,7 @@ sub create_calendar
 
 	$vbox2 = Gtk2::VBox->new(TRUE, DEF_PAD_SMALL);
 	$frame->add($vbox2);
-  
+
 	$hbox = Gtk2::HBox->new(FALSE, 3);
 	$vbox2->pack_start($hbox, FALSE, TRUE, 0);
 	$label = Gtk2::Label->new('Signal:');

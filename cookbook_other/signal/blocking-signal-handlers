@@ -1,10 +1,10 @@
 If you store the ID returned by signal_connect, you can temporarily
 block your signal handler with
-        
+
   $object->signal_handler_block ($handler_id)
-  
+
   and unblock it again when you're done with
-  
+
     $object->signal_handler_unblock ($handler_id).
 ####################################################
 
@@ -16,4 +16,4 @@ Glib::Object->signal_handler_unblock($instance, $id);
 
 Glib::Object->signal_handlers_unblock_by_func($instance, $func, $data);
 
-    
+

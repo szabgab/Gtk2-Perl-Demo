@@ -28,7 +28,7 @@ use constant NUM_COLUMNS         => 8;
 
 
 #
-# tree data 
+# tree data
 #
 
 my @january = (
@@ -138,13 +138,13 @@ sub create_model {
 #			      G_TYPE_BOOLEAN,
 #			      G_TYPE_BOOLEAN,
 #			      G_TYPE_BOOLEAN);
-   my $model = Gtk2::TreeStore->new (qw/ Glib::String 
-                                         Glib::Boolean 
-                                         Glib::Boolean 
-                                         Glib::Boolean 
-                                         Glib::Boolean 
-                                         Glib::Boolean 
-                                         Glib::Boolean 
+   my $model = Gtk2::TreeStore->new (qw/ Glib::String
+                                         Glib::Boolean
+                                         Glib::Boolean
+                                         Glib::Boolean
+                                         Glib::Boolean
+                                         Glib::Boolean
+                                         Glib::Boolean
                                          Glib::Boolean /);
 
    # add data to the tree store/
@@ -213,7 +213,7 @@ sub add_columns {
    my $renderer = Gtk2::CellRendererText->new;
    $renderer->set (xalign => 0.0);
 
-   my $col_offset = $treeview->insert_column_with_attributes 
+   my $col_offset = $treeview->insert_column_with_attributes
    					(-1, "Holiday", $renderer,
 					 text => HOLIDAY_NAME_COLUMN);
    my $column = $treeview->get_column ($col_offset - 1);
@@ -226,9 +226,9 @@ sub add_columns {
 
    $renderer->signal_connect (toggled => \&item_toggled, $model);
 
-   $col_offset = $treeview->insert_column_with_attributes 
+   $col_offset = $treeview->insert_column_with_attributes
  					(-1, "Alex", $renderer,
-					 active => ALEX_COLUMN, 
+					 active => ALEX_COLUMN,
 					 visible => VISIBLE_COLUMN,
 					 activatable => WORLD_COLUMN);
 
@@ -244,9 +244,9 @@ sub add_columns {
 
    $renderer->signal_connect (toggled => \&item_toggled, $model);
 
-   $col_offset = $treeview->insert_column_with_attributes 
+   $col_offset = $treeview->insert_column_with_attributes
    					(-1, "Havoc", $renderer,
-					 active => HAVOC_COLUMN, 
+					 active => HAVOC_COLUMN,
 					 visible => VISIBLE_COLUMN);
 
    $column = $treeview->get_column ($col_offset - 1);
@@ -261,7 +261,7 @@ sub add_columns {
 
    $renderer->signal_connect (toggled => \&item_toggled, $model);
 
-   $col_offset = $treeview->insert_column_with_attributes 
+   $col_offset = $treeview->insert_column_with_attributes
 					(-1, "Tim", $renderer,
 					 active => TIM_COLUMN,
 					 visible => VISIBLE_COLUMN,
@@ -279,7 +279,7 @@ sub add_columns {
 
    $renderer->signal_connect (toggled => \&item_toggled, $model);
 
-   $col_offset = $treeview->insert_column_with_attributes 
+   $col_offset = $treeview->insert_column_with_attributes
    					(-1, "Owen", $renderer,
 					 active => OWEN_COLUMN,
 					 visible => VISIBLE_COLUMN);
@@ -296,7 +296,7 @@ sub add_columns {
 
    $renderer->signal_connect (toggled => \&item_toggled, $model);
 
-   $col_offset = $treeview->insert_column_with_attributes 
+   $col_offset = $treeview->insert_column_with_attributes
    				   (-1, "Dave", $renderer,
 				    active => DAVE_COLUMN,
 				    visible => VISIBLE_COLUMN);
@@ -351,7 +351,7 @@ sub do {
        $window->destroy;
        $window = undef;
    }
- 
+
    return $window;
 }
 

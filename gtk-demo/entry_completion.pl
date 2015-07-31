@@ -27,7 +27,7 @@ sub create_completion_model {
 
   # And another word
   $store->set ($store->append, 0, "totally");
-  
+
   return $store;
 }
 
@@ -62,10 +62,10 @@ sub do {
 
     # Assign the completion to the entry
     $entry->set_completion ($completion);
-    
+
     # Create a tree model and use it as the completion model
     $completion->set_model (create_completion_model ());
-    
+
     # Use model column 0 as the text column
     $completion->set_text_column (0);
   }

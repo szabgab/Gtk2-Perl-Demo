@@ -59,7 +59,7 @@ Gtk2->main;
 
 # of course we could write this simple function in an anonymous
 # subroutin and without the temporary variable
-sub show_button_clicked { 
+sub show_button_clicked {
 	my $text = $entry->get_text;
 	$label->set_text($text);
 

@@ -77,9 +77,9 @@ $btn->signal_connect (clicked => sub {
 	});
 
 # a sub that sends as many exit commands as we have threads.
-# we have to make sure that each thread would only take up 
+# we have to make sure that each thread would only take up
 # a single exit.
-sub queue_exits 
+sub queue_exits
 {
 	foreach (@thrds)
 	{
@@ -99,7 +99,7 @@ $btn->signal_connect (clicked => sub {
 		# won't hurt to queue too many exits, this way
 		# we'll be sure to have the threads, and thus the app
 		# exit
-		queue_exits (); 
+		queue_exits ();
 		Gtk2->main_quit;
 	});
 
@@ -124,7 +124,7 @@ $win->show_all;
 Gtk2->main;
 
 # clean up after ourselves, after main_quit is called we will block here
-# until all threads have exited, it is important that each thread have 
+# until all threads have exited, it is important that each thread have
 # an exit command waitting for it by this point.
 foreach (@thrds)
 {

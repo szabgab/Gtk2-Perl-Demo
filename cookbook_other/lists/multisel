@@ -50,8 +50,8 @@ $tree_view->get_selection->signal_connect (changed => sub {
 $sw->add ($tree_view);
 
 my $renderer = Gtk2::CellRendererText->new;
-my $column = Gtk2::TreeViewColumn->new_with_attributes ("Some numbers", 
-							$renderer, 
+my $column = Gtk2::TreeViewColumn->new_with_attributes ("Some numbers",
+							$renderer,
 							text => 0);
 $tree_view->append_column ($column);
 

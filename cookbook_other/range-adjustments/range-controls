@@ -43,10 +43,10 @@ sub cb_page_size {
 
     # This sets the adjustment and make it emit the "changed" signal to
     # reconfigure all the widgets that are attached to this signal.
-    my $val = $set->value;    
+    my $val = $set->value;
     my $low = ($set->upper) - ($set->page_size);
     my $high = $set->lower;
-        
+
       $set->set_value( clamp($val,$low,$high)  );
 
     $set->signal_emit("changed");

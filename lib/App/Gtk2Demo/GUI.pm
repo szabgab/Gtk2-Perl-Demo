@@ -1,7 +1,7 @@
 package App::Gtk2Demo::GUI;
 use strict;
 use warnings;
- 
+
 use Glib qw/TRUE FALSE/;
 use Gtk2 '-init';
 use Data::Dumper;
@@ -56,20 +56,20 @@ sub build_gui {
     my $HEIGHT = 700;
     my $WIDTH = 600;
     $window->set_default_size($WIDTH, $HEIGHT);
-    
+
     ###### Main box
     my $main_vbox = Gtk2::VBox->new();
     $window->add($main_vbox);
     my $menu_row = _create_menu_row();
     $main_vbox->pack_start($menu_row, FALSE, FALSE, 5);
-   
+
     my $history_row = _create_history_row();
     $main_vbox->pack_start($history_row, FALSE, FALSE, 5);
-   
+
     ################# Add lower panes
     my $lower_pane = Gtk2::VPaned->new();
     $main_vbox->pack_start($lower_pane, TRUE, TRUE, 5);
-    
+
     my $hbox = _create_left_pane();
     $lower_pane->add1($hbox);
     list_examples($files_store, $files_store, undef, $entries);
@@ -86,17 +86,17 @@ sub build_gui {
     set_widget(buffer   => $buffer);
     set_widget(textview => $textview);
     show_file("welcome.txt", "Welcome");
-    
+
     $textview->set_wrap_mode("word");
-    
+
     my $right_scroll = Gtk2::ScrolledWindow->new;
     $right_scroll->set_shadow_type ('in');
     $right_scroll->set_policy ('automatic', 'automatic');
     $right_scroll->add($textview);
-    
+
     $hbox->add2($right_scroll);
     $hbox->set_position(200);
-    
+
     # pane for search results
     my $sw = Gtk2::ScrolledWindow->new;
     $sw->set_shadow_type ('in');
@@ -104,10 +104,10 @@ sub build_gui {
     $lower_pane->add2($sw);
     $lower_pane->set_position($HEIGHT-300);
     set_widget(sw => $sw);
-    
+
     my $results_view = _add_results_box();
     $sw->add($results_view);
-    
+
     _add_accelerators($window);
     $window->show_all();
     Gtk2->main;
@@ -122,17 +122,17 @@ sub _add_results_box {
         my $model  = $some_tree_view->get_model();
         my $tree_selection  = $some_tree_view->get_selection();
         my $iter   = $tree_selection->get_selected();
-        my ($file, $text, $title) = $model->get($iter, $SEARCH_FILENAME, $SEARCH_TEXT, $SEARCH_TITLE); 
+        my ($file, $text, $title) = $model->get($iter, $SEARCH_FILENAME, $SEARCH_TEXT, $SEARCH_TITLE);
         show_file($file, $title);
         search_buffer($text);
     });
-    
+
 
     my @titles = ("Filename", "_Result Line");
     foreach my $i (0..@titles-1) {
         my $renderer = Gtk2::CellRendererText->new;
-        my $column = Gtk2::TreeViewColumn->new_with_attributes ($titles[$i], 
-                            $renderer, 
+        my $column = Gtk2::TreeViewColumn->new_with_attributes ($titles[$i],
+                            $renderer,
                             text => $i);
         $results_view->append_column ($column);
     }
@@ -199,7 +199,7 @@ sub execute_code {
     $fh->flush;
     close $fh;
 
-    usleep(1000); # to make sure the file was fully flushed by the OS 
+    usleep(1000); # to make sure the file was fully flushed by the OS
                   # it seems when we started to use fork, and later the background execution mode
                   # ocassionally the file was not yet created before the code reached system()
                   # very strange
@@ -216,9 +216,9 @@ sub list_examples {
     my ($tree, $tree_store, $parent, $entries) = @_;
     foreach my $entry (@$entries) {
         my $child = $tree_store->append($parent);
-        $tree->set($child, 
-            $ENTRY_NAME => $entry->{title}, 
-            $ENTRY_TYPE => $entry->{type}, 
+        $tree->set($child,
+            $ENTRY_NAME => $entry->{title},
+            $ENTRY_TYPE => $entry->{type},
             $ENTRY_FILE => $entry->{name});
         if ($entry->{more}) {
             list_examples($tree, $tree_store, $child, $entry->{more});
@@ -238,7 +238,7 @@ sub list_widgets {
         }
     }
 }
-    
+
 sub _translate_tree_selection {
     my $model     = $files_view->get_model();
     my $selection = $files_view->get_selection();
@@ -266,7 +266,7 @@ sub build_podview {
     print "display\n";
     my $viewer = Gtk2::Ex::PodViewer->new;
     print "V: $viewer\n";
-    #$viewer->load(’/path/to/file.pod’); 
+    #$viewer->load(’/path/to/file.pod’);
     $viewer->load($module);
     print "loaded\n";
     $viewer->show;
@@ -281,7 +281,7 @@ sub build_podview {
 }
 
 sub select_widget {
-    my ($path, $col) = $widgets_view->get_cursor(); 
+    my ($path, $col) = $widgets_view->get_cursor();
     my @c = split /:/, $path->to_string;
     my $widget = (sort keys %$widgets)[$c[0]];
     if (@c == 1) {
@@ -312,7 +312,7 @@ sub show_file {
         shift @history if @history > $HISTORY_LIMIT;
         #print map {$_->{filename} . "\n"} @history;
     }
-    list_history(); 
+    list_history();
     my $code;
     $title ||= "NA";
     $window->set_title("$app_title     $title: '$filename'");
@@ -327,7 +327,7 @@ sub show_file {
 
 sub show_text {
     my ($text) = @_;
-    my $buffer = get_widget('buffer'); 
+    my $buffer = get_widget('buffer');
     $buffer->delete($buffer->get_start_iter, $buffer->get_end_iter);
     $buffer->insert($buffer->get_iter_at_line(0), $text);
 }
@@ -335,7 +335,7 @@ sub show_text {
 sub search {
     my $search_text = get_widget('search_entry')->get_text;
     if (get_widget('button_all')->get_active()) {
-        my %hits = _search($search_text, $entries); 
+        my %hits = _search($search_text, $entries);
         show_search_results(%hits);
 
     } else { # button_buffer (this is the default if nothing is selected)
@@ -356,7 +356,7 @@ sub _search {
     my %resp;
 
     foreach my $entry (@$entries) {
-        #$entry->{type}, 
+        #$entry->{type},
         if (open my $fh, "<", $entry->{name}) {
             if (my @lines = grep /$text/, <$fh>) {
                 chomp @lines;
@@ -382,9 +382,9 @@ sub show_search_results {
     foreach my $file (keys %hits) {
         foreach my $row (@{$hits{$file}{lines}}) {
             my $iter = $model->append;
-            $model->set ($iter, 
-                $SEARCH_FILENAME => $file, 
-                $SEARCH_TEXT     => $row, 
+            $model->set ($iter,
+                $SEARCH_FILENAME => $file,
+                $SEARCH_TEXT     => $row,
                 $SEARCH_TITLE    => $hits{$file}{title}
             );
         }
@@ -414,7 +414,7 @@ sub search_buffer {
         #print $iter->get_offset, "\n";
         $start_index = $iter->get_offset;
     }
-    
+
     my $start = index ($cont, $text, $start_index);
     return if $start == -1;
     #print "start: $start\n";
@@ -471,7 +471,7 @@ sub right_click {
     #print "clicked\n";
     if (3 eq $event->button) {
         print "right clicked\n";
-        my ($path, $col) = $widgets_view->get_cursor(); 
+        my ($path, $col) = $widgets_view->get_cursor();
         my @c = split /:/, $path->to_string;
         my $widget = (sort keys %$widgets)[$c[0]];
         print "display pod for $widget\n";
@@ -492,14 +492,14 @@ sub _add_radio_buttons {
 
     my $radio_buttons = Gtk2::HBox->new();
     $menu_row->pack_start($radio_buttons, FALSE, FALSE, 0);
-    
+
     my $button_all = Gtk2::RadioButton->new(undef, "All files");
     $radio_buttons->pack_start($button_all, TRUE, TRUE, 0);
     $button_all->set_active(TRUE);
     $button_all->show;
     my @group = $button_all->get_group;
     set_widget(button_all => $button_all);
-    
+
     my $button_buffer = Gtk2::RadioButton->new_with_label(@group, "Current buffer");
     $radio_buttons->pack_start($button_buffer, TRUE, TRUE, 0);
     $button_buffer->show;
@@ -508,42 +508,42 @@ sub _add_radio_buttons {
 
 sub _create_menu_row {
     my $menu_row = Gtk2::HBox->new();
-    
+
     my $execute_button = Gtk2::Button->new_from_stock('gtk-execute');
     $execute_button->signal_connect(clicked=> \&execute_code);
     $menu_row->pack_start($execute_button, FALSE, FALSE, 5);
-    
+
     my $save_button = Gtk2::Button->new_from_stock('gtk-save');
     $save_button->signal_connect(clicked=> \&save_code);
     $menu_row->pack_start($save_button, FALSE, FALSE, 5);
-    
+
     my $search_entry = Gtk2::Entry->new;
     $search_entry->set_activates_default (TRUE);
     $menu_row->pack_start($search_entry, FALSE, FALSE, 5);
     set_widget(search_entry => $search_entry);
-   
+
     _add_radio_buttons($menu_row);
-    
+
     my $search_button = _create_search_button();
     $menu_row->pack_start($search_button, FALSE, FALSE, 5);
     $window->set_default($search_button);
     set_widget(search_button => $search_button);
-   
-    
+
+
     my $exit_button = Gtk2::Button->new_from_stock('gtk-quit');
     $exit_button->signal_connect(clicked=> sub { Gtk2->main_quit; });
     $menu_row->pack_end($exit_button, FALSE, FALSE, 5);
     return $menu_row;
-}    
+}
 
 sub _add_accelerators {
     my $window = shift;
     my @accels = (
-        { key => 'S', mod => 'control-mask', 
+        { key => 'S', mod => 'control-mask',
                 func => sub {get_widget('search_entry')->grab_focus(); get_widget('button_all')->set_active(TRUE);} },
-        { key => 'F', mod => 'control-mask', 
+        { key => 'F', mod => 'control-mask',
                 func => sub {get_widget('search_entry')->grab_focus(); get_widget('button_buffer')->set_active(TRUE); }},
-        { key => 'N', mod => 'control-mask', 
+        { key => 'N', mod => 'control-mask',
                 func => \&search_again},
     );
     my $accel_group = Gtk2::AccelGroup->new;
@@ -557,20 +557,20 @@ sub _add_accelerators {
 
 sub _create_history_row {
     my $history_row = Gtk2::HBox->new();
-    
+
     my $history_label = Gtk2::Label->new("History");
     $history_row->pack_start($history_label, FALSE, FALSE, 5);
-    
+
     my $history_opt = Gtk2::OptionMenu->new;
     #$history_opt->set_history (1);
     $history_row->pack_start($history_opt, FALSE, FALSE, 5);
     set_widget(history_opt => $history_opt);
-    
+
     my $history_button = Gtk2::Button->new_from_stock('gtk-jump-to');
     $history_button->signal_connect(clicked=> \&show_history);
     $history_row->pack_start($history_button, FALSE, FALSE, 5);
     return $history_row;
-} 
+}
 
 ###### file or Widget listing
 sub _create_left_pane {
@@ -583,10 +583,10 @@ sub _create_left_pane {
     $notebook->append_page($widgets_scroll, "Widgets");
     set_widget(notebook => $notebook);
 
-    return $hbox; 
+    return $hbox;
 }
 
-  
+
 1;
 
 

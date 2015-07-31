@@ -96,7 +96,7 @@ $pixbuf_from_raw_data = Gtk2::Gdk::Pixbuf->new_from_data
 #----
 #/* GdkPixbuf RGBA C-Source image dump */
 #
-#static const guint8 my_pixbuf[] = 
+#static const guint8 my_pixbuf[] =
 #{ ""
 #  /* Pixbuf magic (0x47646b50) */
 #  "GdkP"

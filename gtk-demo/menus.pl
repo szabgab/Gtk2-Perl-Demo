@@ -27,7 +27,7 @@
 # GtkItemFactory provides a higher-level interface for creating menu bars
 # and menus; while you can construct menus manually, most people don't
 # do that. There's a separate demo for GtkItemFactory.
-# 
+#
 #
 
 package menus;
@@ -75,32 +75,32 @@ my $window = undef;
 sub do {
   if (!$window) {
       $window = Gtk2::Window->new;
-      
+
       $window->signal_connect (destroy => sub { $window = undef; 1 });
       $window->signal_connect (delete_event => sub { 1 });
-      
+
       my $accel_group = Gtk2::AccelGroup->new;
       $window->add_accel_group ($accel_group);
 
       $window->set_title ("menus");
       $window->set_border_width (0);
-      
-      
+
+
       my $box1 = Gtk2::VBox->new (FALSE, 0);
       $window->add ($box1);
       $box1->show;
-      
+
       my $menubar = Gtk2::MenuBar->new;
       $box1->pack_start ($menubar, FALSE, TRUE, 0);
       $menubar->show;
-      
+
       my $menu = create_menu (2, TRUE);
-      
+
       my $menuitem = Gtk2::MenuItem->new_with_label ("test\nline2");
       $menuitem->set_submenu ($menu);
       $menubar->append ($menuitem);
       $menuitem->show;
-      
+
       $menuitem = Gtk2::MenuItem->new_with_label ("foo");
       $menuitem->set_submenu (create_menu (3, TRUE));
       $menubar->append ($menuitem);
@@ -111,19 +111,19 @@ sub do {
       $menuitem->set_right_justified (TRUE);
       $menubar->append ($menuitem);
       $menuitem->show;
-      
+
       my $box2 = Gtk2::VBox->new (FALSE, 10);
       $box2->set_border_width (10);
       $box1->pack_start ($box2, TRUE, TRUE, 0);
       $box2->show;
-      
+
       $menu = create_menu (1, FALSE);
       $menu->set_accel_group ($accel_group);
-      
+
       $menuitem = Gtk2::SeparatorMenuItem->new;
       $menu->append ($menuitem);
       $menuitem->show;
-      
+
       $menuitem = Gtk2::CheckMenuItem->new_with_label ("Accelerate Me");
       $menu->append ($menuitem);
       $menuitem->show;
@@ -146,7 +146,7 @@ sub do {
       $menuitem->add_accelerator (activate => $accel_group,
 				  $Gtk2::Gdk::Keysyms{F3}, #GDK_F3,
 				  [], ['visible']);
-      
+
       my $optionmenu = Gtk2::OptionMenu->new;
       $optionmenu->set_menu ($menu);
       $optionmenu->set_history (3);

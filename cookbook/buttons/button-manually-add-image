@@ -4,9 +4,9 @@ use strict;
 use Glib qw/TRUE FALSE/;
 use Gtk2 '-init';
 
-# create a new box, and then pack your objects into this 
-# box using the usual Gtk2::Box::pack_start() function, 
-# and then use the Gtk2::Box::add() method call to pack 
+# create a new box, and then pack your objects into this
+# box using the usual Gtk2::Box::pack_start() function,
+# and then use the Gtk2::Box::add() method call to pack
 # the box into the button.
 
 # create a new window

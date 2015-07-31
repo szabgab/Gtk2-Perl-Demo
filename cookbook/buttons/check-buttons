@@ -67,7 +67,7 @@ Gtk2->main;
 sub delete_event {
 Gtk2->main_quit;
 return FALSE;
-}  
+}
 ######################################
 
 sub check_button_callback {
@@ -78,8 +78,8 @@ sub check_button_callback {
      } else {
     # if control reaches here, the check button is up
        print "$number off\n";
-     }   
-  } 
+     }
+  }
 #######################################
 sub setall_event{
  foreach my $check ($checkbutton1,$checkbutton2,$checkbutton3){
@@ -95,4 +95,4 @@ sub unsetall_event{
 ############################################
 
 
-  
+

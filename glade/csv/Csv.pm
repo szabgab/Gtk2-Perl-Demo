@@ -34,7 +34,7 @@ DESTROY {
 
 sub on_open1_activate {
 }
- 
+
 sub on_window_destroy { quit();}
 sub on_quit1_activate { quit();}
 sub quit {

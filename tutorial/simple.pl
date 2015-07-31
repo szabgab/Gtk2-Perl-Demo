@@ -5,13 +5,13 @@ use warnings;
 # Simple window with nothing on it
 # This is the simplest application we can create, nothing just a window
 
-# Loading the Gtk2 module with the "magic" -init paramter 
+# Loading the Gtk2 module with the "magic" -init paramter
 use Gtk2 '-init';
 
 # Create a window object
 my $window = Gtk2::Window->new;
 
-# A signal handler, we will explain later, 
+# A signal handler, we will explain later,
 # for now we just make sure it is in our code
 $window->signal_connect (destroy => sub { Gtk2->main_quit; });
 

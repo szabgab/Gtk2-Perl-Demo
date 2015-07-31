@@ -37,13 +37,13 @@ $inc_button0->signal_connect(
     clicked => sub {
         $count0++;
         $label0->set_text("But0 Clicked $count0 times");
-        
+
     }
 );
 $reset_button0->signal_connect(
-    clicked => sub { 
+    clicked => sub {
               $count0 = 0;
-              $label0->set_text("But0 Clicked $count0 times"); 
+              $label0->set_text("But0 Clicked $count0 times");
               }
 );
 
@@ -71,12 +71,12 @@ $inc_button1->signal_connect(
     clicked => sub {
         $count1++;
         $label1->set_text("But1 Clicked $count1 times");
-        
+
     }
 );
 
 $reset_button1->signal_connect(
-    clicked => sub { $count1 = 0; 
+    clicked => sub { $count1 = 0;
         $label1->set_text("But1 Clicked $count1 times");
         }
 );
@@ -108,7 +108,7 @@ $inc_button2->signal_connect(
 );
 
 $reset_button2->signal_connect(
-    clicked => sub { $count2 = 0; 
+    clicked => sub { $count2 = 0;
       $label2->set_text("But2 Clicked $count2 times");
     }
 );

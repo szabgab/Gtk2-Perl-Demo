@@ -3,17 +3,17 @@
 #
 # Copyright (C) 2003-2004 by Torsten Schoenfeld, with hacks by muppet, some
 # suggested by Jens Wilke.
-# 
+#
 # This library is free software; you can redistribute it and/or modify it under
 # the terms of the GNU Library General Public License as published by the Free
 # Software Foundation; either version 2.1 of the License, or (at your option)
 # any later version.
-# 
+#
 # This library is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 # FOR A PARTICULAR PURPOSE.  See the GNU Library General Public License for
 # more details.
-# 
+#
 # You should have received a copy of the GNU Library General Public License
 # along with this library; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307  USA.
@@ -173,7 +173,7 @@ sub START_EDITING {
     return FALSE;
   });
 
-  $spin_button -> {_focus_out_id} = 
+  $spin_button -> {_focus_out_id} =
       $spin_button -> signal_connect(focus_out_event => sub {
         my ($spin_button, undef) = @_;
         $cell -> _cell_editing_done($path, $spin_button -> get_value());
@@ -218,7 +218,7 @@ foreach (qw(12 12.1 12.12)) {
 
 sub cell_edited {
   my ($cell, $path, $new_value) = @_;
-  
+
   $model -> set($model -> get_iter(Gtk2::TreePath -> new_from_string($path)),
                 0 => $new_value);
 }

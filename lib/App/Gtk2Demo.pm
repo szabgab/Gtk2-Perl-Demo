@@ -55,7 +55,7 @@ sub check_files {
     my %widgets;
     sub collect_widgets {
         my ($entries) = @_;
-    
+
         foreach my $entry (@$entries) {
             if ($entry->{type} eq "file") {
                 analyze_file($entry->{name}, $entry->{title});
@@ -64,7 +64,7 @@ sub check_files {
         }
         return;
     }
-    
+
     sub analyze_file {
         my ($file, $title) = @_;
         open my $fh, $file or return;
@@ -80,7 +80,7 @@ sub check_files {
 }
 
 sub entries {
-    return [ 
+    return [
     {
         title => "Welcome",
         type  => "text",

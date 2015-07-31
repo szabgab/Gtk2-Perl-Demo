@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-# Similary to the previous example we can use an HBox (Horizontal Box) 
+# Similary to the previous example we can use an HBox (Horizontal Box)
 # That will render the widgets we put in it, well horizontally
 
 use Gtk2 '-init';

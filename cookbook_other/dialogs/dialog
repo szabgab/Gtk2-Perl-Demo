@@ -17,7 +17,7 @@ use Gtk2 '-init';
 
 ### begin run type dialog
 # if you want to pop up a simple dialog to get or provide some information this
-# is probably the way you want to go. 
+# is probably the way you want to go.
 
 my $dialog = Gtk2::Dialog->new ('Run Dialog Demo', undef, 'modal',
 	'gtk-ok' => 'ok',  # response ids may be one of the built-in enums...
@@ -44,7 +44,7 @@ $entry->set_activates_default (TRUE);
 
 # run the dialog.  this will show for you.
 my $response = $dialog->run;
-# when a button is clicked the dialog will go away and the response (clicked 
+# when a button is clicked the dialog will go away and the response (clicked
 # button) will be returned from the call to run
 
 print "The user clicked: $response\n";

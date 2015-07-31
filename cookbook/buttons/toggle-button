@@ -50,7 +50,7 @@ Gtk2->main;
 sub delete_event {
 Gtk2->main_quit;
 return FALSE;
-}  
+}
 ######################################
 
 sub toggle_button_callback {
@@ -61,5 +61,5 @@ sub toggle_button_callback {
      } else {
     # if control reaches here, the toggle button is up
        print "$number off\n";
-     }   
+     }
   }

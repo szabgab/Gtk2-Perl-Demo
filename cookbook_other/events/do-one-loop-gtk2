@@ -33,5 +33,5 @@ sub show_loop{
 sub delete_event {
 Gtk2->main_quit;
 return FALSE;
-}  
+}
 

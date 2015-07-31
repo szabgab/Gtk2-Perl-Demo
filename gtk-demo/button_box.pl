@@ -26,13 +26,13 @@ sub create_bbox {
 
   $bbox->set_layout ($layout);
   $bbox->set_spacing ($spacing);
-  
+
   my $button = Gtk2::Button->new_from_stock ('gtk-ok');
   $bbox->add ($button);
-  
+
   $button = Gtk2::Button->new_from_stock ('gtk-cancel');
   $bbox->add ($button);
-  
+
   $button = Gtk2::Button->new_from_stock ('gtk-help');
   $bbox->add ($button);
 
@@ -45,17 +45,17 @@ sub do {
   if (!$window) {
     $window = Gtk2::Window->new;
     $window->set_title ("Button Boxes");
-    
+
     $window->signal_connect (destroy => sub { $window = undef; 1 });
-    
+
     $window->set_border_width (10);
 
     my $main_vbox = Gtk2::VBox->new (FALSE, 0);
     $window->add ($main_vbox);
-    
+
     my $frame_horz = Gtk2::Frame->new ("Horizontal Button Boxes");
     $main_vbox->pack_start ($frame_horz, TRUE, TRUE, 10);
-    
+
     my $vbox = Gtk2::VBox->new (FALSE, 0);
     $vbox->set_border_width (10);
     $frame_horz->add ($vbox);
@@ -67,7 +67,7 @@ sub do {
 
     my $frame_vert = Gtk2::Frame->new ("Vertical Button Boxes");
     $main_vbox->pack_start ($frame_vert, TRUE, TRUE, 10);
-    
+
     my $hbox = Gtk2::HBox->new (FALSE, 0);
     $hbox->set_border_width (10);
     $frame_vert->add ($hbox);
@@ -80,7 +80,7 @@ sub do {
 
   if (!$window->visible) {
       $window->show_all;
-  } else {	 
+  } else {
       $window->destroy;
       $window = undef;
   }

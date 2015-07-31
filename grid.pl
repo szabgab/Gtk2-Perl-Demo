@@ -21,11 +21,11 @@ foreach my $i (1..$rows) {
 	foreach my $j (1..$cols) {
 		my $entry = Gtk2::Entry->new();
 		$table[$i-1][$j-1] = $entry;
-		$table->attach_defaults($entry, $j-1, $j, $i-1, $i); 
+		$table->attach_defaults($entry, $j-1, $j, $i-1, $i);
 		$entry->signal_connect(changed => sub { print $_[0]->get_text . "\n";});
 		$entry->signal_connect("focus-out-event" => \&lost_focus, [$i, $j]);
 
-	}	 
+	}
 }
 
 sub lost_focus {

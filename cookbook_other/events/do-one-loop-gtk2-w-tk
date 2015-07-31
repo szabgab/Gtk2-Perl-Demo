@@ -1,4 +1,4 @@
-#!/usr/bin/perl 
+#!/usr/bin/perl
 use warnings;
 use strict;
 use Gtk2;
@@ -31,7 +31,7 @@ $frame1->set_border_width(3);
 
 my $button = Gtk2::Button->new('Stop Count');
 $frame1->add($button);
-$button->signal_connect( clicked => 
+$button->signal_connect( clicked =>
            sub { $gtk_timer_control = 0 } );
 
 
@@ -56,15 +56,15 @@ $gtkwindow->show_all;
 
 #setup tk $mw
 my $count_tk = 0;
-my $labtk = $mw->Label(-textvariable =>\$count_tk)->pack; 
+my $labtk = $mw->Label(-textvariable =>\$count_tk)->pack;
 my $quit_tk = $mw->Button(-text =>'Quit',
-        -command=> sub{exit})->pack; 
+        -command=> sub{exit})->pack;
 
-$tktimer = $mw->repeat(10, sub{      
+$tktimer = $mw->repeat(10, sub{
     Gtk2->main_iteration while Gtk2->events_pending;
   });
 
-my $tktimer1 = $mw->repeat(200, sub{      
+my $tktimer1 = $mw->repeat(200, sub{
     $count_tk++;
   });
 

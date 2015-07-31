@@ -58,30 +58,30 @@ sub create_pane_options {
 
   my $frame = Gtk2::Frame->new ($frame_label);
   $frame->set_border_width (4);
-  
+
   my $table = Gtk2::Table->new (3, 2, TRUE);
   $frame->add ($table);
-  
+
   my $label = Gtk2::Label->new ($label1);
   $table->attach_defaults ($label, 0, 1, 0, 1);
-  
+
   my $check_button = Gtk2::CheckButton->new ("_Resize");
   $table->attach_defaults ($check_button, 0, 1, 1, 2);
   $check_button->signal_connect (toggled => \&toggle_resize, $paned->child1);
-  
+
   $check_button = Gtk2::CheckButton->new ("_Shrink");
   $table->attach_defaults ($check_button, 0, 1, 2, 3);
   $check_button->set_active (TRUE);
   $check_button->signal_connect (toggled => \&toggle_shrink, $paned->child1);
-  
+
   $label = Gtk2::Label->new ($label2);
   $table->attach_defaults ($label, 1, 2, 0, 1);
-  
+
   $check_button = Gtk2::CheckButton->new ("_Resize");
   $table->attach_defaults ($check_button, 1, 2, 1, 2);
   $check_button->set_active (TRUE);
   $check_button->signal_connect (toggled => \&toggle_resize, $paned->child2);
-  
+
   $check_button = Gtk2::CheckButton->new ("_Shrink");
   $table->attach_defaults ($check_button, 1, 2, 2, 3);
   $check_button->set_active (TRUE);
@@ -102,7 +102,7 @@ sub do {
 
       my $vbox = Gtk2::VBox->new (FALSE, 0);
       $window->add ($vbox);
-      
+
       my $vpaned = Gtk2::VPaned->new;
       $vbox->pack_start ($vpaned, TRUE, TRUE, 0);
       $vpaned->set_border_width (5);
@@ -114,7 +114,7 @@ sub do {
       $frame->set_shadow_type ('in');
       $frame->set_size_request (60, 60);
       $hpaned->add1 ($frame);
-      
+
       my $button = Gtk2::Button->new ("_Hi there");
       $frame->add ($button);
 

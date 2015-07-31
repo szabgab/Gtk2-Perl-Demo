@@ -1,10 +1,10 @@
-#The main lines are the 
+#The main lines are the
 
 open(IN, "...|")
-   
+
 #and
-   
-$tag = Gtk2::Helper->add_watch(fh,'in', sub {...} ) lines. 
+
+$tag = Gtk2::Helper->add_watch(fh,'in', sub {...} ) lines.
 #############################################
 
 open (IN, "runme |");
@@ -13,5 +13,5 @@ while (<IN>)
     # do something with $_
     }
     close (IN);
-    
-##############################################          
+
+##############################################

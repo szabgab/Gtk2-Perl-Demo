@@ -18,7 +18,7 @@ use vars qw/ @testgtk_demos /;
 
 # lists of demo code descriptions.
 # the func is a plain string in each of these, as a sentinel value to tell
-# row_activated_cb that the file containing that function hasn't been 
+# row_activated_cb that the file containing that function hasn't been
 # loaded yet.
 my @child0 = (
   { title => "Editable Cells", filename => "editable_cells.pl", func => 'stub', },
@@ -27,24 +27,24 @@ my @child0 = (
 );
 
 my @child1 = (
-  { title => "Hypertext",       filename => "hypertext.pl",  func => 'stub', }, 
-  { title => "Multiple Views",  filename => "textview.pl",   func => 'stub', }, 
+  { title => "Hypertext",       filename => "hypertext.pl",  func => 'stub', },
+  { title => "Multiple Views",  filename => "textview.pl",   func => 'stub', },
 );
 
 @testgtk_demos = (
-  { title => "Application main window",     filename => "appwindow.pl",     func => 'stub', }, 
-  { title => "Button Boxes",                filename => "button_box.pl",    func => 'stub', }, 
-  { title => "Change Display",              filename => "changedisplay.pl", func => 'stub', }, 
-  { title => "Color Selector",              filename => "colorsel.pl",      func => 'stub', }, 
-  { title => "Dialog and Message Boxes",    filename => "dialog.pl",        func => 'stub', }, 
-  { title => "Drawing Area",                filename => "drawingarea.pl",   func => 'stub', }, 
-  { title => "Images",                      filename => "images.pl",        func => 'stub', }, 
-  { title => "Item Factory",                filename => "item_factory.pl",  func => 'stub', }, 
-  { title => "Menus",                       filename => "menus.pl",         func => 'stub', }, 
-  { title => "Paned Widgets",               filename => "panes.pl",         func => 'stub', }, 
-  { title => "Pixbufs",                     filename => "pixbufs.pl",       func => 'stub', }, 
-  { title => "Size Groups",                 filename => "sizegroup.pl",     func => 'stub', }, 
-  { title => "Stock Item and Icon Browser", filename => "stock_browser.pl", func => 'stub', }, 
+  { title => "Application main window",     filename => "appwindow.pl",     func => 'stub', },
+  { title => "Button Boxes",                filename => "button_box.pl",    func => 'stub', },
+  { title => "Change Display",              filename => "changedisplay.pl", func => 'stub', },
+  { title => "Color Selector",              filename => "colorsel.pl",      func => 'stub', },
+  { title => "Dialog and Message Boxes",    filename => "dialog.pl",        func => 'stub', },
+  { title => "Drawing Area",                filename => "drawingarea.pl",   func => 'stub', },
+  { title => "Images",                      filename => "images.pl",        func => 'stub', },
+  { title => "Item Factory",                filename => "item_factory.pl",  func => 'stub', },
+  { title => "Menus",                       filename => "menus.pl",         func => 'stub', },
+  { title => "Paned Widgets",               filename => "panes.pl",         func => 'stub', },
+  { title => "Pixbufs",                     filename => "pixbufs.pl",       func => 'stub', },
+  { title => "Size Groups",                 filename => "sizegroup.pl",     func => 'stub', },
+  { title => "Stock Item and Icon Browser", filename => "stock_browser.pl", func => 'stub', },
   { title => "Text Widget", children => \@child1 },
   { title => "Tree View",   children => \@child0 },
 );
@@ -72,11 +72,11 @@ use constant NUM_COLUMNS     => 4;
 # * demo_find_file:
 # * @base: base filename
 # * @err:  location to store error, or %NULL.
-# * 
+# *
 # * Looks for @base first in the current directory, then in the
 # * location GTK+ where it will be installed on make install,
 # * returns the first file found.
-# * 
+# *
 # * Return value: the filename, if found or %NULL
 # **/
 sub demo_find_file {
@@ -322,7 +322,7 @@ parse_chars (gchar     *text,
 =cut
 
 #
-# While not as cool as c-mode, this will do as a quick attempt at highlighting 
+# While not as cool as c-mode, this will do as a quick attempt at highlighting
 #
 sub fontify {
   my $text;
@@ -461,14 +461,14 @@ sub row_activated_cb {
    my $model = $tree_view->get_model;
 
    my $iter = $model->get_iter ($path);
-   my ($filename, $func, $italic) = $model->get ($iter, 
-                                                 FILENAME_COLUMN, 
+   my ($filename, $func, $italic) = $model->get ($iter,
+                                                 FILENAME_COLUMN,
                                                  FUNC_COLUMN,
                                                  ITALIC_COLUMN);
 
    # this is rather a bit of a departure from the C version.
-   # in the C version, the various demos are in separate modules that 
-   # get compiled into the program.  perl doesn't work that way.  so, we 
+   # in the C version, the various demos are in separate modules that
+   # get compiled into the program.  perl doesn't work that way.  so, we
    # have the code in external files that define a package with the same
    # name as the file (sans the .pl).  if the demo has never been run,
    # the func column will contain a string; when we see that, we'll
@@ -491,7 +491,7 @@ sub row_activated_cb {
        my $window = $func->($tree_view->get_toplevel);
        if ($window) {
           # unset the italics when the window closes.
-	  $window->signal_connect (destroy => \&window_closed_cb, 
+	  $window->signal_connect (destroy => \&window_closed_cb,
 	                           { model => $model, path => $path->copy });
        }
    }
@@ -535,7 +535,7 @@ sub create_text {
        $text_view->set_pixels_above_lines (2);
        $text_view->set_pixels_below_lines (2);
   }
-  
+
   return $scrolled_window;
 }
 
@@ -578,7 +578,7 @@ sub create_tree {
    my $cell = Gtk2::CellRendererText->new;
 
   $cell->set ('style' => 'italic');
-  
+
   my $column = Gtk2::TreeViewColumn->new_with_attributes
  					("Widget (double click for demo)",
                                         $cell,
@@ -596,7 +596,7 @@ sub create_tree {
 
 sub setup_default_icon {
   my $pixbuf;
-  eval { $pixbuf = Gtk2::Gdk::Pixbuf->new_from_file 
+  eval { $pixbuf = Gtk2::Gdk::Pixbuf->new_from_file
       				(demo_find_file ("gtk-logo-rgb.gif")); };
   if ($@) {
      my $dialog = Gtk2::MessageDialog->new (undef, [], 'error', 'close',
@@ -605,7 +605,7 @@ sub setup_default_icon {
   }
 
   if ($pixbuf) {
-    # The gtk-logo-rgb icon has a white background, make it transparent 
+    # The gtk-logo-rgb icon has a white background, make it transparent
     my $transparent = $pixbuf->add_alpha (TRUE, 0xff, 0xff, 0xff);
 
     # only one item on the parameter list, but the parameter list is a list
@@ -616,7 +616,7 @@ sub setup_default_icon {
 Gtk2->init;
 
 setup_default_icon ();
-  
+
 my $window = Gtk2::Window->new;
 $window->set_title ("Gtk2-Perl Code Demos");
 $window->signal_connect (destroy => sub { Gtk2->main_quit; 1 });
@@ -641,15 +641,15 @@ $notebook->append_page (create_text (\$source_buffer, TRUE),
 
    $tag = $source_buffer->create_tag ("comment", foreground => "red");
    $tag = $source_buffer->create_tag ("type", foreground => "ForestGreen");
-   $tag = $source_buffer->create_tag ("string", 
+   $tag = $source_buffer->create_tag ("string",
                                       foreground => "RosyBrown",
                                       weight => PANGO_WEIGHT_BOLD);
    $tag = $source_buffer->create_tag ("control", "foreground", "purple");
-   $tag = $source_buffer->create_tag ('preprocessor', 
+   $tag = $source_buffer->create_tag ('preprocessor',
                                       style => 'oblique',
                                       foreground => 'burlywood4');
    $tag = $source_buffer->create_tag ('function',
-                                      weight => PANGO_WEIGHT_BOLD, 
+                                      weight => PANGO_WEIGHT_BOLD,
                                       foreground => 'DarkGoldenrod4');
 
    $window->set_default_size (600, 400);
@@ -657,7 +657,7 @@ $notebook->append_page (create_text (\$source_buffer, TRUE),
 
 # this happens anyway, when the list selects the first item on show
 #  load_file ($testgtk_demos[0]{filename});
- 
+
   Gtk2->main;
 __END__
 Copyright (C) 2003 by the gtk2-perl team (see the file AUTHORS for the

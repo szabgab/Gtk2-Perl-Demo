@@ -78,14 +78,14 @@ $eventbox->add ($image);
 
 $eventbox->add_events (['button-press-mask']);
 
-$eventbox->signal_connect ('button-press-event' => 
+$eventbox->signal_connect ('button-press-event' =>
     sub {
         my ($widget, $event) = @_;
 	#use Data::Dumper;
 	#print Dumper $event;
 	#exit;
         my ($x, $y) = ($event->x, $event->y);
-        # If the image is smaller than the window, we need to 
+        # If the image is smaller than the window, we need to
         # translate these window coords into the image coords.
         # Get the allocated size of the image first.
         # I assume that the image is always centered within the allocation.
@@ -101,11 +101,11 @@ $eventbox->signal_connect ('button-press-event' =>
 =pod
 $eventbox->add_events (['pointer-motion-mask', 'pointer-motion-hint-mask']);
 
-$eventbox->signal_connect ('motion-notify-event' => 
+$eventbox->signal_connect ('motion-notify-event' =>
     sub {
         my ($widget, $event) = @_;
         my ($x, $y) = ($event->x, $event->y);
-        # If the image is smaller than the window, we need to 
+        # If the image is smaller than the window, we need to
         # translate these window coords into the image coords.
         # Get the allocated size of the image first.
         # I assume that the image is always centered within the allocation.
