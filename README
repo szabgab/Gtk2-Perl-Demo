@@ -12,7 +12,7 @@ Gtk2
 
 for ViewSource to work:
 Gnome2  which is currently NOT available on MS Windows.
-to install Gnome run 
+to install Gnome run
 
 need libgnomeprintui-devel
 
@@ -22,7 +22,7 @@ cpan install Bundle::Gnome2
 TODO
 ============
 
-- Search results should also show the title of the file 
+- Search results should also show the title of the file
 
 - How can I catch the ESC key pressed ?
 - How can I display simple HTML files or pod ?
@@ -60,14 +60,14 @@ TODO
 - Have an index of all the words in the comments and pod sections of the files ?
   Probably not needed now that we have full text search
 
-- See also and somehow integrate with 
+- See also and somehow integrate with
   http://live.gnome.org/GTK2_2dPerl_2fRecipes
 
 - The color snooper doesn't work --- it complains on the console that it needs an argument.
   change the script to have a default file or we will have to rework the whole examples invocation thing.
 
 
-- It wasn't immediately obvious that i could edit the text to modify and run the samples.  
+- It wasn't immediately obvious that i could edit the text to modify and run the samples.
   Some explanatory text and a "revert" button would be helpful.
 
 - When moving form a buffer that was changed to show another file it silently discards all the
@@ -261,7 +261,7 @@ and where were they used. We might be able to list all the signal handlers
 and where were they used.
 
 Code for execution should be taken from the window and we should encourage people to
-experiment with the various options. 
+experiment with the various options.
 
 Add save button to save the content of the code window (now that we do not have them in separate files)
 
@@ -274,12 +274,12 @@ Add save button to save the content of the code window (now that we do not have 
 - Search and highlight in the current window
 - If you set the shadow type on the two scrolled windows to "in", the window will look a little better.
   Let's see this
-- gtk-demo allows you to run scripts by activating their rows in the treeview (double-clicking or pressing enter). 
+- gtk-demo allows you to run scripts by activating their rows in the treeview (double-clicking or pressing enter).
 
-- gtk-demo allows you to run more than one demo at a time.  Both of those features would be handy.  
+- gtk-demo allows you to run more than one demo at a time.  Both of those features would be handy.
   (Since you can edit the script,
   it would be rather easy for a user to hose the demo.)
-- We might want to run the external application on a fork so the user can run several 
+- We might want to run the external application on a fork so the user can run several
   versions at the same time and see the differences.
 - Repeat search within the buffer pressing Ctr-N
 - Mnemonics and stock icons would spruce up the main window a bit.

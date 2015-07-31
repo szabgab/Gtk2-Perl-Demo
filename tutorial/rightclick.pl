@@ -54,13 +54,13 @@ sub handle_clicks {
 		# block event propagation
 		return 1;
 	}
-			
+
 	# let the event chain proceed
 	return 0;
 }
 
 sub foo {
-	my ($param, $callback_action, $widget) = @_;  
+	my ($param, $callback_action, $widget) = @_;
 	#print "P: $param\n";
 	#print "E: $callback_action\n";
 	#print "W: $widget\n";            # Gtk2::MenuItem
@@ -71,7 +71,7 @@ sub foo {
 		Gtk2->main_quit;
 	}
 }
-sub handle_exit { 
-	print "bye\n"; 
-	Gtk2->main_quit; 
+sub handle_exit {
+	print "bye\n";
+	Gtk2->main_quit;
 }

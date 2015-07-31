@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use lib "lib"; 
+use lib "lib";
 use Glib qw/TRUE FALSE/;
 use Gtk2 '-init';
 use Gtk2::Ex::Datasheet::DBI;
@@ -26,23 +26,23 @@ my $tree_view  = Gtk2::TreeView->new();
 $main_vbox->add($tree_view);
 
 my $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile","","", {AutoCommit => 1});
-my $datasheet_def = { 
-	dbh          => $dbh, 
-	table        => "names", 
-	primary_key  => "id", 
-	sql_select   => "select name, phone ", 
-	sql_order_by => " order by name", 
+my $datasheet_def = {
+	dbh          => $dbh,
+	table        => "names",
+	primary_key  => "id",
+	sql_select   => "select name, phone ",
+	sql_order_by => " order by name",
 	treeview     => $tree_view,
-	fields       => [ 
-		{ 
-			name => "name", 
-			x_percent => 35, 
+	fields       => [
+		{
+			name => "name",
+			x_percent => 35,
 			validation => sub { &validate_name(@_); } },
-		{ 
-			name => "phone", 
-			x_percent => 60 }, 
-	], 
-	multi_select => TRUE 
+		{
+			name => "phone",
+			x_percent => 60 },
+	],
+	multi_select => TRUE
 };
 
 my $data_sheet = Gtk2::Ex::Datasheet::DBI->new($datasheet_def) || die ("Error setting up Gtk2::Ex::Datasheet::DBI\n");
@@ -66,20 +66,20 @@ $buttons->add($apply_button);
 sub on_btn_add_clicked {
 	$data_sheet->insert( );
 	#$data_sheet->insert( $data_sheet->column_from_name("GroupNo") => 1 );
-	
+
 }
 sub validate_name {
 	return 1;
 }
 
 sub on_btn_apply_clicked {
-	
+
 	$data_sheet->apply;
 }
 
 sub on_btn_delete_clicked {
 	$data_sheet->delete;
-	
+
 }
 
 

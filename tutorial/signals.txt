@@ -1,6 +1,6 @@
-Explanation of signals 
+Explanation of signals
 
-When something happens to the application 
+When something happens to the application
 	the mouse is moved
 	a button was clicked by the mouse
 	some key was pressed (or released) on the keyboard
@@ -22,8 +22,8 @@ line in it:
 
 This is actually a signal handler that will be called when the window is destroyed,
 that is when you click on the [x] on the window.
-Within the signal handler you can see an anonymous subroutin with the single command 
-in it to quite the Gtk2 application.	
+Within the signal handler you can see an anonymous subroutin with the single command
+in it to quite the Gtk2 application.
 Without this line when you click on [x] the window will disappear but the application
 will not quit. If you executed it from the command line you can kill it by
 Ctr-C but it will seem it "hangs".

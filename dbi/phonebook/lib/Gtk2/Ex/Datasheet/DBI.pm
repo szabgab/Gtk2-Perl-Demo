@@ -36,9 +36,9 @@ BEGIN {
 }
 
 sub new {
-	
+
 	my ( $class, $req ) = @_;
-	
+
 	# Assemble object from request
 	my $self = {
 			dbh				=> $$req{dbh},			# A database handle
@@ -52,35 +52,35 @@ sub new {
 			multi_select	=> $$req{multi_select},	# Boolean to enable multi selection mode
 			on_apply		=> $$req{on_apply}		# Code that runs *after* each *record* is applied
 	};
-	
+
 	bless $self, $class;
-	
+
 	$self->setup_treeview;
-	
+
 	# Remember the primary key column
 	$self->{primary_key_column} = scalar( @{$self->{fieldlist}} ) + 1 + ( $self->{dynamic_models} || 0 );
-	
+
 	$self->query;
-	
+
 	return $self;
-	
+
 }
 
 sub setup_treeview {
-	
+
 	# This sub sets up the TreeView, *and* a definition for the TreeStore ( which is used to create
 	# a new TreeStore whenever we requery )
-	
+
 	my $self = shift;
-	
+
 	# Cache the fieldlist array so we don't have to continually query the DB server for it
 	my $sth;
-	
+
 	eval {
 		$sth = $self->{dbh}->prepare( $self->{sql_select} . " from " . $self->{table} . " where 0=1" )
 			|| die $self->{dbh}->errstr;
 	};
-	
+
 	if ($@) {
 		Gtk2::Ex::Dialogs::ErrorMsg->new_and_run(
 								title		=> "Error in Query!",
@@ -88,11 +88,11 @@ sub setup_treeview {
 							);
 		return FALSE;
 	}
-	
+
 	eval {
 		$sth->execute || die $self->{dbh}->errstr;
 	};
-	
+
 	if ($@) {
 		Gtk2::Ex::Dialogs::ErrorMsg->new_and_run(
 								title		=> "Error in Query!",
@@ -100,14 +100,14 @@ sub setup_treeview {
 							);
 		return FALSE;
 	}
-	
+
 	$self->{fieldlist} = $sth->{'NAME'};
-	
+
 	$sth->finish;
-	
+
 	# Fetch column_info for current table
 	$sth = $self->{dbh}->column_info ( undef, $self->{schema}, $self->{table}, '%' );
-	
+
 	# Loop through the list of columns from the database, and
 	# add only columns that we're actually dealing with
 	#while ( my $column_info_row = $sth->fetchrow_hashref ) {
@@ -118,19 +118,19 @@ sub setup_treeview {
 	#		}
 	#	}
 	#}
-	
+
 	#$sth->finish;
 	$self->{column_info}->{id}    = {TYPE_NAME => "INTEGER"};
 	$self->{column_info}->{name}  = {TYPE_NAME => "CHAR"};
 	$self->{column_info}->{phone} = {TYPE_NAME => "CHAR"};
-	
+
 	# If there are no field definitions, then create some from our fieldlist from the database
 	if ( ! $self->{fields} ) {
 		for my $field ( @{$self->{fieldlist}} ) {
 			push @{$self->{fields}}, { name	=> $field };
 		}
 	}
-	
+
 	# Now loop through our field definitions, and fill in the renderers if they're not already done
 	for my $field ( @{$self->{fields}} ) {
 		if ( ! $field->{renderer} ) {
@@ -147,162 +147,162 @@ sub setup_treeview {
 			}
 		}
 	}
-	
+
 	my $column_no = 0;
-	
+
 	# First is the record status indicator: a CellRendererPixbuf ...
 	my $renderer = Gtk2::CellRendererPixbuf->new;
 	$self->{columns}[$column_no] = Gtk2::TreeViewColumn->new_with_attributes("", $renderer);
 	$self->{treeview}->append_column($self->{columns}[$column_no]);
-	
+
 	# Set up fixed size for status indicator and add to sum of fixed sizes
 	$self->{columns}[$column_no]->set_sizing("fixed");
 	$self->{columns}[$column_no]->set_fixed_width(20);
 	$self->{sum_absolute_x} = 20;
-	
+
 	$self->{columns}[$column_no]->set_cell_data_func( $renderer, sub { $self->render_pixbuf_cell( @_ ); } );
-	
+
 	# ... and the TreeStore column that goes with it
 	push @{$self->{ts_def}}, "Glib::Int";
-	
+
 	$column_no ++;
-	
+
 	# Now set up the model and columns
 	for my $field ( @{$self->{fields}} ) {
-		
+
 		# Rename 'none' renderer to 'hidden' ... support legacy software using the old term
 		if ( $field->{renderer} eq "none" ) {
 			$field->{renderer} = "hidden";
 		}
-		
+
 		$field->{column} = $column_no - 1; # The field number is 1 off the column number ( status column )
-		
+
 		if ( $field->{renderer} eq "text" || $field->{renderer} eq "hidden" || $field->{renderer} eq "number" ) {
-			
+
 			if ( $field->{renderer} eq "hidden" ) {
 				$renderer = Gtk2::CellRendererText->new; # No need for custom one if it's not being displayed
 			} else {
 				$renderer = MOFO::CellRendererText->new;
 			}
-			
+
 			$renderer->{column} = $column_no;
-			
+
 			if ( ! $self->{readonly} ) {
 				$renderer->set( editable => TRUE );
 			}
-			
+
 			$self->{columns}[$column_no] = Gtk2::TreeViewColumn->new_with_attributes(
 																						$field->{name},
 																						$renderer,
 																						'text'	=> $column_no
 																					);
-			
+
 			if ( $field->{renderer} eq "hidden" ) {
 				$self->{columns}[$column_no]->set_visible( FALSE );
 			}
-			
+
 			$renderer->signal_connect( edited => sub { $self->process_text_editing( @_ ); } );
-			
+
 			$self->{treeview}->append_column($self->{columns}[$column_no]);
-			
+
 			# Add a string column to the TreeStore definition ( recreated when we query() )
 			push @{$self->{ts_def}}, "Glib::String";
-			
+
 		#} elsif ( $field->{renderer} eq "number" ) {
-		#	
+		#
 		#	$renderer = MOFO::CellRendererSpinButton->new;
-		#	
+		#
 		#	if ( ! $self->{readonly} ) {
 		#		$renderer->set( mode => "editable" );
 		#	}
-		#	
+		#
 		#	$renderer->set(
 		#			min	=> $field->{min}	|| 0,
 		#			max	=> $field->{max}	|| 9999,
 		#			digits	=> $field->{digits}	|| 0,
 		#			step	=> $field->{step}	|| 1
 		#		      );
-		#	
+		#
 		#	$renderer->{column} = $column_no;
-		#	
+		#
 		#	$self->{columns}[$column_no] = Gtk2::TreeViewColumn->new_with_attributes(
 		#											$field->{name},
 		#											$renderer,
 		#											'value'	=> $column_no
 		#										);
-		#	
+		#
 		#	$renderer->signal_connect( edited => sub { $self->process_text_editing( @_ ); } );
-		#	
+		#
 		#	$self->{treeview}->append_column($self->{columns}[$column_no]);
-		#	
+		#
 		#	# Add a numeric field to the TreeStore definition ( recreated when we query() )
 		#	push @{$self->{ts_def}}, "Glib::Double";
-			
+
 		} elsif ( $field->{renderer} eq "combo" ) {
-			
+
 			$renderer = Gtk2::CellRendererCombo->new;
 			$renderer->{column} = $column_no;
-			
+
 			# Get the data type and attach it to the renderer, so we know what kind of comparison
 			# ( string vs numeric ) to use later
 			my $sql_name = $self->column_name_to_sql_name( $field->{name} );
 			my $fieldtype = $self->{column_info}->{$sql_name}->{TYPE_NAME};
-			
+
 			if ( $fieldtype =~ m/INT/ ) {
 				$renderer->{data_type} = "numeric";
 			} else {
 				$renderer->{data_type} = "string";
 			}
-			
+
 			if ( ! $self->{readonly} ) {
-				
+
 				$renderer->set(
 								editable	=> TRUE,
 								text_column	=> 1,
 								has_entry	=> TRUE
 							  );
-				
+
 				# It's possible that we won't have a model at this point
 				if ( $field->{model} ) {
 					$renderer->set( model	=> $field->{model} );
 				}
-				
+
 			}
-			
+
 			$self->{columns}[$column_no] = Gtk2::TreeViewColumn->new_with_attributes(
 													$field->{name},
 													$renderer,
 													text	=> $column_no
 												);
-			
+
 			$renderer->signal_connect( edited => sub { $self->process_text_editing( @_ ); } );
-			
+
 			$self->{treeview}->append_column($self->{columns}[$column_no]);
-			
+
 			$self->{columns}[$column_no]->set_cell_data_func($renderer, sub { $self->render_combo_cell( @_ ); } );
-			
+
 			# Add a string column to the TreeStore definition ( recreated when we query() )
 			push @{$self->{ts_def}}, "Glib::String";
-			
+
 		} elsif ( $field->{renderer} eq "dynamic_combo" ) {
-			
+
 			$renderer = Gtk2::CellRendererCombo->new;
 			$renderer->{column} = $column_no;
-			
+
 			# For a dynamic combo, we have to tell the TreeViewColumn where the model is.
 			# Therefore we need to keep track of how many models we've got.
 			# We can't use $self->column_from_name() because this only works for columns that have a matching
 			# field in our SQL command ( ie are in $self->{fieldlist} ). We also have to be careful not to
 			# upset the order of columns in $self->column_from_name and $self->{fieldlist} ... ie we should
 			# append these models at the end of the the main model, just before the primary key
-			
+
 			$self->{dynamic_models} ++;
 			$renderer->{dynamic_model_no} = $self->{dynamic_models};
 			$renderer->{dynamic_model_position} = scalar @{$self->{fieldlist}} + 1 + $self->{dynamic_model_no};
-			
+
 			# Keep this position number in the field has as well
 			$field->{dynamic_model_position} = $renderer->{dynamic_model_position};
-			
+
 			if ( ! $self->{readonly} ) {
 				$renderer->set(
 								editable	=> TRUE,
@@ -310,115 +310,115 @@ sub setup_treeview {
 								has_entry	=> TRUE
 							  );
 			}
-			
+
 			# Get the data type and attach it to the renderer, so we know what kind of comparison
 			# ( string vs numeric ) to use later
 			my $sql_name = $self->column_name_to_sql_name( $field->{name} );
 			my $fieldtype = $self->{column_info}->{$sql_name}->{TYPE_NAME};
-			
+
 			if ( $fieldtype =~ m/INT/ ) {
 				$renderer->{data_type} = "numeric";
 			} else {
 				$renderer->{data_type} = "string";
 			}
-			
+
 			$self->{columns}[$column_no] = Gtk2::TreeViewColumn->new_with_attributes(
 													$field->{name},
 													$renderer,
 													text	=> $column_no,
 													model	=> $renderer->{dynamic_model_position}
 												);
-			
+
 			$renderer->signal_connect( edited => sub { $self->process_text_editing( @_ ); } );
-			
+
 			$self->{treeview}->append_column($self->{columns}[$column_no]);
-			
+
 			$self->{columns}[$column_no]->set_cell_data_func($renderer, sub { $self->render_combo_cell( @_ ); } );
-			
+
 			# Add a string column to the TreeStore definition ( recreated when we query() )
 			push @{$self->{ts_def}}, "Glib::String";
-			
+
 			# Add a Gtk2::ListStore column to the TreeStore definition for the model of this combo,
 			# ***BUT*** we can't add it here - queue it until the end of the 'normal' columns ( in the SQL select )
 			push @{$self->{ts_models}}, "Gtk2::ListStore";
-			
+
 		} elsif ( $field->{renderer} eq "toggle" ) {
-			
+
 			$renderer = Gtk2::CellRendererToggle->new;
-			
+
 			if ( ! $self->{readonly} ) {
 				$renderer->set( activatable	=> TRUE );
 			}
-			
+
 			$renderer->{column} = $column_no;
-			
+
 			$self->{columns}[$column_no] = Gtk2::TreeViewColumn->new_with_attributes(
 													$field->{name},
 													$renderer,
 													active	=> $column_no
 												);
-			
+
 			$renderer->signal_connect( toggled => sub { $self->process_toggle( @_ ); } );
-			
+
 			$self->{treeview}->append_column($self->{columns}[$column_no]);
-			
+
 			# Add an integer column to the TreeStore definition ( recreated when we query() )
 			push @{$self->{ts_def}}, "Glib::Boolean";
-			
+
 		} elsif ( $field->{renderer} eq "date" ) {
-			
+
 			$renderer = MOFO::CellRendererDate->new;
 			$renderer->{column} = $column_no;
-			
+
 			if ( ! $self->{readonly} ) {
 				$renderer->set( mode => "editable" );
 			}
-			
+
 			$self->{columns}[$column_no] = Gtk2::TreeViewColumn->new_with_attributes(
 													$field->{name},
 													$renderer,
 													'date'	=> $column_no
 												);
-			
+
 			$renderer->signal_connect( edited => sub { $self->process_text_editing( @_ ); } );
-			
+
 			$self->{treeview}->append_column($self->{columns}[$column_no]);
-			
+
 			# Add a string column to the TreeStore definition ( recreated when we query() )
 			push @{$self->{ts_def}}, "Glib::String";
-			
+
 		} else {
-			
+
 			warn "Unknown render: " . $field->{renderer} . "\n";
-			
+
 		}
-		
+
 		# Set up column sizing stuff
 		if ( $field->{x_absolute} || $field->{x_percent} ) {
 			$self->{columns}[$column_no]->set_sizing("fixed");
 		}
-		
+
 		# Add any absolute x values to our total and set their column size ( once only for these )
 		if ( $field->{x_absolute} ) {
 			$self->{sum_absolute_x} += $field->{x_absolute};
 			$self->{columns}[$column_no]->set_fixed_width($field->{x_absolute});
 		}
-		
+
 		$column_no ++;
-		
+
 	}
-	
+
 	# Now we've finished the 'normal' columns, we can add any queued dynamic model definitions
 	for my $model_def ( @{$self->{ts_models}} ) {
 		push @{$self->{ts_def}}, $model_def;
 	}
-	
+
 	# Now that all the columns are set up, loop over them again looking for dynamic models, so we can
 	# set up automatic requerying of models when a column they depend on changes. We *could* have done this
 	# in the above loop, but there's a ( remote ) chance that someone will want to set up a dynamic combo
 	# that depends on a column *after* it ... while I can't see why people would do this, it's easy relatively
 	# easy to accomodate anyway.
-	
+
 	for my $field ( @{$self->{fields}} ) {
 		if ( $field->{renderer} && $field->{renderer} eq "dynamic_combo" ) {
 			for my $criteria ( @{$field->{model_setup}->{criteria}} ) {
@@ -427,53 +427,53 @@ sub setup_treeview {
 			}
 		}
 	}
-	
+
 	# Finally, a column for the primary key to the TreeStore definition ... *MUST* have a numberic primary key
 	push @{$self->{ts_def}}, "Glib::Int";
-	
+
 	# Now set up icons for use in the record status column
 	$self->{icons}[UNCHANGED]	= $self->{treeview}->render_icon( "gtk-yes",		"menu" );
 	$self->{icons}[CHANGED]		= $self->{treeview}->render_icon( "gtk-refresh",	"menu" );
 	$self->{icons}[INSERTED]	= $self->{treeview}->render_icon( "gtk-add",		"menu" );
 	$self->{icons}[DELETED]		= $self->{treeview}->render_icon( "gtk-delete",		"menu" );
-	
+
 	$self->{resize_signal} = $self->{treeview}->signal_connect( size_allocate => sub { $self->size_allocate( @_ ); } );
-	
+
 	# Turn on multi-select mode if requested
 	if ($self->{multi_select}) {
 		$self->{treeview}->get_selection->set_mode("multiple");
 	}
-	
+
 	$self->{current_width} = 0; # Prevent warnings
-	
+
 }
 
 sub render_pixbuf_cell {
-	
+
 	my ( $self, $tree_column, $renderer, $model, $iter ) = @_;
-	
+
 	my $status = $model->get($iter, STATUS_COLUMN);
 	$renderer->set(pixbuf => $self->{icons}[$status]);
-	
+
 }
 
 sub render_combo_cell {
-	
+
 	my ( $self, $tree_column, $renderer, $model, $iter ) = @_;
-	
+
 	# Get the ID that represents the text value to display
 	my $key_value = $model->get($iter, $renderer->{column});
-	
+
 	my $combo_model = $renderer->get("model");
-	
+
 	if ( $combo_model ) {
-		
+
 		# Loop through our combo's model and find a match for the above ID to get our text value
 		my $combo_iter = $combo_model->get_iter_first;
 		my $found_match = FALSE;
-		
+
 		while ($combo_iter) {
-			
+
 			if ( $renderer->{data_type} eq "numeric" ) {
 				if (
 						$combo_model->get( $combo_iter, 0 )
@@ -497,24 +497,24 @@ sub render_combo_cell {
 					last;
 				}
 			}
-			
+
 			$combo_iter = $combo_model->iter_next($combo_iter);
-			
+
 		}
-		
+
 		# If we haven't found a match, default to displaying an empty value
 		if ( !$found_match ) {
 			$renderer->set( text	=> "" );
 		}
-		
+
 	} else {
-		
+
 		print "Gtk2::Ex::Datasheet::DBI::render_combo_cell called without a model being attached!\n";
-		
+
 	}
-	
+
 	return FALSE;
-	
+
 }
 
 sub refresh_dynamic_combos {
@@ -523,55 +523,55 @@ sub refresh_dynamic_combos {
 	# ( ie dynamic combos - in this case *this* renderer will have an array of
 	# dependant_columns pointing to the *dependant* columns )
 	#  ... refresh them
-	
+
 	my ( $self, $renderer, $path ) = @_;
-	
+
 	my $model = $self->{treeview}->get_model;
 	my $iter = $model->get_iter ($path); # I've been told not to pass iters around, so we'd better get a fresh one
-	
+
 	if ( $renderer->{dependant_columns} ) {
-		
+
 		# Get the current row in an array
 		my @data = $model->get( $model->get_iter( $path ) );
-		
+
 		# We don't want the status column in there - it's not in the SQL fieldlist
 		my $status = shift( @data );
-		
+
 		for my $dependant ( @{$renderer->{dependant_columns}} ) {
-			
+
 			# Create a new model
 			my $new_model = $self->create_dynamic_model(
 															$self->{fields}[$dependant]->{model_setup},
 															\@data
 													   );
-			
+
 			# Dump the combo model in the main TreeView model
 			$model->set(
 					$iter,
 					$self->{fields}[$dependant]->{dynamic_model_position},
 					$new_model
 				   );
-			
+
 		}
-		
+
 	}
-	
+
 }
 
 sub process_text_editing {
-	
+
 	my ( $self, $renderer, $text_path, $new_text ) = @_;
-	
+
 	my $column_no = $renderer->{column};
 	my $path = Gtk2::TreePath->new_from_string ($text_path);
 	my $model = $self->{treeview}->get_model;
 	my $iter = $model->get_iter ($path);
-	
+
 	# If this is a CellRendererCombo, then we have to look up the ID to match $new_text
 	if ( ref($renderer) eq "Gtk2::CellRendererCombo" ) {
-		
+
 		my $combo_model;
-		
+
 		# If this is a dynamic combo, we can't get the model simply by $render->get("model") because
 		# this is unreliable if the user has clicked outside the current row to end editing.
 		if ( $renderer->{dynamic_model_position} ) {
@@ -579,35 +579,35 @@ sub process_text_editing {
 		} else {
 			$combo_model = $renderer->get("model");
 		}
-		
+
 		my $combo_iter = $combo_model->get_iter_first;
 		my $found_match = FALSE;
-		
+
 		while ($combo_iter) {
-			
+
 			if ($combo_model->get($combo_iter, 1) eq $new_text) {
 				$found_match = TRUE;
 				$new_text = $combo_model->get( $combo_iter, 0 ); # It's possible that this is a bad idea
 				last;
 			}
-			
+
 			$combo_iter = $combo_model->iter_next($combo_iter);
-			
+
 		}
-		
+
 		# If we haven't found a match, default to a zero
 		if ( !$found_match ) {
 			$new_text = 0; # This may also be a bad idea
 		}
-		
+
 	}
-	
+
 	# Test to see if there is *really* a change or whether we've just received a double-click
 	# or something else that hasn't actually changed the data
 	my $old_text = $model->get( $iter, $column_no );
-	
+
 	if ( $old_text ne $new_text ) {
-		
+
 		if ( $self->{fields}->[$column_no - 1]->{validation} ) { # Array of field defs starts at zero
 			if ( ! $self->{fields}->[$column_no - 1]->{validation}(
 									{
@@ -620,93 +620,93 @@ sub process_text_editing {
 				return FALSE; # Error dialog should have already been produced by validation code
 			}
 		}
-		
+
 		$model->set( $iter, $column_no, $new_text );
-        
+
 		# Refresh dependant columns if any
 		if ( $renderer->{dependant_columns} ) {
 			$self->refresh_dynamic_combos( $renderer, $path );
 		}
-		
+
 	}
-	
+
 	return FALSE;
-	
+
 }
 
 sub process_toggle {
-	
+
 	my ( $self, $renderer, $text_path, $something ) = @_;
-	
+
 	my $path = Gtk2::TreePath->new ($text_path);
 	my $model = $self->{treeview}->get_model;
 	my $iter = $model->get_iter ($path);
 	my $old_value = $model->get( $iter, $renderer->{column} );
 	$model->set ( $iter, $renderer->{column}, ! $old_value );
-	
+
 	# Refresh dependant columns if any
 	if ( $renderer->{dependant_columns} ) {
 		$self->refresh_dynamic_combos( $renderer, $path );
 	}
-	
+
 	return FALSE;
-	
+
 }
 
 sub query {
-	
+
 	my ( $self, $sql_where, $dont_apply ) = @_;
-	
+
 	my $model = $self->{treeview}->get_model;
-	
+
 	if ( ! $dont_apply && $model ) {
-		
+
 		# First test to see if we have any outstanding changes to the current datasheet
-		
+
 		my $iter = $model->get_iter_first;
-		
+
 		while ($iter) {
-			
+
 			my $status = $model->get($iter, STATUS_COLUMN);
-			
+
 			# Decide what to do based on status
 			if ( $status != UNCHANGED ) {
-				
+
 				my $answer = ask Gtk2::Ex::Dialogs::Question(
 						    title	=> "Apply changes to " . $self->{table} . " before querying?",
 						    text	=> "There are outstanding changes to the current datasheet ( " . $self->{table} . " )."
 									. " Do you want to apply them before running a new query?"
 									    );
-				
+
 				if ($answer) {
 				    if ( ! $self->apply ) {
 					return FALSE; # Apply method will already give a dialog explaining error
 				    }
 				}
-				
+
 			}
-			
+
 			$iter = $model->iter_next($iter);
-			
+
 		}
-		
+
 	}
-	
+
 	if (defined $sql_where) {
 		$self->{sql_where} = $sql_where;
 	}
-	
+
 	my $sth;
 	my $sql = $self->{sql_select} . ", " . $self->{primary_key} . " from " . $self->{table};
-	
+
 	if ($self->{sql_where}) {
 		$sql .= " " . $self->{sql_where};
 	}
-	
+
 	eval {
 		$sth = $self->{dbh}->prepare($sql) || die;
 	};
-	
+
 	if ($@) {
 			new_and_run Gtk2::Ex::Dialogs::ErrorMsg(
 								title   => "Error preparing select statement!",
@@ -714,14 +714,14 @@ sub query {
 							       );
 			return 0;
 	}
-	
+
 	# Create a new ListStore
 	my $liststore = Gtk2::ListStore->new(@{$self->{ts_def}});
-	
+
 	eval {
 		$sth->execute || die;
 	};
-	
+
 	if ($@) {
 			new_and_run Gtk2::Ex::Dialogs::ErrorMsg(
 								title   => "Error executing statement!",
@@ -729,82 +729,82 @@ sub query {
 							       );
 			return 0;
 	}
-	
+
 	while (my @row = $sth->fetchrow_array) {
-		
+
 		my @model_row;
 		my @dynamic_models;
 		my $column = 0;
-		
+
 		# Append a new treeiter, and the status indicator
 		push @model_row, $liststore->append, STATUS_COLUMN, UNCHANGED;
-		
+
 		for my $field (@{$self->{fields}}) {
-			
+
 			push @model_row, $column + 1, $row[$column];
-			
+
 			# If this is a dynamic combo, construct it's model now and queue it to be appended
 			# at the end of the 'normal' columns
-			
+
 			# *** TODO *** Do we need to actually queue this stuff, or can we specify them
 			# out-of-order, as long as we use the right values for the column number?
-			
+
 			if ( $field->{renderer} && $field->{renderer} eq "dynamic_combo" ) {
 				push @dynamic_models,
 					$field->{dynamic_model_position},
 					$self->create_dynamic_model( $field->{model_setup}, \@row );
 			}
-			
+
 			$column++;
 		}
-		
+
 		# Append queued models for dynamic combos
 		for my $dynamic_model ( @dynamic_models ) {
 			push @model_row, $dynamic_model;
 		}
-		
+
 		# Append the primary key to the end
 		push @model_row,
 			$column + 1 + ( $self->{dynamic_models} || 0 ),
 			$row[$column];
-		
+
 		$liststore->set(@model_row);
-		
+
 	}
-	
+
 	$self->{changed_signal} = $liststore->signal_connect( "row-changed" => sub { $self->changed(@_) } );
-	
+
 	$self->{treeview}->set_model($liststore);
-	
+
 }
 
 sub undo {
-	
+
 	my $self = shift;
-	
+
 	$self->query( undef, TRUE );
-	
+
 }
 
 sub changed {
-	
+
 	my ( $self, $liststore, $treepath, $iter ) = @_;
-	
+
 	my $model = $self->{treeview}->get_model;
-	
+
 	# Only change the record status if it's currently unchanged
 	if ( ! $model->get($iter, STATUS_COLUMN) ) {
 		$model->signal_handler_block($self->{changed_signal});
 		$model->set($iter, STATUS_COLUMN, CHANGED);
 		$model->signal_handler_unblock($self->{changed_signal});
 	}
-	
+
 }
 
 sub apply {
-	
+
 	my $self = shift;
-	
+
 	if ( $self->{readonly} ) {
 		new_and_run Gtk2::Ex::Dialogs::ErrorMsg(
 					title   => "Read Only!",
@@ -812,31 +812,31 @@ sub apply {
 				       );
 		return 0;
 	}
-	
+
 	my $model = $self->{treeview}->get_model;
 	my $iter = $model->get_iter_first;
-	
+
 	while ($iter) {
-		
+
 		my $status = $model->get($iter, STATUS_COLUMN);
-		
+
 		# Decide what to do based on status
 		if ( $status == UNCHANGED ) {
-			
+
 			$iter = $model->iter_next($iter);
 			next;
-			
+
 		} elsif ( $status == DELETED ) {
-			
+
 			my $primary_key = $model->get($iter, $self->{primary_key_column});
-			
+
 			my $sth = $self->{dbh}->prepare("delete from " . $self->{table}
 				. " where " . $self->{primary_key} . "=?");
-			
+
 			eval {
 				$sth->execute($primary_key) || die;
 			};
-			
+
 			if ($@) {
 					new_and_run Gtk2::Ex::Dialogs::ErrorMsg(
 										title   => "Error deleting record!",
@@ -844,20 +844,20 @@ sub apply {
 									       );
 					return 0;
 			};
-			
+
 			$model->remove($iter);
-			
+
 		} else {
-			
+
 			# We process the insert / update operations in a similar fashion
-			
+
 			my $sql;			# Final SQL to send to DB server
 			my $sql_fields;			# A comma-separated list of fields
 			my @values;			# An array of values taken from the current record
 			my $placeholders;		# A string of placeholders, eg ( ?, ?, ? )
 			my $field_index = 1;		# Start at offset=1 to skip over changed flag
 			my $primary_key = undef;	# We pass this to the on_apply() function
-			
+
 			foreach my $field ( @{$self->{fieldlist}} ) {
 				if ( $status == INSERTED ) {
 					$sql_fields .= " $field,";
@@ -868,10 +868,10 @@ sub apply {
 				push @values, $model->get( $iter, $field_index );
 				$field_index++;
 			}
-			
+
 			# Remove trailing comma
 			chop($sql_fields);
-			
+
 			if ( $status == INSERTED ) {
 				chop($placeholders);
 				$sql = "insert into " . $self->{table} . " ( $sql_fields ) values ( $placeholders )";
@@ -881,13 +881,13 @@ sub apply {
 				$primary_key = $model->get( $iter, $self->{primary_key_column} );
 				push @values, $primary_key;
 			}
-			
+
 			my $sth;
-			
+
 			eval {
 				$sth = $self->{dbh}->prepare($sql) || die;
 			};
-			
+
 			if ($@) {
 					new_and_run Gtk2::Ex::Dialogs::ErrorMsg(
 										title   => "Error preparing statement!",
@@ -895,11 +895,11 @@ sub apply {
 									       );
 					return 0;
 			}
-			
+
 			eval {
 				$sth->execute(@values) || die;
 			};
-			
+
 			if ($@) {
 					new_and_run Gtk2::Ex::Dialogs::ErrorMsg(
 										title   => "Error processing recordset!",
@@ -908,26 +908,26 @@ sub apply {
 					warn "Error updating recordset:\n$sql\n" . $@ . "\n\n";
 					return 0;
 			}
-			
+
 			# If we just inserted a record, we have to fetch the primary key and replace the current '!' with it
 			if ( $status == INSERTED ) {
 				$primary_key = $self->last_insert_id;
 				$model->set( $iter, $self->{primary_key_column}, $primary_key );
 			}
-			
+
 			# If we've gotten this far, the update was OK, so we'll reset the 'changed' flag
 			# and move onto the next record
 			$model->signal_handler_block($self->{changed_signal});
 			$model->set($iter, STATUS_COLUMN, UNCHANGED);
 			$model->signal_handler_unblock($self->{changed_signal});
-			
+
 			# Execute user-defined functions
 			if ( $self->{on_apply} ) {
-				
+
 				# Better change the status indicator back into text, rather than make
 				# people use our constants. I think, anyway ...
 				my $status_txt;
-				
+
 				if ( $status == INSERTED ) {
 					$status_txt = "inserted";
 				} elsif ( $status == CHANGED ) {
@@ -935,7 +935,7 @@ sub apply {
 				} elsif ( $status == DELETED ) {
 					$status_txt = "deleted"
 				}
-				
+
 				# Do people want the whole row? I don't. Maybe others would? Wait for requests...
 				$self->{on_apply}(
 						  {
@@ -943,23 +943,23 @@ sub apply {
 							primary_key	=> $primary_key,
 						  }
 						 );
-				
+
 			}
-			
+
 		}
-		
+
 		$iter = $model->iter_next($iter);
-		
+
 	}
-	
+
 	return TRUE;
-	
+
 }
 
 sub insert {
-	
+
 	my ( $self, @columns_and_values ) = @_;
-	
+
 	if ( $self->{readonly} ) {
 		new_and_run Gtk2::Ex::Dialogs::ErrorMsg(
 					title   => "Read Only!",
@@ -967,13 +967,13 @@ sub insert {
 				       );
 		return 0;
 	}
-		
+
 	my $model = $self->{treeview}->get_model;
 	my $iter = $model->append;
-	
+
 	# Append any remaining fields ( ie that haven't been explicitely defined in @columns_and_values )
 	# with default values from the database to the @columns_and_values array
-	
+
 	for my $column_no ( 0 .. @{$self->{fieldlist}} - 1) {
 		my $found = FALSE;
 		for ( my $x = 0; $x < ( scalar(@columns_and_values) / 2 ); $x ++ ) {
@@ -989,27 +989,27 @@ sub insert {
 				$self->{column_info}->{$self->{fieldlist}[$column_no]}->{COLUMN_DEF};
 		}
 	}
-	
+
 	my @new_record;
-	
+
 	push @new_record, $iter, STATUS_COLUMN, INSERTED;
-	
+
 	if ( scalar(@columns_and_values) ) {
 		push @new_record, @columns_and_values;
 	}
-	
+
 	$model->set( @new_record );
-	
+
 	$self->{treeview}->set_cursor( $model->get_path($iter), $self->{columns}[1], 1 );
-	
+
 	return 1;
-	
+
 }
 
 sub delete {
-	
+
 	my $self = shift;
-	
+
 	if ( $self->{readonly} ) {
 		new_and_run Gtk2::Ex::Dialogs::ErrorMsg(
 					title   => "Read Only!",
@@ -1017,180 +1017,180 @@ sub delete {
 				       );
 		return 0;
 	}
-		
+
 	# We only mark the selected record for deletion at this point
 	my @selected_paths = $self->{treeview}->get_selection->get_selected_rows;
 	my $model = $self->{treeview}->get_model;
-	
+
 	for my $path (@selected_paths) {
 		$model->set( $model->get_iter($path), STATUS_COLUMN, DELETED );
 	}
-	
+
 }
 
 sub size_allocate {
-	
+
 	my ( $self, $widget, $rectangle ) = @_;
-	
+
 	my ( $x, $y, $width, $height ) = $rectangle->values;
-	
+
 	if ( $self->{current_width} != $width ) { # *** TODO *** Fix this. Should block signal ( see below )
-		
+
 		# Absolute values are calculated in setup_treeview as they only have to be calculated once
 		# We take the sum of the absolute values away from the width we've just been passed, and *THEN*
 		# allocate the remainder to fields according to their x_percent values
-		
+
 		my $available_x = $width - $self->{sum_absolute_x};
-		
+
 		my $column_no = 1;
 		$self->{current_width} = $width;
-		
+
 		# *** TODO *** Doesn't currently work ( completely )
 		$self->{treeview}->signal_handler_block($self->{resize_signal});
-		
+
 		for my $field (@{$self->{fields}}) {
 			if ($field->{x_percent}) { # Only need to set ones that have a percentage
 				$self->{columns}[$column_no]->set_fixed_width( $available_x * ( $field->{x_percent} / 100 ) );
 			}
 			$column_no ++;
 		}
-		
+
 		# *** TODO *** Doesn't currently work ( completely )
 		$self->{treeview}->signal_handler_unblock($self->{resize_signal});
-		
+
 	}
-	
+
 }
 
 sub column_from_name {
-	
+
 	# This function takes an *SQL* field name and returns the column that the field is in by
 	# walking through the array $self->{fieldlist}
-	
+
 	# It returns the column no in the MODEL
-	
+
 	my ( $self, $sql_fieldname ) = @_;
-	
+
 	my $counter = 1; # Start at 1, because column 0 is status column
-	
+
 	for my $field ( @{$self->{fieldlist}} ) {
 		if ( $field eq $sql_fieldname ) {
 			return $counter;
 		}
 		$counter ++;
 	}
-	
+
 }
 
 sub column_from_column_name {
-	
+
 	# This function takes a *COLUMN* name and returns the column that the field is in by
 	# walking through the array $self->{fields}
-	
+
 	# It returns the column no in the MODEL
-	
+
 	my ( $self, $column_name ) = @_;
-	
+
 	my $counter = 1; # Start at 1, because column 0 is a status column
-	
+
 	for my $field ( @{$self->{fields}} ) {
 		if ( $field->{name} eq $column_name ) {
 			return $counter;
 		}
 		$counter ++;
 	}
-	
+
 }
 
 sub column_name_to_sql_name {
-	
+
 	# This function converts a column name to an SQL field name
-	
+
 	my ( $ self, $column_name ) = @_;
-	
+
 	my $column_no = $self->column_from_column_name ( $column_name );
 	return $self->{fieldlist}[$column_no - 1]; # minus 1 as $self->{fieldlist} doesn't have a status 'column'
-	
+
 }
 
 sub column_value {
-	
+
 	# This function returns the value in the requested column in the currently selected row
 	# If multi_select is turned on and more than 1 row is selected, it looks in the 1st row
-	
+
 	my ( $self, $sql_fieldname ) = @_;
-	
+
 	if ($self->{mult_select}) {
 		print "Gtk2::Ex::Datasheet::DBI - column_value() called with multi_select enabled!\n"
 			. " ... returning value from 1st selected row\n";
 	}
-	
+
 	my @selected_paths = $self->{treeview}->get_selection->get_selected_rows;
-	
+
 	if ( ! scalar(@selected_paths) ) {
 		return 0;
 	}
-		
+
 	my $model = $self->{treeview}->get_model;
-	
+
 	return $model->get( $model->get_iter($selected_paths[0]), $self->column_from_name($sql_fieldname) );
-	
+
 }
 
 sub last_insert_id {
-	
+
 	my $self = shift;
-	
+
 	my $sth = $self->{dbh}->prepare('select @@IDENTITY');
 	$sth->execute;
-	
+
 	if (my $row = $sth->fetchrow_array) {
 		return $row;
 	} else {
 		return undef;
 	}
-	
+
 }
 
 sub replace_combo_model {
-	
+
 	# This function replaces a *normal* combo ( NOT a dynamic one ) with a new one
-	
+
 	my ( $self, $column_no, $model ) = @_;
-	
+
 	my $column = $self->{treeview}->get_column($column_no);
 	my $renderer = ($column->get_cell_renderers)[0];
 	$renderer->set( model => $model );
-	
+
 	return TRUE;
-	
+
 }
 
 sub create_dynamic_model {
-	
+
 	# This function accepts a combo definition and a row of data ( *MINUS* the record status column ),
 	# and creates a combo model to insert back into the main TreeView's model
 	# We currently only support a model with 2 columns: an ID column and a Display column
-	
+
 	# *** TODO *** support adding more columns to the model
-	
+
 	my ( $self, $model_setup, $data ) = @_;
-	
+
 	# Firstly we clone the database handle, as the DBD::ODBC / FreeTDS combo won't allow
 	# multiple active statements on the same connection
-	
+
 	# *** TODO *** Test for the DBD::ODBC driver type so we don't clone the dbh unless we need to
-	
+
 	my $dbh = $self->{dbh}->clone;
-	
+
 	my $liststore = Gtk2::ListStore->new(
 						"Glib::String",
 						"Glib::String"
 					    );
-	
+
 	my $sql = "select " . $model_setup->{id} . ", " . $model_setup->{display} . " from " . $model_setup->{table};
 	my @bind_variables;
-	
+
 	if ( $model_setup->{criteria} ) {
 		$sql .= " where";
 		for my $criteria ( @{$model_setup->{criteria}} ) {
@@ -1198,23 +1198,23 @@ sub create_dynamic_model {
 			push @bind_variables, $$data[$self->column_from_name($criteria->{column_name}) - 1];
 		}
 	}
-	
+
 	$sql = substr( $sql, 0, length($sql) - 3 ); # Remove trailing 'and'
-	
+
 	if ( $model_setup->{group_by} ) {
 		$sql .= " " . $model_setup->{group_by};
 	}
-	
+
 	if ( $model_setup->{order_by} ) {
 		$sql .= " " . $model_setup->{order_by};
 	}
-	
+
 	my $sth;
-	
+
 	eval {
 		$sth = $dbh->prepare($sql) || die $dbh->errstr;
 	};
-	
+
 	if ($@) {
 		new_and_run Gtk2::Ex::Dialogs::ErrorMsg(
 					title   => "Error creating combo model!",
@@ -1222,27 +1222,27 @@ sub create_dynamic_model {
 				       );
 		return FALSE;
 	}
-	
+
 	$sth->execute(@bind_variables);
-	
+
 	my $iter;
-    
+
 	while (my @record = $sth->fetchrow_array) {
-		
+
 	        $iter = $liststore->append;
 		$liststore->set(
 					$iter,
 					0, $record[0],
 					1, $record[1]
 			       );
-	        
+
 	}
-	
+
 	$sth->finish;
 	$dbh->disconnect;
-	
+
 	return $liststore;
-	
+
 }
 
 1;
@@ -1274,32 +1274,32 @@ use Glib::Object::Subclass
   interfaces => [ Gtk2::CellEditable:: ];
 
 sub set_text {
-	
+
 	my ($editable, $text) = @_;
 	$text = "" unless (defined($text));
-	
+
 	$editable -> get_buffer() -> set_text($text);
-	
+
 }
 
 sub get_text {
-	
+
 	my ($editable) = @_;
 	my $buffer = $editable -> get_buffer();
-	
+
 	return $buffer -> get_text($buffer -> get_bounds(), TRUE);
-	
+
 }
 
 sub select_all {
-	
+
 	my ($editable) = @_;
 	my $buffer = $editable -> get_buffer();
-	
+
 	my ($start, $end) = $buffer -> get_bounds();
 	$buffer -> move_mark_by_name(insert => $start);
 	$buffer -> move_mark_by_name(selection_bound => $end);
-	
+
 }
 
 1;
@@ -1325,32 +1325,32 @@ use Glib::Object::Subclass
   ];
 
 sub INIT_INSTANCE {
-	
+
 	my ($cell) = @_;
-	
+
 	my $editable = MOFO::CellEditableText -> new();
-	
+
 	$editable -> set(border_width => $cell -> get("ypad"));
-	
+
 	$editable -> signal_connect(key_press_event => sub {
-		
+
 		my ($editable, $event) = @_;
-		
+
 		if ($event -> keyval == $Gtk2::Gdk::Keysyms{ Return } ||
 			$event -> keyval == $Gtk2::Gdk::Keysyms{ KP_Enter }
 			and not $event -> state & qw(control-mask)) {
-				
+
 				# Grab parent
 				my $parent = $editable->get_parent;
-				
+
 				$editable -> { _editing_canceled } = FALSE;
 				$editable -> editing_done();
 				$editable -> remove_widget();
-				
+
 				my ($path, $focus_column) = $parent->get_cursor;
 				my @cols = $parent->get_columns;
 				my $next_col = undef;
-				
+
 				foreach my $i (0..$#cols) {
 					if ($cols[$i] == $focus_column) {
 						if ($event->state >= 'shift-mask') {
@@ -1363,62 +1363,62 @@ sub INIT_INSTANCE {
 						last;
 					}
 				}
-				
+
 				$parent->set_cursor ($path, $next_col, 1)
 					if $next_col;
-				
+
 				return TRUE;
-				
+
 		}
-	
+
 		return FALSE;
-		
+
 	});
-	
+
 	$editable -> signal_connect(editing_done => sub {
-		
+
 		my ($editable) = @_;
-		
+
 		# gtk+ changed semantics in 2.6.  you now need to call stop_editing().
 		if (Gtk2 -> CHECK_VERSION(2, 6, 0)) {
 			$cell -> stop_editing($editable -> { _editing_canceled });
 		}
-		
+
 		# if gtk+ < 2.4.0, emit the signal regardless of whether editing was
 		# canceled to make undo/redo work.
-		
+
 		my $new = Gtk2 -> CHECK_VERSION(2, 4, 0);
-		
+
 		if (!$new || ($new && !$editable -> { _editing_canceled })) {
 			$cell -> signal_emit(edited => $editable -> { _path }, $editable -> get_text());
 		} else {
 			$cell -> editing_canceled();
 		}
 	});
-	
+
 	$cell -> set(editable_widget => $editable);
-	
+
 }
 
 sub START_EDITING {
-	
+
 	my ($cell, $event, $view, $path, $background_area, $cell_area, $flags) = @_;
-	
+
 	if ($event) {
 		return unless ($event -> button == 1);
 	}
-	
+
 	my $editable = $cell -> get("editable-widget");
-	
+
 	$editable -> { _editing_canceled } = FALSE;
 	$editable -> { _path } = $path;
-	
+
 	$editable -> set_text($cell -> get("text"));
 	$editable -> select_all();
 	$editable -> show();
-	
+
 	return $editable;
-	
+
 }
 
 #######################################################################################
@@ -1461,11 +1461,11 @@ use Glib::Object::Subclass
 		    ["max",   "Max",   "Ah, you're too generous.", 100.0],
 		    ["step",  "Step",  "Okay.",                      5.0])
 		  ];
-  
+
 sub INIT_INSTANCE {
-	
+
 	my $self = shift;
-	
+
 	$self->{editable} =     0;
 	$self->{digits}   =     2;
 	$self->{value}    =   0.0;
@@ -1473,56 +1473,56 @@ sub INIT_INSTANCE {
 	$self->{max}      = 100.0;
 	$self->{step}     =   5.0;
 	$self->{xalign}   =   1.0;
-	
+
 }
 
 sub calc_size {
-	
+
 	my ($cell, $layout, $area) = @_;
-	
+
 	my ($width, $height) = $layout -> get_pixel_size();
-	
+
 	return (
 		$area ? $cell->{xalign} * ($area->width - ($width + 3 * x_padding)) : 0,
 		0,
 		$width + x_padding * 2,
 		$height + y_padding * 2
 	       );
-	
+
 }
 
 sub format_text {
-	
+
 	my $cell = shift;
 	my $format = sprintf '%%.%df', $cell->{digits};
 	sprintf $format, $cell->{value};
-	
+
 }
 
 sub GET_SIZE {
-	
+
 	my ($cell, $widget, $area) = @_;
-	
+
 	my $layout = $cell -> get_layout($widget);
 	$layout -> set_text($cell -> format_text);
-	
+
 	return $cell -> calc_size($layout, $area);
-	
+
 }
 
 sub get_layout {
-	
+
 	my ($cell, $widget) = @_;
-	
+
 	return $widget -> create_pango_layout("");
-	
+
 }
 
 sub RENDER {
-	
+
 	my ($cell, $window, $widget, $background_area, $cell_area, $expose_area, $flags) = @_;
 	my $state;
-	
+
 	if ($flags & 'selected') {
 		$state = $widget -> has_focus()
 		? 'selected'
@@ -1532,12 +1532,12 @@ sub RENDER {
 		? 'insensitive'
 		: 'normal';
 	}
-	
+
 	my $layout = $cell -> get_layout($widget);
 	$layout -> set_text ($cell -> format_text);
-	
+
 	my ($x_offset, $y_offset, $width, $height) = $cell -> calc_size($layout, $cell_area);
-	
+
 	$widget -> get_style -> paint_layout(
 						$window,
 						$state,
@@ -1549,43 +1549,43 @@ sub RENDER {
 						$cell_area -> y() + $y_offset + y_padding,
 						$layout
 					    );
-	
+
 }
 
 sub START_EDITING {
-	
+
 	my ( $cell, $event, $view, $path, $background_area, $cell_area, $flags ) = @_;
 	my $spin_button = Gtk2::SpinButton -> new_with_range( $cell -> get(qw(min max step)) );
-	
+
 	$spin_button -> set_value($cell -> get("value"));
 	$spin_button -> set_digits($cell -> get("digits"));
-	
+
 	$spin_button -> grab_focus();
-	
+
 	$spin_button -> signal_connect(key_press_event => sub {
-		
+
 		my (undef, $event) = @_;
-		
+
 		# grab this for later.
 		my $parent = $spin_button->get_parent;
-		
+
 		if ($event -> keyval == $Gtk2::Gdk::Keysyms{ Return } ||
 			$event -> keyval == $Gtk2::Gdk::Keysyms{ KP_Enter } ||
 			$event -> keyval == $Gtk2::Gdk::Keysyms{ Tab }) {
-			
+
 				$spin_button -> update();
 				$cell -> signal_emit(edited => $path, $spin_button -> get_value());
 				$spin_button -> destroy();
-				
+
 				if ( ( $event -> keyval == $Gtk2::Gdk::Keysyms{ Return } ||
 					$event->keyval == $Gtk2::Gdk::Keysyms{ KP_Enter } )
 					&& $parent -> isa ('Gtk2::TreeView')) {
-					
+
 					# If the user has hit Enter, move to the next column
 					my ($path, $focus_column) = $parent->get_cursor;
 					my @cols = $parent->get_columns;
 					my $next_col = undef;
-					
+
 					foreach my $i (0..$#cols) {
 						if ($cols[$i] == $focus_column) {
 							if ($event->state >= 'shift-mask') {
@@ -1598,13 +1598,13 @@ sub START_EDITING {
 							last;
 						}
 					}
-					
+
 					$parent->set_cursor ($path, $next_col, 1)
 						if $next_col;
 				}
-				
+
 				return 1;
-				
+
 			} elsif ($event -> keyval == $Gtk2::Gdk::Keysyms{ Up }) {
 				$spin_button -> spin('step-forward', ($spin_button -> get_increments())[0]);
 				return 1;
@@ -1612,24 +1612,24 @@ sub START_EDITING {
 				$spin_button -> spin('step-backward', ($spin_button -> get_increments())[0]);
 				return 1;
 			}
-			
+
 			return 0;
-			
+
 		}
 				      );
-	
+
 	$spin_button -> signal_connect(focus_out_event => sub {
-		
+
 		$spin_button -> update();
 		$cell -> signal_emit(edited => $path, $spin_button -> get_value());
-		
+
 	}
 				      );
-	
+
 	$spin_button -> show_all();
-	
+
 	return $spin_button;
-	
+
 }
 
 1;
@@ -1640,17 +1640,17 @@ sub START_EDITING {
 #######################################################################################
 
 # Copyright (C) 2003 by Torsten Schoenfeld
-# 
+#
 # This library is free software; you can redistribute it and/or modify it under
 # the terms of the GNU Library General Public License as published by the Free
 # Software Foundation; either version 2.1 of the License, or (at your option)
 # any later version.
-# 
+#
 # This library is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 # FOR A PARTICULAR PURPOSE.  See the GNU Library General Public License for
 # more details.
-# 
+#
 # You should have received a copy of the GNU Library General Public License
 # along with this library; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307  USA.
@@ -1962,7 +1962,7 @@ Gtk2::Ex::Datasheet::DBI
 
 use DBI;
 use Gtk2 -init;
-use Gtk2::Ex::Datasheet::DBI; 
+use Gtk2::Ex::Datasheet::DBI;
 
 my $dbh = DBI->connect (
                         "dbi:mysql:dbname=sales;host=screamer;port=3306",
@@ -2030,21 +2030,21 @@ such as inserting, deleting, etc.
 =head2 new
 
 Object constructor. Expects a hash of key / value pairs. Bare minimum are:
-  
+
   dbh             - a DBI database handle
   table           - the name of the table you are querying
   primary_key     - the primary key of the table you are querying ( required for updating / deleting )
   sql_select      - the 'select' clause of the query
-  
+
 Other keys accepted are:
-  
+
   sql_where       - the 'where' clause of the query
   sql_order_by    - the 'order by' clause of the query
   multi_selcet    - a boolean to turn on the TreeView's 'multiple' selection mode
   fields          - an array of hashes to describe the fields ( columns ) in the TreeView
-  
+
 Each item in the 'fields' key is a hash, with the following possible keys:
-  
+
   name            - the name to display in the column's heading
   x_percent       - a percentage of the available width to use for this column
   x_absolute      - an absolute value to use for the width of this column
@@ -2115,7 +2115,7 @@ The 'criteria' key is an array of hashes for you to define criteria. Inside each
 The 'group_by' key is a 'group by' clause. You *shouldn't* need one, but I've added support anyway...
 
 The 'order_by' key is an 'order by' clause
-  
+
 =head2 query ( [ $new_where_clause ], [ $dont_apply ] )
 
 Requeries the DB server. If there are any outstanding changes that haven't been applied to the database,

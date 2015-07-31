@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 our $AUTOLOAD;
-#my $VERSION = 
+#my $VERSION =
 
 
 use Gtk2 -init;
@@ -23,7 +23,7 @@ sub on_main_window_destroy {
 
 sub on_button1_clicked {
 	my $text = $gladexml->get_widget('entry1')->get_text;
-	$gladexml->get_widget('label1')->set_text($text)	
+	$gladexml->get_widget('label1')->set_text($text)
 }
 
 
