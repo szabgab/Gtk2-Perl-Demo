@@ -16,7 +16,7 @@ my $imgv = new_from_file Gtk2::ImageViewer($file);
 $window->add($imgv);
 $window->show_all;
 
-my $tktimer = $mw->repeat(10, sub{      
+my $tktimer = $mw->repeat(10, sub{
    Gtk2->main_iteration while Gtk2->events_pending;
   });
 

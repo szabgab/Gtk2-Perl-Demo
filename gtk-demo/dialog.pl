@@ -62,7 +62,7 @@ sub interactive_dialog_clicked {
   $local_entry2->set_text ($entry2->get_text);
   $table->attach_defaults ($local_entry2, 1, 2, 1, 2);
   $label->set_mnemonic_widget ($local_entry2);
-  
+
   $hbox->show_all;
   my $response = $dialog->run;
 
@@ -121,7 +121,7 @@ sub do {
       $label->set_mnemonic_widget ($entry1);
 
       $label = Gtk2::Label->new_with_mnemonic ("E_ntry 2");
-      
+
       $table->attach_defaults ($label, 0, 1, 1, 2);
 
       $entry2 = Gtk2::Entry->new;
@@ -131,7 +131,7 @@ sub do {
 
   if (!$window->visible) {
       $window->show_all;
-  } else {    
+  } else {
       $window->destroy;
       $window = undef;
   }

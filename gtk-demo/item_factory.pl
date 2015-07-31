@@ -50,12 +50,12 @@ my $window = undef;
 sub do {
   if (!$window) {
       $window = Gtk2::Window->new;
-      
+
       $window->signal_connect (destroy => sub { $window = undef; 1 });
       $window->signal_connect (delete_event => sub { $window->destroy; 1 });
-      
+
       my $accel_group = Gtk2::AccelGroup->new;
-      my $item_factory = Gtk2::ItemFactory->new ('Gtk2::MenuBar', 
+      my $item_factory = Gtk2::ItemFactory->new ('Gtk2::MenuBar',
                                                  '<main>', $accel_group);
       $window->{"<main>"} = $item_factory;
       $window->add_accel_group ($accel_group);
@@ -69,7 +69,7 @@ sub do {
 
       my $box1 = Gtk2::VBox->new (FALSE, 0);
       $window->add ($box1);
-      
+
       $box1->pack_start ($item_factory->get_widget ("<main>"), FALSE, FALSE, 0);
 
       my $label = Gtk2::Label->new ("Type\n<alt>\nto start");

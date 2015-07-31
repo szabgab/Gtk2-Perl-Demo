@@ -68,7 +68,7 @@ sub GET_SIZE {
 
     $y_offset = $cell->get ('yalign') * ($cell_area->height - $height);
     $y_offset = MAX ($y_offset, 0);
-    
+
   }
 
   return ($x_offset, $y_offset, $width, $height);
@@ -83,7 +83,7 @@ $expose_area, $flags) = @_;
 
   my ($x_offset, $y_offset, $width, $height)
             = $cell->GET_SIZE ($widget, $cell_area);
- 
+
   my $state = $widget->has_focus ? 'active' : 'normal';
 
   my ($xpad, $ypad) = $cell->get (qw(xpad ypad));
@@ -92,7 +92,7 @@ $expose_area, $flags) = @_;
   $height -= $ypad*2;
   my $plainstyle = $widget->get_modifier_style->copy;
 
-  $cell->set('cell_background_set' => 'grey'); 
+  $cell->set('cell_background_set' => 'grey');
 
   $widget->style->paint_box ($window,
                              $state, 'out',
@@ -178,7 +178,7 @@ sub create_view_and_model {
   my $view = Gtk2::ComboBox->new($liststore);
   my $renderer = Gtk2::CellRendererText->new;
   my $view_alloc = $view->allocation;
-  
+
   $view->pack_start ($renderer, TRUE);
   $view->add_attribute($renderer, text => COL_TEXT);
 

@@ -10,17 +10,17 @@ to use this object, then go ahead, but remember the gpl.
 
 #
 # Copyright (C) 2003-2004 by muppet
-# 
+#
 # This library is free software; you can redistribute it and/or modify it under
 # the terms of the GNU Library General Public License as published by the Free
 # Software Foundation; either version 2.1 of the License, or (at your option)
 # any later version.
-# 
+#
 # This library is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 # FOR A PARTICULAR PURPOSE.  See the GNU Library General Public License for
 # more details.
-# 
+#
 # You should have received a copy of the GNU Library General Public License
 # along with this library; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307  USA.
@@ -147,7 +147,7 @@ sub menu_pos_func {
 	# entire treeview's coordinate space; if it's inside a scrolled
 	# window, then only part of it is visible.  thus, we need to add
 	# the offset of the visible portion of the treeview.  we want the
-	# menu to start xpad from the left of the cell (just like the 
+	# menu to start xpad from the left of the cell (just like the
 	# button graphic), and we'll start by centering it vertically.
 	# got all that?
 	my ($wx, $wy) = $treeview->get_bin_window->get_origin;

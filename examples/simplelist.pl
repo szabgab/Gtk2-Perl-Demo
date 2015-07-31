@@ -3,17 +3,17 @@
 #
 # Copyright (C) 2003 by the gtk2-perl team (see the file AUTHORS for the full
 # list)
-# 
+#
 # This library is free software; you can redistribute it and/or modify it under
 # the terms of the GNU Library General Public License as published by the Free
 # Software Foundation; either version 2.1 of the License, or (at your option)
 # any later version.
-# 
+#
 # This library is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 # FOR A PARTICULAR PURPOSE.  See the GNU Library General Public License for
 # more details.
-# 
+#
 # You should have received a copy of the GNU Library General Public License
 # along with this library; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307  USA.
@@ -30,21 +30,21 @@ use Gtk2::SimpleList;
 # add a new type of column that reverses the text that's in a scalar
 Gtk2::SimpleList->add_column_type(
 	'ralacs', 	# think about it for a second...
-		type     => 'Glib::Scalar',      
-		renderer => 'Gtk2::CellRendererText',   
+		type     => 'Glib::Scalar',
+		renderer => 'Gtk2::CellRendererText',
 		attr     => sub {
 			my ($tree_column, $cell, $model, $iter, $i) = @_;
 			my $info = $model->get ($iter, $i);
 			$info = join('',reverse(split('', $info || '' )));
 			$cell->set (text => $info);
-		} 
+		}
 	);
 
 # add a new type of column that sums up an array reference
 Gtk2::SimpleList->add_column_type(
 	'sum_of_array',
-		type     => 'Glib::Scalar',      
-		renderer => 'Gtk2::CellRendererText',   
+		type     => 'Glib::Scalar',
+		renderer => 'Gtk2::CellRendererText',
 		attr     => sub {
 			my ($tree_column, $cell, $model, $iter, $i) = @_;
 			my $sum = 0;
@@ -54,7 +54,7 @@ Gtk2::SimpleList->add_column_type(
 				$sum += $_;
 			}
 			$cell->set (text => $sum);
-		} 
+		}
 	);
 
 my $win = Gtk2::Window->new;
@@ -160,7 +160,7 @@ $vbox->pack_end($btn, 0, 1, 0);
 $slist->signal_connect (row_activated => sub {
 		my ($slist, $path, $column) = @_;
 		my $row_ref = $slist->get_row_data_from_path ($path);
-		print 'act '.Dumper ($row_ref);	
+		print 'act '.Dumper ($row_ref);
 	});
 
 # just for shorthand
@@ -168,7 +168,7 @@ my $dslist = $slist->{data};
 my $op_count = 0;
 
 my @pixbufs;
-foreach (qw/gtk-ok gtk-cancel gtk-quit gtk-apply gtk-clear 
+foreach (qw/gtk-ok gtk-cancel gtk-quit gtk-apply gtk-clear
 	    gtk-delete gtk-execute gtk-dnd/)
 {
 	push @pixbufs, $win->render_icon ($_, 'menu');
@@ -182,8 +182,8 @@ sub btn_clicked
 
 	if( $op eq 'Push' )
 	{
-		push @$dslist, [ 'pushed',5, 5.5, 0, 'scalar pushed', 
-			$pixbufs[rand($#pixbufs+1)], 'scalar pushed', 
+		push @$dslist, [ 'pushed',5, 5.5, 0, 'scalar pushed',
+			$pixbufs[rand($#pixbufs+1)], 'scalar pushed',
 			[5, 6, 7], '<span color="green">pushed</span>' ];
 	}
 	elsif( $op eq 'Pop' )
@@ -192,7 +192,7 @@ sub btn_clicked
 	}
 	elsif( $op eq 'Unshift' )
 	{
-		unshift @$dslist, [ 'unshifted', 6, 6.6, 1, 'scalar unshifted', 
+		unshift @$dslist, [ 'unshifted', 6, 6.6, 1, 'scalar unshifted',
 			$pixbufs[rand($#pixbufs+1)], 'scalar unshifted',
 			[6, 7, 8], '<span color="green">unshift</span>' ];
 	}
@@ -202,7 +202,7 @@ sub btn_clicked
 	}
 	elsif( $op eq 'Change 1' )
 	{
-		$dslist->[0] = [ 'changed1', 7, 7.7, 0, 'scalar changed1', 
+		$dslist->[0] = [ 'changed1', 7, 7.7, 0, 'scalar changed1',
 			$pixbufs[rand($#pixbufs+1)], 'scalar changed1',
 			[7, 8, 9], '<span color="green">changed1</span>' ];
 	}
@@ -256,16 +256,16 @@ sub btn_clicked
 		# in the simple list's data.
 
 		@{$slist->{data}} = (
-			[ 'one', 1, 1.1, 1, 'uno', undef, 'uno', 
+			[ 'one', 1, 1.1, 1, 'uno', undef, 'uno',
 				[1, 2, 3],
 				'<span color="green">one</span>' ],
-			[ 'two', 2, 2.2, 0, 'dos', undef, 'dos', 
+			[ 'two', 2, 2.2, 0, 'dos', undef, 'dos',
 				[2, 3, 4],
 				'<span color="green">two</span>' ],
-			[ 'three', 3, 3.3, 1, 'tres', undef, 'tres', 
+			[ 'three', 3, 3.3, 1, 'tres', undef, 'tres',
 				[3, 4, 5],
 				'<span color="green">three</span>' ],
-			[ 'four', 4, 4.4, 0, 'quatro', undef,  'quatro', 
+			[ 'four', 4, 4.4, 0, 'quatro', undef,  'quatro',
 				[4, 5, 6],
 				'<span color="green">four</span>' ],
 		);
@@ -275,30 +275,30 @@ sub btn_clicked
 		# can't use shorthand on this b/c we're replacing the ref
 		# in the simple list's data.
 		push @{$slist->{data}}, (
-			[ 'one', 1, 1.1, 1, 'uno', undef, 'uno', 
+			[ 'one', 1, 1.1, 1, 'uno', undef, 'uno',
 				[1, 2, 3],
 				'<span color="green">one</span>' ],
-			[ 'two', 2, 2.2, 0, 'dos', undef, 'dos', 
+			[ 'two', 2, 2.2, 0, 'dos', undef, 'dos',
 				[2, 3, 4],
 				'<span color="green">two</span>' ],
-			[ 'three', 3, 3.3, 1, 'tres', undef, 'tres', 
+			[ 'three', 3, 3.3, 1, 'tres', undef, 'tres',
 				[3, 4, 5],
 				'<span color="green">three</span>' ],
-			[ 'four', 4, 4.4, 0, 'quatro', undef,  'quatro', 
+			[ 'four', 4, 4.4, 0, 'quatro', undef,  'quatro',
 				[4, 5, 6],
 				'<span color="green">four</span>' ],
 		);
 		unshift @{$slist->{data}}, (
-			[ 'one', 1, 1.1, 1, 'uno', undef, 'uno', 
+			[ 'one', 1, 1.1, 1, 'uno', undef, 'uno',
 				[1, 2, 3],
 				'<span color="green">one</span>' ],
-			[ 'two', 2, 2.2, 0, 'dos', undef, 'dos', 
+			[ 'two', 2, 2.2, 0, 'dos', undef, 'dos',
 				[2, 3, 4],
 				'<span color="green">two</span>' ],
-			[ 'three', 3, 3.3, 1, 'tres', undef, 'tres', 
+			[ 'three', 3, 3.3, 1, 'tres', undef, 'tres',
 				[3, 4, 5],
 				'<span color="green">three</span>' ],
-			[ 'four', 4, 4.4, 0, 'quatro', undef,  'quatro', 
+			[ 'four', 4, 4.4, 0, 'quatro', undef,  'quatro',
 				[4, 5, 6],
 				'<span color="green">four</span>' ],
 		);

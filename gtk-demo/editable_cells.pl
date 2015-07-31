@@ -183,7 +183,7 @@ sub do {
 
   if (!$window->visible) {
       $window->show_all;
-  } else {	 
+  } else {
       $window->destroy;
       $window = undef;
   }

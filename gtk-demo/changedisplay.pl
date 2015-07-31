@@ -1,6 +1,6 @@
 #
 # Change Display
-# 
+#
 # Demonstrates migrating a window between different displays and
 # screens. A display is a mouse and keyboard with some number of
 # associated monitors. A screen is a set of monitors grouped
@@ -22,7 +22,7 @@
 #  - Changing the screen for a window
 #
 #  - Letting the user choose a window by clicking on it
-# 
+#
 #  - Using GtkListStore and GtkTreeView
 #
 #  - Using GtkDialog
@@ -54,7 +54,7 @@ use Gtk2;
 #  GtkTreeModel *display_model;
 #  GtkTreeModel *screen_model;
 #  GtkTreeSelection *screen_selection;
-#  
+#
 #  GdkDisplay *current_display;
 #  GdkScreen *current_screen;
 #};
@@ -115,23 +115,23 @@ sub query_for_toplevel {
 
   my $display = $screen->get_display;
   my $toplevel = undef;
-  
+
   my $popup = Gtk2::Window->new ('popup');
   $popup->set_screen ($screen);
   $popup->set_modal (TRUE);
   $popup->set_position ('center');
-  
+
   my $frame = Gtk2::Frame->new;
   $frame->set_shadow_type ('out');
   $popup->add ($frame);
-  
+
   my $label = Gtk2::Label->new ($prompt);
   $label->set_padding (10, 10);
   $frame->add ($label);
-  
+
   $popup->show_all;
   my $cursor = Gtk2::Gdk::Cursor->new_for_display ($display, 'crosshair');
-  
+
   if (Gtk2::Gdk->pointer_grab ($popup->window, FALSE,
                                'button-release-mask',
                                undef,
@@ -141,7 +141,7 @@ sub query_for_toplevel {
       my $clicked = FALSE;
 
       $popup->signal_connect (button_release_event => \&button_release_event_cb, \$clicked);
-      
+
       #
       # Process events until clicked is set by button_release_event_cb.
       # We pass in may_block=TRUE since we want to wait if there
@@ -150,15 +150,15 @@ sub query_for_toplevel {
       while (!$clicked) {
 	Glib::MainContext->default->iteration (TRUE);
       }
-      
+
       $toplevel = find_toplevel_at_pointer ($screen->get_display);
       # don't move yourself
       $toplevel = undef if defined $toplevel and $toplevel == $popup;
     }
-      
+
   $popup->destroy;
   Gtk2::Gdk->flush;			# Really release the grab
-  
+
   return $toplevel;
 }
 
@@ -190,10 +190,10 @@ sub fill_screens {
 
   if ($info->{current_display}) {
       my $n_screens = $info->{current_display}->get_n_screens;
-      
+
       for (my $i = 0; $i < $n_screens; $i++) {
 	  my $screen = $info->{current_display}->get_screen ($i);
-	  
+
 	  my $iter = $info->{screen_model}->append;
 	  $info->{screen_model}->set ($iter,
 				      SCREEN_COLUMN_NUMBER, $i,
@@ -245,11 +245,11 @@ sub open_display_cb {
 
   $display_entry->grab_focus;
   $dialog->child->show_all;
-  
+
   while (!$result) {
       my $response_id = $dialog->run;
       last unless $response_id eq 'ok';
-      
+
       my $new_screen_name = $display_entry->get_chars (0, -1);
 
       if (length $new_screen_name) {
@@ -259,7 +259,7 @@ sub open_display_cb {
 	  }
       }
   }
-  
+
   $dialog->destroy;
 }
 
@@ -317,7 +317,7 @@ sub screen_changed_cb {
 #
 sub create_frame {
   my ($info, $title) = @_;
-  
+
   my $frame = Gtk2::Frame->new ($title);
 
   my $hbox = Gtk2::HBox->new (FALSE, 8);
@@ -342,7 +342,7 @@ sub create_frame {
   if (!$info->{size_group}) {
     $info->{size_group} = Gtk2::SizeGroup->new ('horizontal');
   }
-  
+
   $info->{size_group}->add_widget ($button_vbox);
 
   return ($frame, $tree_view, $button_vbox);
@@ -371,7 +371,7 @@ sub create_display_frame {
   my $button = left_align_button_new ("_Open...");
   $button->signal_connect (clicked => \&open_display_cb, $info);
   $button_vbox->pack_start ($button, FALSE, FALSE, 0);
-  
+
   $button = left_align_button_new ("_Close");
   $button->signal_connect (clicked => \&close_display_cb, $info);
   $button_vbox->pack_start ($button, FALSE, FALSE, 0);
@@ -445,13 +445,13 @@ sub add_display {
   my ($info, $display) = @_;
 
   my $name = $display->get_name;
-  
+
   my $iter = $info->{display_model}->append;
   $info->{display_model}->set ($iter,
                                DISPLAY_COLUMN_NAME,    $name,
                                DISPLAY_COLUMN_DISPLAY, $display);
 
-  $display->signal_connect (closed => \&display_closed_cb, $info); 
+  $display->signal_connect (closed => \&display_closed_cb, $info);
 }
 
 #
@@ -494,7 +494,7 @@ sub destroy_info {
   foreach my $display ($manager->list_displays) {
     $display->signal_handlers_disconnect_by_func (\&display_closed_cb, $info);
   }
-  
+
   $info = undef;
 }
 
@@ -538,12 +538,12 @@ sub do {
 
       my $vbox = Gtk2::VBox->new (FALSE, 5);
       $vbox->set_border_width (8);
-	
+
       $info->{window}->vbox->pack_start ($vbox, TRUE, TRUE, 0);
 
       my $frame = create_display_frame ($info);
       $vbox->pack_start ($frame, TRUE, TRUE, 0);
-      
+
       $frame = create_screen_frame ($info);
       $vbox->pack_start ($frame, TRUE, TRUE, 0);
 

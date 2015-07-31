@@ -21,7 +21,7 @@ $window->signal_connect (destroy => sub { Gtk2->main_quit; });
 
 my $button = Gtk2::Button->new("Exit");
 
-# this is the same as 
+# this is the same as
 # my $button = Gtk2::Button->new_with_label("Exit");
 
 # A better approach is to use mnemonic.
@@ -33,7 +33,7 @@ my $button = Gtk2::Button->new("Exit");
 
 
 # Probably the best approach is to use stock item.
-# There are many stock items 
+# There are many stock items
 # (see gtk-Stock-Items.html in the documentation)
 #my $button = Gtk2::Button->new_from_stock("gtk-quit");
 

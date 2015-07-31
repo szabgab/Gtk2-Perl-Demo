@@ -40,7 +40,7 @@ Glib::IO->add_watch(
     sub {
         my ( $fd, $condition ) = @_;
         if ( $condition >= 'in' ) {
-            my $lines = (<IN>);  
+            my $lines = (<IN>);
 	    $buffer->insert( $buffer->get_end_iter, $lines ); #need scalar
         }
         if ( $condition >= 'hup' ) {

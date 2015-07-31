@@ -13,7 +13,7 @@ my ($page_width, $page_height) = $config->get_page_size;
 
 $pc->beginpage("1");
 
-my $img = Gtk2::Gdk::Pixbuf->new_from_file('adis.jpg'); 
+my $img = Gtk2::Gdk::Pixbuf->new_from_file('adis.jpg');
 #an image sized 100x48 in 3bytes/pixel
 
 $pc->moveto($page_width/2-$img->get_width/2,

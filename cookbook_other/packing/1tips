@@ -1,4 +1,4 @@
- At the root of the tree should be a
+At the root of the tree should be a
 Gtk2::Window, which can contain a single child.
 Normally the window will contain either a VBox or
 HBox. In the example above a VBox is used. That
@@ -18,7 +18,7 @@ widget hierarchy is shown above.
 
 $vbox can contain multiple widgets
 
-A Frame is a simple widget with a text label 
+A Frame is a simple widget with a text label
 and outline box, it can contain a single widget.
 
 

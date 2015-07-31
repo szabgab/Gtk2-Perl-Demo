@@ -6,17 +6,17 @@
 #
 # Copyright (C) 2003 by the gtk2-perl team (see the file AUTHORS for the full
 # list)
-# 
+#
 # This library is free software; you can redistribute it and/or modify it under
 # the terms of the GNU Library General Public License as published by the Free
 # Software Foundation; either version 2.1 of the License, or (at your option)
 # any later version.
-# 
+#
 # This library is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 # FOR A PARTICULAR PURPOSE.  See the GNU Library General Public License for
 # more details.
-# 
+#
 # You should have received a copy of the GNU Library General Public License
 # along with this library; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307  USA.
@@ -61,17 +61,17 @@ sub create_bbox
 	#gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox), child_w, child_h);
 
 	my $button = Gtk2::Button->new_from_stock('gtk-ok');
-	$button->signal_connect( 'clicked' => sub { 
+	$button->signal_connect( 'clicked' => sub {
 			print "$title ok clicked\n"; } );
 	$bbox->add($button);
 
 	$button = Gtk2::Button->new_from_stock('gtk-cancel');
-	$button->signal_connect( 'clicked' => sub { 
+	$button->signal_connect( 'clicked' => sub {
 			print "$title cancel clicked\n"; } );
 	$bbox->add($button);
 
 	$button = Gtk2::Button->new_from_stock('gtk-help');
-	$button->signal_connect( 'clicked' => sub { 
+	$button->signal_connect( 'clicked' => sub {
 			print "$title help clicked\n"; } );
 	$bbox->add($button);
 

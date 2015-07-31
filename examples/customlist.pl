@@ -335,7 +335,7 @@ sub set {
 	# This is so we can avoid trying to extract the guts of an iter
 	# that we did not create in the first place.
 	my $iter = $treeiter->to_arrayref($self->{stamp});
-	
+
 	my $record = $iter->[2];
 
 	while (my ($col, $val) = each %vals) {

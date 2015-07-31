@@ -3,17 +3,17 @@
 #
 # Copyright (C) 2003 by the gtk2-perl team (see the file AUTHORS for the full
 # list)
-# 
+#
 # This library is free software; you can redistribute it and/or modify it under
 # the terms of the GNU Library General Public License as published by the Free
 # Software Foundation; either version 2.1 of the License, or (at your option)
 # any later version.
-# 
+#
 # This library is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 # FOR A PARTICULAR PURPOSE.  See the GNU Library General Public License for
 # more details.
-# 
+#
 # You should have received a copy of the GNU Library General Public License
 # along with this library; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307  USA.
@@ -77,7 +77,7 @@ sub threshold_to_screen {
 #
 # in order to create a new type to which you can add signals and properties,
 # and which will be indistinguishable from "normal" GObjects at the C level
-# (which means you can pass it to other gtk functions), you need to 
+# (which means you can pass it to other gtk functions), you need to
 # register your subclass with the Glib::Type subsystem.
 #
 # here, we're registering the current package as a new subclass of
@@ -223,7 +223,7 @@ sub calc_dims {
 			   / Gtk2::Pango->scale; #PANGO_SCALE;
 	$plot->{textheight} = ($metrics->get_descent + $metrics->get_ascent)
 		            / Gtk2::Pango->scale; #PANGO_SCALE;
-	
+
 	$plot->{chartleft} = $plot->{textwidth} + 2;
 	$plot->{chartwidth} = $plot->allocation->width - $plot->{chartleft};
 	$plot->{bottom} = $plot->allocation->height - $plot->{textheight} - 3;
@@ -293,7 +293,7 @@ sub draw_th_marker {
 	$plot->{marker_textwidth} = $textwidth;
 
 	# erase text
-	$w->draw_rectangle ($plot->style->bg_gc($plot->state), 
+	$w->draw_rectangle ($plot->style->bg_gc($plot->state),
 			    TRUE,
 			    $threshold_screen - $plot->{marker_textwidth} - 1,
 			    $plot->{bottom} + 1,
@@ -302,7 +302,7 @@ sub draw_th_marker {
 			    $textheight);
 
 	if ($draw_text) {
-		$w->draw_layout ($plot->{th_gc}, 
+		$w->draw_layout ($plot->{th_gc},
 				 $threshold_screen - $plot->{marker_textwidth},
 				 $plot->{bottom} + 1,
 				 $plot->{current_layout});
@@ -369,7 +369,7 @@ sub button_press_event {
 	$plot->draw_th_marker ($plot->window, TRUE);
 	$plot->{dragging} = TRUE;
 
-	$drag_info{offset_x} = 
+	$drag_info{offset_x} =
 		$plot->threshold_to_screen ($plot->{threshold}) - $event->x;
 
 	return TRUE;
@@ -379,13 +379,13 @@ sub button_release_event {
 	my ($plot, $event) = @_;
 
 	return FALSE
-		if ($event->button != 1 
+		if ($event->button != 1
 		    || !$plot->{dragging}
 		    || not defined $plot->{pixmap});
 
 	# erase the previous threshold line from the window...
 	$plot->draw_th_marker ($plot->window, FALSE);
-	$plot->{threshold} = 
+	$plot->{threshold} =
 		$plot->screen_to_threshold ($event->x + $drag_info{offset_x});
 	# and draw the new one on the pixmap.
 	$plot->draw_th_marker ($plot->{pixmap}, TRUE);
@@ -481,16 +481,16 @@ sub motion_notify_event {
 		return FALSE
 			unless $state >= 'button1-mask'
 			    and defined $plot->{pixmap};
-		
+
 		$plot->draw_th_marker ($plot->window, FALSE);
-		
+
 		$x += $drag_info{offset_x};
-		
+
 		# confine to valid region
 		my $t = $plot->screen_to_threshold ($x);
 		$x = $plot->threshold_to_screen (0) if $t < 0;
 		$x = $plot->threshold_to_screen (255) if $t > 255;
-		
+
 		$plot->{threshold} = $plot->screen_to_threshold ($x);
 		$plot->draw_th_marker ($plot->window, TRUE);
 
@@ -543,7 +543,7 @@ sub histogram_draw {
 	$plot->{pixmap}->draw_line ($gc, 0, 0, $plot->{chartleft}, 0);
 	$plot->{pixmap}->draw_line ($gc, 0, $plot->{bottom},
 				    $plot->{chartleft}, $plot->{bottom});
-	$plot->{pixmap}->draw_line ($gc, $plot->{chartleft}, $plot->{bottom}, 
+	$plot->{pixmap}->draw_line ($gc, $plot->{chartleft}, $plot->{bottom},
 				    $plot->{chartleft},
 				    $plot->{bottom} + $plot->{textheight} + 1);
 	$plot->{pixmap}->draw_line ($gc,
@@ -554,7 +554,7 @@ sub histogram_draw {
 			 1, $plot->{maxval_layout});
 	$plot->{pixmap}->draw_layout ($gc,
 			 $plot->{chartleft} - (1 + $plot->{textwidth}),
-			 $plot->{bottom} - 1 - $plot->{textheight}, 
+			 $plot->{bottom} - 1 - $plot->{textheight},
 			 $plot->{origin_layout});
 	$plot->{pixmap}->draw_layout ($gc,
 			 $plot->{chartleft} + 2, $plot->{bottom} + 1,
@@ -584,7 +584,7 @@ sub set_plot_data {
 		}
 		$plot->{max} = $max;
 		$plot->{histogram} = \@hist;
-		$plot->{maxval_layout}->set_text 
+		$plot->{maxval_layout}->set_text
 			( sprintf "%4.1f%%", (100.0 * $plot->{max}) / $total );
 	}
 

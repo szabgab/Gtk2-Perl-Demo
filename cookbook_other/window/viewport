@@ -35,9 +35,9 @@ $button->signal_connect( clicked => \&delete_event );
 # creates its own adjustment
 my ($value, $lower, $upper, $step_increment, $page_increment, $page_size)=
    ( 60,     0,       100 ,    1           , 1              , 0.0);
-   	    
+
 my $hadjustment = Gtk2::Adjustment->new(
- $value, $lower, $upper, $step_increment, 
+ $value, $lower, $upper, $step_increment,
  $page_increment, $page_size);
 my $vadjustment = undef;
 
@@ -54,4 +54,4 @@ Gtk2->main;
 sub delete_event {
 Gtk2->main_quit;
 return FALSE;
-}  
+}

@@ -9,17 +9,17 @@ source distribution.  YMMV.
 
 # Copyright (C) 2003 by the gtk2-perl team (see the file AUTHORS for the full
 # list)
-# 
+#
 # This library is free software; you can redistribute it and/or modify it under
 # the terms of the GNU Library General Public License as published by the Free
 # Software Foundation; either version 2.1 of the License, or (at your option)
 # any later version.
-# 
+#
 # This library is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 # FOR A PARTICULAR PURPOSE.  See the GNU Library General Public License for
 # more details.
-# 
+#
 # You should have received a copy of the GNU Library General Public License
 # along with this library; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307  USA.
@@ -342,7 +342,7 @@ sub target_drag_drop {
       $widget->drag_get_data($context, $atom, $time);
       return 1;
     }
-  print "no targets in drop\n"; 
+  print "no targets in drop\n";
   return 0;
 }
 
@@ -357,10 +357,10 @@ sub target_drag_data_received {
       $context->finish (1, 0, $time);
       return;
     }
-  
+
   $context->finish (0, 0, $time);
 }
-  
+
 sub label_drag_data_received {
   my ($widget, $context, $x, $y, $data, $info, $time) = @_;
   if (($data->length >= 0) && ($data->format == 8))
@@ -369,7 +369,7 @@ sub label_drag_data_received {
       $context->finish (1, 0, $time);
       return;
     }
-  
+
   $context->finish (0, 0, $time);
 }
 
@@ -382,7 +382,7 @@ sub source_drag_data_get {
     $data->set ($data->target, 8, "I'm Data!");
   }
 }
-  
+
 #/* The following is a rather elaborate example demonstrating/testing
 # * changing of the window heirarchy during a drag - in this case,
 # * via a "spring-loaded" popup window.
@@ -440,7 +440,7 @@ sub popup_cb {
       if (!$popup_window)
 	{
 	  my ($button, $table, $i, $j);
-	  
+
 	  $popup_window = Gtk2::Window->new ('popup');
 	  $popup_window->set_position('mouse');
 
@@ -496,7 +496,7 @@ sub source_drag_data_delete {
   my ($widget, $context, $data) = @_;
   print ("Delete the data!\n");
 }
-  
+
 init Gtk2;
 
 $window = new Gtk2::Window;
@@ -529,7 +529,7 @@ $table->attach ($label, 1, 2, 1, 2, ['expand', 'fill'], ['expand', 'fill'], 0, 0
 
 $label->signal_connect ("drag_motion", \&popsite_motion);
 $label->signal_connect ("drag_leave", \&popsite_leave);
-  
+
 $pixmap = Gtk2::Image->new_from_pixmap ($trashcan_closed, $trashcan_closed_mask);
 $pixmap->drag_dest_set ([], []);
 $table->attach ($pixmap, 1, 2, 0, 1, ['expand', 'fill'], ['expand', 'fill'], 0, 0);

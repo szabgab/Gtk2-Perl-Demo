@@ -8,21 +8,21 @@ my $vbox = Gtk2::VBox->new(FALSE);
 my $small = Gtk2::Label->new('small phrase');
 my $large = Gtk2::Label->new('really loooooooooooong phrase');
 
-$small->set_justify('left'); 
+$small->set_justify('left');
 $large->set_justify('left');
 
-#What you need is 
+#What you need is
 $small->set_alignment(0, 0.5);
 
-# The first argument controls horizontal alignment, 
-# and 0 makes it align to the right. The second specified 
-# vertical alignment, and 0.5 makes it 
+# The first argument controls horizontal alignment,
+# and 0 makes it align to the right. The second specified
+# vertical alignment, and 0.5 makes it
 # vertically centered. 0 will make it align to the top.
 
-# to clarify --- GtkLabel isa GtkMisc, 
-# and Gtk2::Misc::set_alignment() controls where within the 
-# widget's allocation the contents are drawn.  
-# Gtk2::Label;:set_justify() controls justification of 
+# to clarify --- GtkLabel isa GtkMisc,
+# and Gtk2::Misc::set_alignment() controls where within the
+# widget's allocation the contents are drawn.
+# Gtk2::Label;:set_justify() controls justification of
 # text in multiline label layouts.
 
 $vbox->pack_start($small, FALSE, FALSE, 0);

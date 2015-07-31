@@ -69,13 +69,13 @@ sub on_first_clicked {
 }
 
 sub on_prev_clicked {
-	display(fetch("prev"));	
+	display(fetch("prev"));
 }
 sub on_next_clicked {
-	display(fetch("next"));	
+	display(fetch("next"));
 }
 sub on_last_clicked {
-	display(fetch("last"));	
+	display(fetch("last"));
 }
 sub on_new_clicked {
 	display({});
@@ -102,7 +102,7 @@ sub fetch {
 				last;
 			}
 		}
-	}	
+	}
 	if ($which eq "prev") {
 		$h = $sth->fetchrow_hashref;
 		if ($h->{id} != $id) {

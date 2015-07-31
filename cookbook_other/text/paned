@@ -14,13 +14,13 @@ $hpaned2->add2(Gtk2::TextView->new);
 $hpaned1->set_position(100);
 $hpaned2->set_position(100);
 
-$hpaned1->signal_connect('notify::position' => 
+$hpaned1->signal_connect('notify::position' =>
 	sub {
 		$hpaned2->set_position($hpaned1->get_position);
 	}
 );
 
-$hpaned2->signal_connect('notify::position' => 
+$hpaned2->signal_connect('notify::position' =>
 	sub {
 		# If I uncomment this line, it'll go into an infinite loop
 		# $hpaned1->set_position($hpaned2->get_position);

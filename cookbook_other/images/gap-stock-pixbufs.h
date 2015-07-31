@@ -4,9 +4,9 @@
 #pragma align 4 (gap_add_point)
 #endif
 #ifdef __GNUC__
-static const guint8 gap_add_point[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 gap_add_point[] __attribute__ ((__aligned__ (4))) =
 #else
-static const guint8 gap_add_point[] = 
+static const guint8 gap_add_point[] =
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */
@@ -102,9 +102,9 @@ static const guint8 gap_add_point[] =
 #pragma align 4 (gap_anim_preview)
 #endif
 #ifdef __GNUC__
-static const guint8 gap_anim_preview[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 gap_anim_preview[] __attribute__ ((__aligned__ (4))) =
 #else
-static const guint8 gap_anim_preview[] = 
+static const guint8 gap_anim_preview[] =
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */
@@ -210,9 +210,9 @@ static const guint8 gap_anim_preview[] =
 #pragma align 4 (gap_delete_all_points)
 #endif
 #ifdef __GNUC__
-static const guint8 gap_delete_all_points[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 gap_delete_all_points[] __attribute__ ((__aligned__ (4))) =
 #else
-static const guint8 gap_delete_all_points[] = 
+static const guint8 gap_delete_all_points[] =
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */
@@ -314,9 +314,9 @@ static const guint8 gap_delete_all_points[] =
 #pragma align 4 (gap_delete_point)
 #endif
 #ifdef __GNUC__
-static const guint8 gap_delete_point[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 gap_delete_point[] __attribute__ ((__aligned__ (4))) =
 #else
-static const guint8 gap_delete_point[] = 
+static const guint8 gap_delete_point[] =
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */
@@ -415,9 +415,9 @@ static const guint8 gap_delete_point[] =
 #pragma align 4 (gap_first_point)
 #endif
 #ifdef __GNUC__
-static const guint8 gap_first_point[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 gap_first_point[] __attribute__ ((__aligned__ (4))) =
 #else
-static const guint8 gap_first_point[] = 
+static const guint8 gap_first_point[] =
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */
@@ -520,9 +520,9 @@ static const guint8 gap_first_point[] =
 #pragma align 4 (gap_grab_points)
 #endif
 #ifdef __GNUC__
-static const guint8 gap_grab_points[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 gap_grab_points[] __attribute__ ((__aligned__ (4))) =
 #else
-static const guint8 gap_grab_points[] = 
+static const guint8 gap_grab_points[] =
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */
@@ -623,9 +623,9 @@ static const guint8 gap_grab_points[] =
 #pragma align 4 (gap_insert_point)
 #endif
 #ifdef __GNUC__
-static const guint8 gap_insert_point[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 gap_insert_point[] __attribute__ ((__aligned__ (4))) =
 #else
-static const guint8 gap_insert_point[] = 
+static const guint8 gap_insert_point[] =
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */
@@ -718,9 +718,9 @@ static const guint8 gap_insert_point[] =
 #pragma align 4 (gap_last_point)
 #endif
 #ifdef __GNUC__
-static const guint8 gap_last_point[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 gap_last_point[] __attribute__ ((__aligned__ (4))) =
 #else
-static const guint8 gap_last_point[] = 
+static const guint8 gap_last_point[] =
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */
@@ -823,9 +823,9 @@ static const guint8 gap_last_point[] =
 #pragma align 4 (gap_next_point)
 #endif
 #ifdef __GNUC__
-static const guint8 gap_next_point[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 gap_next_point[] __attribute__ ((__aligned__ (4))) =
 #else
-static const guint8 gap_next_point[] = 
+static const guint8 gap_next_point[] =
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */
@@ -923,9 +923,9 @@ static const guint8 gap_next_point[] =
 #pragma align 4 (gap_pause)
 #endif
 #ifdef __GNUC__
-static const guint8 gap_pause[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 gap_pause[] __attribute__ ((__aligned__ (4))) =
 #else
-static const guint8 gap_pause[] = 
+static const guint8 gap_pause[] =
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */
@@ -973,9 +973,9 @@ static const guint8 gap_pause[] =
 #pragma align 4 (gap_play)
 #endif
 #ifdef __GNUC__
-static const guint8 gap_play[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 gap_play[] __attribute__ ((__aligned__ (4))) =
 #else
-static const guint8 gap_play[] = 
+static const guint8 gap_play[] =
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */
@@ -1022,9 +1022,9 @@ static const guint8 gap_play[] =
 #pragma align 4 (gap_play_reverse)
 #endif
 #ifdef __GNUC__
-static const guint8 gap_play_reverse[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 gap_play_reverse[] __attribute__ ((__aligned__ (4))) =
 #else
-static const guint8 gap_play_reverse[] = 
+static const guint8 gap_play_reverse[] =
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */
@@ -1070,9 +1070,9 @@ static const guint8 gap_play_reverse[] =
 #pragma align 4 (gap_prev_point)
 #endif
 #ifdef __GNUC__
-static const guint8 gap_prev_point[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 gap_prev_point[] __attribute__ ((__aligned__ (4))) =
 #else
-static const guint8 gap_prev_point[] = 
+static const guint8 gap_prev_point[] =
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */
@@ -1170,9 +1170,9 @@ static const guint8 gap_prev_point[] =
 #pragma align 4 (gap_reset_all_points)
 #endif
 #ifdef __GNUC__
-static const guint8 gap_reset_all_points[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 gap_reset_all_points[] __attribute__ ((__aligned__ (4))) =
 #else
-static const guint8 gap_reset_all_points[] = 
+static const guint8 gap_reset_all_points[] =
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */
@@ -1268,9 +1268,9 @@ static const guint8 gap_reset_all_points[] =
 #pragma align 4 (gap_reset_point)
 #endif
 #ifdef __GNUC__
-static const guint8 gap_reset_point[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 gap_reset_point[] __attribute__ ((__aligned__ (4))) =
 #else
-static const guint8 gap_reset_point[] = 
+static const guint8 gap_reset_point[] =
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */
@@ -1366,9 +1366,9 @@ static const guint8 gap_reset_point[] =
 #pragma align 4 (gap_rotate_follow)
 #endif
 #ifdef __GNUC__
-static const guint8 gap_rotate_follow[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 gap_rotate_follow[] __attribute__ ((__aligned__ (4))) =
 #else
-static const guint8 gap_rotate_follow[] = 
+static const guint8 gap_rotate_follow[] =
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */
@@ -1462,9 +1462,9 @@ static const guint8 gap_rotate_follow[] =
 #pragma align 4 (gap_source_image)
 #endif
 #ifdef __GNUC__
-static const guint8 gap_source_image[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 gap_source_image[] __attribute__ ((__aligned__ (4))) =
 #else
-static const guint8 gap_source_image[] = 
+static const guint8 gap_source_image[] =
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */
@@ -1566,9 +1566,9 @@ static const guint8 gap_source_image[] =
 #pragma align 4 (gap_stepmode)
 #endif
 #ifdef __GNUC__
-static const guint8 gap_stepmode[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 gap_stepmode[] __attribute__ ((__aligned__ (4))) =
 #else
-static const guint8 gap_stepmode[] = 
+static const guint8 gap_stepmode[] =
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */
@@ -1674,9 +1674,9 @@ static const guint8 gap_stepmode[] =
 #pragma align 4 (gap_update)
 #endif
 #ifdef __GNUC__
-static const guint8 gap_update[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 gap_update[] __attribute__ ((__aligned__ (4))) =
 #else
-static const guint8 gap_update[] = 
+static const guint8 gap_update[] =
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */

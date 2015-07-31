@@ -36,7 +36,7 @@ $window->show_all();
 Gtk2->main;
 
 
-sub show_button_clicked { 
+sub show_button_clicked {
 	my $text = $entry->get_text . " / " . $password->get_text;
 	$label->set_text($text);
 }

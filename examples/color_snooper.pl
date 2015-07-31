@@ -67,7 +67,7 @@ $ebox->signal_connect (motion_notify_event => sub {
 	# and unpack to get to its values.
 	my ($r, $g, $b, $a) =
 		unpack "C*",
-			substr $pixels, 
+			substr $pixels,
 			       $pixbuf->get_rowstride * $y
 			        + $pixbuf->get_n_channels * $x,
 			       $pixbuf->get_n_channels;
@@ -80,7 +80,7 @@ $ebox->signal_connect (motion_notify_event => sub {
 	# GdkColors use 16-bit color values, but GdkPixbufs use 8-bit.
 	# note the bitshifts to account for that.
 	my $color = Gtk2::Gdk::Color->new ($r << 8, $g << 8, $b << 8);
-	
+
 	$darea->modify_bg ('normal', $color);
 	$darea->queue_draw;
 });

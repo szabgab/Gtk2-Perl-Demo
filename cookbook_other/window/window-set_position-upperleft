@@ -36,4 +36,4 @@ Gtk2->main;
 sub delete_event {
 Gtk2->main_quit;
 return FALSE;
-}  
+}

@@ -2,9 +2,9 @@
 #
 # Text Widget/Hypertext
 #
-# Usually, tags modify the appearance of text in the view, e.g. making it 
-# bold or colored or underlined. But tags are not restricted to appearance. 
-# They can also affect the behavior of mouse and key presses, as this demo 
+# Usually, tags modify the appearance of text in the view, e.g. making it
+# bold or colored or underlined. But tags are not restricted to appearance.
+# They can also affect the behavior of mouse and key presses, as this demo
 # shows.
 #
 
@@ -22,13 +22,13 @@ my $window = undef;
 # Inserts a piece of text into the buffer, giving it the usual
 # appearance of a hyperlink in a web browser: blue and underlined.
 # Additionally, attaches some data on the tag, to make it recognizable
-# as a link. 
+# as a link.
 #
 sub insert_link {
   my ($buffer, $iter, $text, $page) = @_;
-  
-  my $tag = $buffer->create_tag (undef, 
-				 foreground => "blue", 
+
+  my $tag = $buffer->create_tag (undef,
+				 foreground => "blue",
 				 underline => 'single');
   $tag->{page} = $page;
   $buffer->insert_with_tags ($iter, $text, $tag);
@@ -52,7 +52,7 @@ sub show_page {
     }
   elsif ($page == 2)
     {
-      $buffer->insert ($iter, 
+      $buffer->insert ($iter,
 	       "A tag is an attribute that can be applied to some range of text. "
 	     . "For example, a tag might be called \"bold\" and make the text inside "
 	     . "the tag bold. However, the tag concept is more general than that; "
@@ -61,18 +61,18 @@ sub show_page {
 	     . "user can't edit it, or countless other things.\n");
       insert_link ($buffer, $iter, "Go back", 1);
     }
-  elsif ($page == 3) 
+  elsif ($page == 3)
     {
       my $tag = $buffer->create_tag (undef, weight => PANGO_WEIGHT_BOLD);
       $buffer->insert_with_tags ($iter, "hypertext:\n", $tag);
-      $buffer->insert ($iter, 
+      $buffer->insert ($iter,
 		       "machine-readable text that is not sequential but is organized "
 		     . "so that related items of information are connected.\n");
       insert_link ($buffer, $iter, "Go back", 1);
     }
 }
 
-# Looks at all tags covering the position of iter in the text view, 
+# Looks at all tags covering the position of iter in the text view,
 # and if one of them is a link, follow it by showing the page identified
 # by the data attached to it.
 #
@@ -110,7 +110,7 @@ sub key_press_event {
 sub event_after {
   my ($text_view, $event) = @_;
 
-  return FALSE unless $event->type eq 'button-release'; 
+  return FALSE unless $event->type eq 'button-release';
   return FALSE unless $event->button == 1;
 
   my $buffer = $text_view->get_buffer;
@@ -134,7 +134,7 @@ my $hovering_over_link = FALSE;
 my $hand_cursor = undef;
 my $regular_cursor = undef;
 
-# Looks at all tags covering the position (x, y) in the text view, 
+# Looks at all tags covering the position (x, y) in the text view,
 # and if one of them is a link, change the cursor to the "hands" cursor
 # typically used by web browsers.
 #
@@ -145,7 +145,7 @@ sub set_cursor_if_appropriate {
   my $buffer = $text_view->get_buffer;
 
   my $iter = $text_view->get_iter_at_location ($x, $y);
-  
+
   foreach my $tag ($iter->get_tags) {
       if ($tag->{page}) {
           $hovering = TRUE;
@@ -162,12 +162,12 @@ sub set_cursor_if_appropriate {
     }
 }
 
-# Update the cursor image if the pointer moved. 
+# Update the cursor image if the pointer moved.
 #
 sub motion_notify_event {
   my ($text_view, $event) = @_;
 
-  my ($x, $y) = $text_view->window_to_buffer_coords ( 
+  my ($x, $y) = $text_view->window_to_buffer_coords (
                                          'widget', #GTK_TEXT_WINDOW_WIDGET,
                                          $event->x, $event->y);
 
@@ -184,8 +184,8 @@ sub visibility_notify_event {
   my ($text_view, $event) = @_;
 
   my (undef, $wx, $wy, undef) = $text_view->window->get_pointer;
-  
-  my ($bx, $by) = $text_view->window_to_buffer_coords ( 
+
+  my ($bx, $by) = $text_view->window_to_buffer_coords (
                                          'widget', #GTK_TEXT_WINDOW_WIDGET,
                                          $wx, $wy);
 
@@ -200,12 +200,12 @@ sub do {
   if (!$window) {
       $hand_cursor = Gtk2::Gdk::Cursor->new ('hand2');
       $regular_cursor = Gtk2::Gdk::Cursor->new ('xterm');
-      
+
       $window = Gtk2::Window->new;
       $window->set_screen ($do_widget->get_screen)
         if Gtk2->CHECK_VERSION (2, 2, 0);
       $window->set_default_size (450, 450);
-      
+
       $window->signal_connect (destroy => sub {$window = undef});
 
       $window->set_title ("Hypertext");
@@ -219,7 +219,7 @@ sub do {
       $view->signal_connect (visibility_notify_event => \&visibility_notify_event);
 
       my $buffer = $view->get_buffer;
-      
+
       my $sw = Gtk2::ScrolledWindow->new;
       $sw->set_policy ('automatic', 'automatic');
       $window->add ($sw);
